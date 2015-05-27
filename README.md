@@ -10,7 +10,7 @@ In emqttd project:
 
 
 ```
-git submodule add plugins/emqttd_dashboard https://github.com/emqtt/emqttd_dashboard.git
+git submodule add https://github.com/emqtt/emqttd_dashboard.git plugins/emqttd_dashboard 
 
 ```
 
