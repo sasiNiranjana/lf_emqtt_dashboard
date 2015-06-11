@@ -32,10 +32,24 @@
 
 %%TODO...
 
+%handle_request(Req) ->
+%    Req:ok("hello:)").
+
 handle_request(Req) ->
-    Req:ok("hello:)").
+    handle_request(Req:get(method), Req:get(path), Req).
 
+handle_request('GET', "/api/memory", Req) ->
+    Req:respond({200, [], <<"{\"allocated\":\"47148004\"}">>});
 
+handle_request('GET', "/" ++ File, Req) ->
+    lager:info("Dashboard GET File:~s", [File]),
+    mochiweb_request:serve_file(File, docroot(), Req);
 
+handle_request(Method, Path, Req) ->
+    lager:error("Unexpected HTTP Request: ~s ~s", [Method, Path]),
+    Req:not_found().
 
-
+docroot() ->
+    {file, Here} = code:is_loaded(?MODULE),
+    Dir = filename:dirname(filename:dirname(Here)),
+    filename:join([Dir, "priv", "www"]).
