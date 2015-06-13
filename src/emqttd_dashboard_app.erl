@@ -11,7 +11,8 @@
 
 start(_StartType, _StartArgs) ->
     {ok, Sup} = emqttd_dashboard_sup:start_link(),
-    open_listener(application:get_env(listener)),
+    {ok, Listener} = application:get_env(emqttd_dashboard, listener),
+    open_listener(Listener),
     {ok, Sup}.
 
 stop(_State) ->
