@@ -39,7 +39,7 @@
 
 handle_request(Req) ->
 	File = Req:get(path),
-	lager:info("Dashboard file: ~s", Req:get(method) ++ "->" ++ File),
+	lager:info("Dashboard file: ~s ~s", [Req:get(method), File]),
     handle_request(File, Req).
 
 handle_request("/api/" ++ Rest, Req) when length(Rest) > 0 ->
@@ -54,9 +54,10 @@ docroot() ->
     filename:join([Dir, "priv", "www"]).
 
 build_dispatcher() ->
-	[{["api" | Path],  Mod, Args} || {Path, Mod, Args} <- lists:append([emqttd_dashboard_dispatcher:dispatcher()])].
+	[{["api" | Path],  Mod, Args} || {Path, Mod, Args} <-
+		lists:append([emqttd_dashboard_dispatcher:dispatcher()])].
 
-wm_loop(Req) -> 
+wm_loop(Req) ->
 	PathAsString = Req:get(path),
     Path = string:tokens(PathAsString, [?SEPARTOR]).
     %%{value, {[_P], M, Args}} = lists:keysearch(Path, 1, build_dispatcher()).
