@@ -30,26 +30,33 @@
 
 -export([handle_request/1]).
 
+-define(SEPARTOR, $\/).
+
 %%TODO...
 
 %handle_request(Req) ->
 %    Req:ok("hello:)").
 
 handle_request(Req) ->
-    handle_request(Req:get(method), Req:get(path), Req).
+	File = Req:get(path),
+	lager:info("Dashboard file: ~s", Req:get(method) ++ "->" ++ File),
+    handle_request(File, Req).
 
-handle_request('GET', "/api/memory", Req) ->
-    Req:respond({200, [], <<"{\"allocated\":\"47148004\"}">>});
+handle_request("/api/" ++ Rest, Req) when length(Rest) > 0 ->
+	wm_loop(Req);
 
-handle_request('GET', "/" ++ File, Req) ->
-    lager:info("Dashboard GET File:~s", [File]),
-    mochiweb_request:serve_file(File, docroot(), Req);
-
-handle_request(Method, Path, Req) ->
-    lager:error("Unexpected HTTP Request: ~s ~s", [Method, Path]),
-    Req:not_found().
+handle_request("/" ++ Rest, Req) ->
+    mochiweb_request:serve_file(Rest, docroot(), Req).
 
 docroot() ->
     {file, Here} = code:is_loaded(?MODULE),
     Dir = filename:dirname(filename:dirname(Here)),
     filename:join([Dir, "priv", "www"]).
+
+build_dispatcher() ->
+	[{["api" | Path],  Mod, Args} || {Path, Mod, Args} <- lists:append([emqttd_dashboard_dispatcher:dispatcher()])].
+
+wm_loop(Req) -> 
+	PathAsString = Req:get(path),
+    Path = string:tokens(PathAsString, [?SEPARTOR]).
+    %%{value, {[_P], M, Args}} = lists:keysearch(Path, 1, build_dispatcher()).
