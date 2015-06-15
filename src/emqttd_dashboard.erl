@@ -37,6 +37,35 @@ handle_request(Req) ->
     lager:info("Dashboard file: ~s ~s", [Req:get(method), Path]),
     handle_request(Path, Req).
 
+%%%overview api
+%% broker info
+handle_request("/api/broker", Req) ->
+    Funs = [sysdescr, version, uptime, datetime],
+    BrokerInfo = [{Fun, list_to_binary(emqttd_broker:Fun())}|| Fun <- Funs],
+    Jsons = mochijson2:encode(BrokerInfo),
+    Req:respond({200, [], iolist_to_binary(Jsons)});
+
+handle_request("/api/stats", Req) ->
+    Stats = [{Stat, Val} || {Stat, Val} <- emqttd_stats:getstats()],
+    Jsons = mochijson2:encode(Stats),
+    Req:respond({200, [], iolist_to_binary(Jsons)});
+
+handle_request("/api/ptype", Req) ->
+    PortTyeps = emqttd_vm:get_port_types(), 
+    Jsons = mochijson2:encode(PortTyeps),
+    Req:respond({200, [], iolist_to_binary(Jsons)});
+
+handle_request("/api/memory", Req) ->
+    Memory = emqttd_vm:get_memory(), 
+    Jsons = mochijson2:encode(Memory),
+    Req:respond({200, [], iolist_to_binary(Jsons)});
+
+handle_request("/api/listeners", Req) ->
+    Llists = [Listeners || {Listeners , _Port} <- esockd:listeners()],
+    Jsons = mochijson2:encode(Llists),
+    Req:respond({200, [], iolist_to_binary(Jsons)});
+
+%%clients api
 handle_request("/api/clients", Req) ->
     ClientsTab =  emqttd_cm:table(),
     Bodys = [[{mqtt_client,  Tab},
@@ -49,9 +78,10 @@ handle_request("/api/clients", Req) ->
     lager:info("Json: ~s", [Jsons]),
     Clients = [iolist_to_binary(Json)|| Json<- Jsons],
     Req:respond({200, [], Clients});
- 
+
+
 handle_request("/api/" ++ Rest, Req) when length(Rest) > 0 ->
-	wm_loop(Req);
+    wm_loop(Req);
 
 handle_request("/" ++ Rest, Req) ->
     mochiweb_request:serve_file(Rest, docroot(), Req).
