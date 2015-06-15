@@ -27,7 +27,7 @@ function broker() {
 	var sysTime = jQuery('#sys_time', sysInfo);
 
 	var options = {
-		url : 'http://192.168.1.7:18083/api/broker',
+		url : 'api/broker',
 		type : 'POST',
 		dataType : 'json',
 		data : {},
