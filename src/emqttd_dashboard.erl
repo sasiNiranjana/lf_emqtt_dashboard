@@ -32,16 +32,24 @@
 
 -define(SEPARTOR, $\/).
 
-%%TODO...
-
-%handle_request(Req) ->
-%    Req:ok("hello:)").
-
 handle_request(Req) ->
-	File = Req:get(path),
-	lager:info("Dashboard file: ~s ~s", [Req:get(method), File]),
-    handle_request(File, Req).
+    Path = Req:get(path),
+    lager:info("Dashboard file: ~s ~s", [Req:get(method), Path]),
+    handle_request(Path, Req).
 
+handle_request("/api/clients", Req) ->
+    ClientsTab =  emqttd_cm:table(),
+    Bodys = [[{mqtt_client,  Tab},
+	     {clientId, ClientId}, 
+	     {ipaddress, list_to_binary(emqttd_net:ntoa(Ip))}, 
+	     {session, CleanSession}] || {Tab, ClientId, _Pid, Ip, _, _, CleanSession, _ }
+	    <- emqttd_vm:get_ets_object(ClientsTab)],
+ 
+    Jsons = [mochijson2:encode(Body)|| Body<- Bodys],
+    lager:info("Json: ~s", [Jsons]),
+    Clients = [iolist_to_binary(Json)|| Json<- Jsons],
+    Req:respond({200, [], Clients});
+ 
 handle_request("/api/" ++ Rest, Req) when length(Rest) > 0 ->
 	wm_loop(Req);
 
@@ -58,6 +66,6 @@ build_dispatcher() ->
 		lists:append([emqttd_dashboard_dispatcher:dispatcher()])].
 
 wm_loop(Req) ->
-	PathAsString = Req:get(path),
+    PathAsString = Req:get(path),
     Path = string:tokens(PathAsString, [?SEPARTOR]).
     %%{value, {[_P], M, Args}} = lists:keysearch(Path, 1, build_dispatcher()).
