@@ -60,6 +60,12 @@ handle_request("/api/memory", Req) ->
     Jsons = mochijson2:encode(Memory),
     Req:respond({200, [], iolist_to_binary(Jsons)});
 
+handle_request("/api/cpu", Req) ->
+    Cpu = emqttd_vm:loads(), 
+    Jsons = mochijson2:encode(Cpu),
+    Req:respond({200, [], iolist_to_binary(Jsons)});
+
+
 handle_request("/api/listeners", Req) ->
     Llists = [Listeners || {Listeners , _Port} <- esockd:listeners()],
     Jsons = mochijson2:encode(Llists),
@@ -79,6 +85,23 @@ handle_request("/api/clients", Req) ->
     Clients = [iolist_to_binary(Json)|| Json<- Jsons],
     Req:respond({200, [], Clients});
 
+%%sessin api
+handle_request("/api/session", Req) ->
+    SessionsTab =  emqttd_sm:table(),
+    Bodys = [[{mqtt_session,  Tab},
+	     {clientId, ClientId}, 
+	     {ipaddress, list_to_binary(emqttd_net:ntoa(Ip))}, 
+	     {session, CleanSession}] || {Tab, ClientId, _Pid, Ip, _, _, CleanSession, _ }
+	    <- emqttd_vm:get_ets_object(SessionsTab)],
+ 
+    Jsons = [mochijson2:encode(Body)|| Body<- Bodys],
+    lager:info("Json: ~s", [Jsons]),
+    Session = [iolist_to_binary(Json)|| Json<- Jsons],
+    Req:respond({200, [], Session});
+
+%%topic api
+handle_request("/api/topic" ++ Rest, Req) ->
+    Req:respond({200, [], <<"to do...">>});
 
 handle_request("/api/" ++ Rest, Req) when length(Rest) > 0 ->
     wm_loop(Req);
