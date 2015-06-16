@@ -37,42 +37,54 @@ handle_request(Req) ->
     lager:info("Dashboard file: ~s ~s", [Req:get(method), Path]),
     handle_request(Path, Req).
 
-%%%overview api
+handle_request("/api/" ++ Path, Req) when length(Path) > 0 ->
+    api(Path, Req);
+
+handle_request("/" ++ Rest, Req) ->
+    mochiweb_request:serve_file(Rest, docroot(), Req).
+
+docroot() ->
+    {file, Here} = code:is_loaded(?MODULE),
+    Dir = filename:dirname(filename:dirname(Here)),
+    filename:join([Dir, "priv", "www"]).
+
+%%-------------------------------------------------------------------------
+
 %% broker info
-handle_request("/api/broker", Req) ->
+api(broker, Req) ->
     Funs = [sysdescr, version, uptime, datetime],
     BrokerInfo = [{Fun, list_to_binary(emqttd_broker:Fun())}|| Fun <- Funs],
     Jsons = mochijson2:encode(BrokerInfo),
     Req:respond({200, [], iolist_to_binary(Jsons)});
 
-handle_request("/api/stats", Req) ->
+api(stats, Req) ->
     Stats = [{Stat, Val} || {Stat, Val} <- emqttd_stats:getstats()],
     Jsons = mochijson2:encode(Stats),
     Req:respond({200, [], iolist_to_binary(Jsons)});
 
-handle_request("/api/ptype", Req) ->
+api(ptype, Req) ->
     PortTyeps = emqttd_vm:get_port_types(), 
     Jsons = mochijson2:encode(PortTyeps),
     Req:respond({200, [], iolist_to_binary(Jsons)});
 
-handle_request("/api/memory", Req) ->
+api(memory, Req) ->
     Memory = emqttd_vm:get_memory(), 
     Jsons = mochijson2:encode(Memory),
     Req:respond({200, [], iolist_to_binary(Jsons)});
 
-handle_request("/api/cpu", Req) ->
+api(cpu, Req) ->
     Cpu = emqttd_vm:loads(), 
     Jsons = mochijson2:encode(Cpu),
     Req:respond({200, [], iolist_to_binary(Jsons)});
 
 
-handle_request("/api/listeners", Req) ->
+api(listeners, Req) ->
     Llists = [Listeners || {Listeners , _Port} <- esockd:listeners()],
     Jsons = mochijson2:encode(Llists),
     Req:respond({200, [], iolist_to_binary(Jsons)});
 
 %%clients api
-handle_request("/api/clients", Req) ->
+api(clients, Req) ->
     ClientsTab =  emqttd_cm:table(),
     Bodys = [[{mqtt_client,  Tab},
 	     {clientId, ClientId}, 
@@ -86,7 +98,7 @@ handle_request("/api/clients", Req) ->
     Req:respond({200, [], Clients});
 
 %%sessin api
-handle_request("/api/session", Req) ->
+api(session, Req) ->
     SessionsTab =  emqttd_sm:table(),
     Bodys = [[{mqtt_session,  Tab},
 	     {clientId, ClientId}, 
@@ -100,25 +112,5 @@ handle_request("/api/session", Req) ->
     Req:respond({200, [], Session});
 
 %%topic api
-handle_request("/api/topic" ++ Rest, Req) ->
-    Req:respond({200, [], <<"to do...">>});
-
-handle_request("/api/" ++ Rest, Req) when length(Rest) > 0 ->
-    wm_loop(Req);
-
-handle_request("/" ++ Rest, Req) ->
-    mochiweb_request:serve_file(Rest, docroot(), Req).
-
-docroot() ->
-    {file, Here} = code:is_loaded(?MODULE),
-    Dir = filename:dirname(filename:dirname(Here)),
-    filename:join([Dir, "priv", "www"]).
-
-build_dispatcher() ->
-	[{["api" | Path],  Mod, Args} || {Path, Mod, Args} <-
-		lists:append([emqttd_dashboard_dispatcher:dispatcher()])].
-
-wm_loop(Req) ->
-    PathAsString = Req:get(path),
-    Path = string:tokens(PathAsString, [?SEPARTOR]).
-    %%{value, {[_P], M, Args}} = lists:keysearch(Path, 1, build_dispatcher()).
+api(topic, Req) ->
+    Req:respond({200, [], <<"to do...">>}).
