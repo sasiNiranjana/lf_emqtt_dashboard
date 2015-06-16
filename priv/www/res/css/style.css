@@ -1502,6 +1502,8 @@ div.widget_contents.lgNoPadding .line_grid {
 /* Tables */
 .tables {
 	width: 100%;
+	border-collapse: collapse;
+	border-spacing: 0;
 }
 
 .tables th, .tables td {

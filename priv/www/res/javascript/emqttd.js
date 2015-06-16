@@ -51,18 +51,20 @@ Overview.prototype = {
 
 	// 加载系统基本信息
 	_broker : function() {
+		var _t = this;
 		var options = {
 			url : 'api/broker',
 			type : 'POST',
 			dataType : 'json',
 			data : {},
 			success : function(d) {
-				this.elements.sysName.text(d.sysdescr);
-				this.elements.sysVersion.text(d.version);
-				this.elements.sysUptime.text(d.uptime);
-				this.elements.sysTime.text(d.datetime);
+				_t.elements.sysName.text(d.sysdescr);
+				_t.elements.sysVersion.text(d.version);
+				_t.elements.sysUptime.text(d.uptime);
+				_t.elements.sysTime.text(d.datetime);
 			},
 			error : function(e) {
+				console.log('api/broker->error');
 			}
 		};
 		jQuery.ajax(options);
