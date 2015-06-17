@@ -31,6 +31,8 @@
 -export([handle_request/1]).
 
 -define(SEPARTOR, $\/).
+ 
+-include_lib("stdlib/include/qlc.hrl").
 
 handle_request(Req) ->
     Path = Req:get(path),
@@ -38,7 +40,7 @@ handle_request(Req) ->
     handle_request(Path, Req).
 
 handle_request("/api/" ++ Path, Req) when length(Path) > 0 ->
-    api(Path, Req);
+    api(list_to_atom(Path), Req);
 
 handle_request("/" ++ Rest, Req) ->
     mochiweb_request:serve_file(Rest, docroot(), Req).
@@ -113,4 +115,18 @@ api(session, Req) ->
 
 %%topic api
 api(topic, Req) ->
-    Req:respond({200, [], <<"to do...">>}).
+    F = fun() ->
+        Q = qlc:q([E || E <- mnesia:table(topic)]),
+	qlc:e(Q) 
+        end,
+    {atomic, TopicLists} =  mnesia:transaction(F),
+    Bodys = [[{mqtt_topic,  Tab},
+	     {topic, Topic}, 
+	     {node, Node} 
+	     ] || {Tab, Topic, Node} <- TopicLists],
+ 
+    Jsons = [mochijson2:encode(Body)|| Body<- Bodys],
+    Topics = [iolist_to_binary(Json)|| Json<- Jsons],
+    Req:respond({200, [], Topics}).
+
+
