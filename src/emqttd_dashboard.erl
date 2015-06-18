@@ -50,7 +50,7 @@ docroot() ->
     Dir = filename:dirname(filename:dirname(Here)),
     filename:join([Dir, "priv", "www"]).
 
-%%-------------------------------------------------------------------------
+%%-----------------------------------overview--------------------------------------
 
 %% broker info
 api(broker, Req) ->
@@ -85,6 +85,7 @@ api(listeners, Req) ->
     Jsons = mochijson2:encode(Llists),
     Req:respond({200, [], iolist_to_binary(Jsons)});
 
+%%-----------------------------------clients--------------------------------------
 %%clients api
 api(clients, Req) ->
     ClientsTab =  emqttd_cm:table(),
@@ -99,6 +100,7 @@ api(clients, Req) ->
     Clients = [iolist_to_binary(Json)|| Json<- Jsons],
     Req:respond({200, [], Clients});
 
+%%-----------------------------------session--------------------------------------
 %%sessin api
 api(session, Req) ->
     SessionsTab =  emqttd_sm:table(),
@@ -113,6 +115,7 @@ api(session, Req) ->
     Session = [iolist_to_binary(Json)|| Json<- Jsons],
     Req:respond({200, [], Session});
 
+%%-----------------------------------topic--------------------------------------
 %%topic api
 api(topic, Req) ->
     F = fun() ->
@@ -127,6 +130,24 @@ api(topic, Req) ->
  
     Jsons = [mochijson2:encode(Body)|| Body<- Bodys],
     Topics = [iolist_to_binary(Json)|| Json<- Jsons],
-    Req:respond({200, [], Topics}).
+    Req:respond({200, [], Topics});
+
+%%-----------------------------------subscribe--------------------------------------
+%%subscribe api
+api(subscriber, Req) ->
+    F = fun() ->
+        Q = qlc:q([E || E <- mnesia:table(subscriber)]),
+	qlc:e(Q) 
+        end,
+    {atomic, SubLists} =  mnesia:transaction(F),
+    Bodys = [[{mqtt_subscriber,  Tab},
+             {topic, Topic}, 
+             {qos, Qos}] || {Tab, Topic, Qos, Pid} <- SubLists],
+ 
+    Jsons = [mochijson2:encode(Body)|| Body<- Bodys],
+    Subscribes = [iolist_to_binary(Json)|| Json<- Jsons],
+    io:format("lllll:~s", [Subscribes]), 
+    io:format("test put:~s", [["lalalal"]]), 
+    Req:respond({200, [], Subscribes}).
 
 
