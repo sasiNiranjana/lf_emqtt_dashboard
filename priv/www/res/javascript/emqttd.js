@@ -127,7 +127,7 @@ function Clients() {
 	_t.elements = {};
 
 	// 加载模块
-	loading('.html', function() {
+	loading('clients.html', function() {
 		
 	});
 }
@@ -147,7 +147,7 @@ function Session() {
 	_t.elements = {};
 
 	// 加载模块
-	loading('.html', function() {
+	loading('session.html', function() {
 		
 	});
 }
@@ -167,7 +167,7 @@ function Topic() {
 	_t.elements = {};
 
 	// 加载模块
-	loading('.html', function() {
+	loading('topic.html', function() {
 		
 	});
 }
@@ -187,7 +187,7 @@ function Subpub() {
 	_t.elements = {};
 
 	// 加载模块
-	loading('.html', function() {
+	loading('subpub.html', function() {
 		
 	});
 }
