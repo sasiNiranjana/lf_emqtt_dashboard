@@ -11,7 +11,7 @@ function loading(module, fun) {
 	var loadingAjax = jQuery('#contents');
 	loadingAjax.empty().append(
 			'<div styles="margin: 0 10px;' + 'margin-bottom: 20px;">'
-					+ '<img src="images/Icons/Load/load-13.gif"'
+					+ '<img src="res/images/Icons/Load/load-13.gif"'
 					+ ' alt="load"></div>');
 	loadingAjax.load(module, fun);
 }
