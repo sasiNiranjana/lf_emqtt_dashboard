@@ -56,34 +56,33 @@ docroot() ->
 api(broker, Req) ->
     Funs = [sysdescr, version, uptime, datetime],
     BrokerInfo = [{Fun, list_to_binary(emqttd_broker:Fun())}|| Fun <- Funs],
-    Jsons = mochijson2:encode(BrokerInfo),
-    Req:respond({200, [], iolist_to_binary(Jsons)});
+    JsonData = list_to_binary(mochijson2:encode(BrokerInfo) ++ <<10>>), 
+    Req:respond({200, [{"Content-Type","application/json"}], JsonData});
 
 api(stats, Req) ->
     Stats = [{Stat, Val} || {Stat, Val} <- emqttd_stats:getstats()],
-    Jsons = mochijson2:encode(Stats),
-    Req:respond({200, [], iolist_to_binary(Jsons)});
+    JsonData = list_to_binary(mochijson2:encode(Stats) ++ <<10>>), 
+    Req:respond({200, [{"Content-Type","application/json"}], JsonData});
 
 api(ptype, Req) ->
     PortTyeps = emqttd_vm:get_port_types(), 
-    Jsons = mochijson2:encode(PortTyeps),
-    Req:respond({200, [], iolist_to_binary(Jsons)});
+    JsonData = list_to_binary(mochijson2:encode([PortTyeps]) ++ <<10>>), 
+    Req:respond({200, [{"Content-Type","application/json"}], JsonData});
 
 api(memory, Req) ->
     Memory = emqttd_vm:get_memory(), 
-    Jsons = mochijson2:encode(Memory),
-    Req:respond({200, [], iolist_to_binary(Jsons)});
+    JsonData = list_to_binary(mochijson2:encode(Memory) ++ <<10>>), 
+    Req:respond({200, [{"Content-Type","application/json"}], JsonData});
 
 api(cpu, Req) ->
     Cpu = emqttd_vm:loads(), 
-    Jsons = mochijson2:encode(Cpu),
-    Req:respond({200, [], iolist_to_binary(Jsons)});
-
+    JsonData = list_to_binary(mochijson2:encode(Cpu) ++ <<10>>), 
+    Req:respond({200, [{"Content-Type","application/json"}], JsonData});
 
 api(listeners, Req) ->
-    Llists = [Listeners || {Listeners , _Port} <- esockd:listeners()],
-    Jsons = mochijson2:encode(Llists),
-    Req:respond({200, [], iolist_to_binary(Jsons)});
+    Llists = [[Listeners] || {Listeners , _Port} <- esockd:listeners()],
+    JsonData = list_to_binary(mochijson2:encode(Llists) ++ <<10>>), 
+    Req:respond({200, [{"Content-Type","application/json"}], JsonData});
 
 %%-----------------------------------clients--------------------------------------
 %%clients api
@@ -94,14 +93,11 @@ api(clients, Req) ->
 	     {ipaddress, list_to_binary(emqttd_net:ntoa(Ip))}, 
 	     {session, CleanSession}] || {Tab, ClientId, _Pid, Ip, _, _, CleanSession, _ }
 	    <- emqttd_vm:get_ets_object(ClientsTab)],
- 
-    Jsons = [mochijson2:encode(Body)|| Body<- Bodys],
-    lager:info("Json: ~s", [Jsons]),
-    Clients = [iolist_to_binary(Json)|| Json<- Jsons],
-    Req:respond({200, [], Clients});
+    JsonData = list_to_binary(mochijson2:encode(Bodys) ++ <<10>>), 
+    Req:respond({200, [{"Content-Type","application/json"}], JsonData});
 
 %%-----------------------------------session--------------------------------------
-%%sessin api
+%%sessin check api
 api(session, Req) ->
     SessionsTab =  emqttd_sm:table(),
     Bodys = [[{mqtt_session,  Tab},
@@ -110,10 +106,8 @@ api(session, Req) ->
 	     {session, CleanSession}] || {Tab, ClientId, _Pid, Ip, _, _, CleanSession, _ }
 	    <- emqttd_vm:get_ets_object(SessionsTab)],
  
-    Jsons = [mochijson2:encode(Body)|| Body<- Bodys],
-    lager:info("Json: ~s", [Jsons]),
-    Session = [iolist_to_binary(Json)|| Json<- Jsons],
-    Req:respond({200, [], Session});
+    JsonData = list_to_binary(mochijson2:encode(Bodys) ++ <<10>>), 
+    Req:respond({200, [{"Content-Type","application/json"}], JsonData});
 
 %%-----------------------------------topic--------------------------------------
 %%topic api
@@ -128,9 +122,8 @@ api(topic, Req) ->
 	     {node, Node} 
 	     ] || {Tab, Topic, Node} <- TopicLists],
  
-    Jsons = [mochijson2:encode(Body)|| Body<- Bodys],
-    Topics = [iolist_to_binary(Json)|| Json<- Jsons],
-    Req:respond({200, [], Topics});
+    JsonData = list_to_binary(mochijson2:encode(Bodys) ++ <<10>>), 
+    Req:respond({200, [{"Content-Type","application/json"}], JsonData});
 
 %%-----------------------------------subscribe--------------------------------------
 %%subscribe api
@@ -144,10 +137,6 @@ api(subscriber, Req) ->
              {topic, Topic}, 
              {qos, Qos}] || {Tab, Topic, Qos, Pid} <- SubLists],
  
-    Jsons = [mochijson2:encode(Body)|| Body<- Bodys],
-    Subscribes = [iolist_to_binary(Json)|| Json<- Jsons],
-    io:format("lllll:~s", [Subscribes]), 
-    io:format("test put:~s", [["lalalal"]]), 
-    Req:respond({200, [], Subscribes}).
-
+    JsonData = list_to_binary(mochijson2:encode(Bodys) ++ <<10>>), 
+    Req:respond({200, [{"Content-Type","application/json"}], JsonData}).
 
