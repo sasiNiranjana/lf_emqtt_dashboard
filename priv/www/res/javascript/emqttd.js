@@ -17,10 +17,17 @@ function loading(module, fun) {
 }
 
 function tabClass(e) {
+	closeTask();
 	$('#tab_nav>li').each(function() {
 		$(this).removeClass('active_tab');
 	});
 	$(e).addClass('active_tab');
+}
+
+function closeTask() {
+	if (overview != null) {
+		overview.closeTask();
+	}
 }
 
 var overview = null;
@@ -88,6 +95,9 @@ function Overview() {
 		_t.timetask = setInterval(function() {
 			_t._broker();
 		}, 1000);
+		_t._stats();
+		_t._ptype();
+		_t._listeners();
 	});
 }
 
@@ -113,10 +123,75 @@ Overview.prototype = {
 		};
 		jQuery.ajax(options);
 	},
+	
+	// 加载stats
+	_stats : function() {
+		var _t = this;
+		var options = {
+			url : 'api/stats',
+			type : 'POST',
+			dataType : 'json',
+			data : {},
+			success : function(d) {
+				jQuery('#subscribers_max').text(d['subscribers/max']);
+				jQuery('#topics_count').text(d['topics/count']);
+				jQuery('#clients_count').text(d['clients/count']);
+				jQuery('#topics_max').text(d['topics/max']);
+				jQuery('#queues_count').text(d['queues/count']);
+				jQuery('#sessions_count').text(d['sessions/count']);
+				jQuery('#sessions_max').text(d['sessions/max']);
+				jQuery('#queues_max').text(d['queues/max']);
+				jQuery('#clients_max').text(d['clients/max']);
+				jQuery('#subscribers_count').text(d['subscribers/count']);
+			},
+			error : function(e) {
+				console.log('api/stats->error');
+			}
+		};
+		jQuery.ajax(options);
+	},
+	
+	// 加载ptype
+	_ptype : function() {
+		var _t = this;
+		var options = {
+			url : 'api/ptype',
+			type : 'POST',
+			dataType : 'json',
+			data : {},
+			success : function(d) {
+				jQuery('#ptype_td_1').text(d['tcp_inet']);
+			},
+			error : function(e) {
+				console.log('api/ptype->error');
+			}
+		};
+		jQuery.ajax(options);
+	},
+	
+	// 加载listeners
+	_listeners : function() {
+		var _t = this;
+		var options = {
+			url : 'api/listeners',
+			type : 'POST',
+			dataType : 'json',
+			data : {},
+			success : function(d) {
+				jQuery('#lis_http').text(d['http']);
+				jQuery('#lis_mqtts').text(d['mqtts']);
+				jQuery('#lis_mqtt').text(d['mqtt']);
+			},
+			error : function(e) {
+				console.log('api/listeners->error');
+			}
+		};
+		jQuery.ajax(options);
+	},
 
 	// 关闭任务（定时任务等）
 	closeTask : function() {
-		
+		clearInterval(this.timetask);
 	}
 
 };
@@ -128,12 +203,33 @@ function Clients() {
 
 	// 加载模块
 	loading('clients.html', function() {
-		
+		_t._clients();
 	});
 }
 
 Clients.prototype = {
-
+	// 加载clients
+	_clients : function() {
+		var _t = this;
+		var options = {
+			url : 'api/clients',
+			type : 'POST',
+			dataType : 'json',
+			data : {},
+			success : function(d) {
+				var tby = jQuery('#clients tbody').empty();
+				for (var i = 0; i < d.length; i++) {
+					var cli = d[i];
+					tby.append('<tr><td>'+cli['mqtt_client']+'</td><td>'+cli['clientId']+'</td><td>'+cli['ipaddress']+'</td><td>'+cli['session']+'</td></tr>');
+				}
+			},
+			error : function(e) {
+				console.log('api/clients->error');
+			}
+		};
+		jQuery.ajax(options);
+	},
+	
 	// 关闭任务（定时任务等）
 	closeTask : function() {
 		

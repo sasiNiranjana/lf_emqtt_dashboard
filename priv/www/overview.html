@@ -43,7 +43,7 @@
 		</div>
 	</div>
 
-	<!-- Quick Statistics -->
+	<!-- Quick Statistics 
 	<div class="g_3 quick_stats">
 		<div class="big_stats visitor_stats">9827</div>
 		<h5 class="stats_info">New Visitor</h5>
@@ -60,6 +60,75 @@
 		<div class="big_stats orders_stats">2045</div>
 		<h5 class="stats_info">Orders</h5>
 	</div>
+	 -->
+
+	<div class="g_12">
+		<div class="widget_header">
+			<h4 class="widget_header_title wwIcon i_16_tables">Stats</h4>
+		</div>
+		<div class="widget_contents noPadding">
+			<table class="tables" id="stats">
+				<thead>
+					<tr>
+						<th>Subscribers Max</th>
+						<th>Topics Count</th>
+						<th>Clients Count</th>
+						<th>Topics Max</th>
+						<th>Queues Count</th>
+						<th>Sessions Count</th>
+						<th>Sessions Max</th>
+						<th>Queues Max</th>
+						<th>Clients Max</th>
+						<th>Subscribers Count</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td id="subscribers_max"></td>
+						<td id="topics_count"></td>
+						<td id="clients_count"></td>
+						<td id="topics_max"></td>
+						<td id="queues_count"></td>
+						<td id="sessions_count"></td>
+						<td id="sessions_max"></td>
+						<td id="queues_max"></td>
+						<td id="clients_max"></td>
+						<td id="subscribers_count"></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	<div class="g_12">
+		<div class="widget_header">
+			<h4 class="widget_header_title wwIcon i_16_tables">Ptype</h4>
+		</div>
+		<div class="widget_contents noPadding">
+			<table class="tables" id="ptype">
+				<thead>
+					<tr>
+						<th>tcp_inet</th>
+						<th>efile</th>
+						<th>2/2</th>
+						<th>inet_gethost 4 </th>
+						<td>sh -s disksup 2>&1</td>
+						<td>tty_sl -c -e</td>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td id="ptype_td_1"></td>
+						<td id="ptype_td_2"></td>
+						<td id="ptype_td_3"></td>
+						<td id="ptype_td_4"></td>
+						<td id="ptype_td_5"></td>
+						<td id="ptype_td_6"></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
 
 	<!-- Separator -->
 	<div class="g_12 separator">
@@ -72,7 +141,7 @@
 			<h4 class="widget_header_title wwIcon i_16_tables">Listening ports</h4>
 		</div>
 		<div class="widget_contents noPadding">
-			<table class="tables">
+			<table class="tables" id="listeners">
 				<thead>
 					<tr>
 						<th>Protocol</th>
@@ -82,25 +151,22 @@
 				<tbody>
 					<tr>
 						<td>http</td>
-						<td>8083</td>
-					</tr>
-					<tr>
-						<td>mqtts</td>
-						<td>8883</td>
+						<td id="lis_http"></td>
 					</tr>
 					<tr>
 						<td>mqtt</td>
-						<td>1883</td>
+						<td id="lis_mqtts"></td>
 					</tr>
 					<tr>
-						<td>http</td>
-						<td>18083</td>
+						<td>mqtt</td>
+						<td id="lis_mqtt"></td>
 					</tr>
 				</tbody>
 			</table>
 		</div>
 	</div>
 
+	<!-- 
 	<div class="g_12">
 		<div class="widget_header">
 			<h4 class="widget_header_title wwIcon i_16_tables">Web contexts</h4>
@@ -124,4 +190,5 @@
 			</table>
 		</div>
 	</div>
+	 -->
 </div>
