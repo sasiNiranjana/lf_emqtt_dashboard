@@ -80,7 +80,7 @@ api(cpu, Req) ->
     Req:respond({200, [{"Content-Type","application/json"}], JsonData});
 
 api(listeners, Req) ->
-    Llists = [[Listeners] || {Listeners , _Port} <- esockd:listeners()],
+    Llists = [Listeners || {Listeners , _Port} <- esockd:listeners()],
     JsonData = list_to_binary(mochijson2:encode(Llists) ++ <<10>>), 
     Req:respond({200, [{"Content-Type","application/json"}], JsonData});
 
@@ -93,7 +93,12 @@ api(clients, Req) ->
 	     {ipaddress, list_to_binary(emqttd_net:ntoa(Ip))}, 
 	     {session, CleanSession}] || {Tab, ClientId, _Pid, Ip, _, _, CleanSession, _ }
 	    <- emqttd_vm:get_ets_object(ClientsTab)],
-    JsonData = list_to_binary(mochijson2:encode(Bodys) ++ <<10>>), 
+    JsonData = 
+    if length(Bodys) == 0 ->
+	<<"\[\]">>;
+    true ->
+        list_to_binary(mochijson2:encode(Bodys) ++ <<10>>)
+    end,
     Req:respond({200, [{"Content-Type","application/json"}], JsonData});
 
 %%-----------------------------------session--------------------------------------
@@ -105,8 +110,12 @@ api(session, Req) ->
 	     {ipaddress, list_to_binary(emqttd_net:ntoa(Ip))}, 
 	     {session, CleanSession}] || {Tab, ClientId, _Pid, Ip, _, _, CleanSession, _ }
 	    <- emqttd_vm:get_ets_object(SessionsTab)],
- 
-    JsonData = list_to_binary(mochijson2:encode(Bodys) ++ <<10>>), 
+    JsonData = 
+    if length(Bodys) == 0 ->
+	<<"\[\]">>;
+    true ->
+        list_to_binary(mochijson2:encode(Bodys) ++ <<10>>)
+    end,
     Req:respond({200, [{"Content-Type","application/json"}], JsonData});
 
 %%-----------------------------------topic--------------------------------------
@@ -136,7 +145,11 @@ api(subscriber, Req) ->
     Bodys = [[{mqtt_subscriber,  Tab},
              {topic, Topic}, 
              {qos, Qos}] || {Tab, Topic, Qos, Pid} <- SubLists],
- 
-    JsonData = list_to_binary(mochijson2:encode(Bodys) ++ <<10>>), 
+    JsonData = 
+    if length(Bodys) == 0 ->
+	<<"\[\]">>;
+    true ->
+        list_to_binary(mochijson2:encode(Bodys) ++ <<10>>)
+    end,
     Req:respond({200, [{"Content-Type","application/json"}], JsonData}).
 
