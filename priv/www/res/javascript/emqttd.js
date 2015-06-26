@@ -220,7 +220,7 @@ Clients.prototype = {
 				if (d.length == 0) {
 					var cTable = jQuery('#clients');
 					cTable.hide();
-					cTable.parents().append('<span>... no clients ...</span>');
+					cTable.parent().append('<span style="padding: 12px;">... no clients ...</span>');
 				} else {
 					var tby = jQuery('#clients tbody').empty();
 					for (var i = 0; i < d.length; i++) {
@@ -268,7 +268,7 @@ Session.prototype = {
 				if (d.length == 0) {
 					var sTable = jQuery('#session');
 					sTable.hide();
-					sTable.parents().append('<span>... no session ...</span>');
+					sTable.parent().append('<span style="padding: 12px;">... no session ...</span>');
 				} else {
 					var tby = jQuery('#session tbody').empty();
 					for (var i = 0; i < d.length; i++) {
@@ -316,7 +316,7 @@ Topic.prototype = {
 				if (d.length == 0) {
 					var sTable = jQuery('#topic');
 					sTable.hide();
-					sTable.parents().append('<span>... no topic ...</span>');
+					sTable.parent().append('<span style="padding: 12px;">... no topic ...</span>');
 				} else {
 					var tby = jQuery('#topic tbody').empty();
 					for (var i = 0; i < d.length; i++) {
@@ -364,7 +364,7 @@ Subpub.prototype = {
 				if (d.length == 0) {
 					var sTable = jQuery('#subpub');
 					sTable.hide();
-					sTable.parents().append('<span>... no subpub ...</span>');
+					sTable.parent().append('<span style="padding: 12px;">... no subpub ...</span>');
 				} else {
 					var tby = jQuery('#subpub tbody').empty();
 					for (var i = 0; i < d.length; i++) {
