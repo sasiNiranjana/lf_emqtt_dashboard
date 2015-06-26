@@ -298,11 +298,39 @@ function Topic() {
 
 	// 加载模块
 	loading('topic.html', function() {
-		
+		_t._topic();
 	});
 }
 
 Topic.prototype = {
+
+	// 加载topic
+	_topic : function() {
+		var _t = this;
+		var options = {
+			url : 'api/topic',
+			type : 'POST',
+			dataType : 'json',
+			data : {},
+			success : function(d) {
+				if (d.length == 0) {
+					var sTable = jQuery('#topic');
+					sTable.hide();
+					sTable.parents().append('<span>... no topic ...</span>');
+				} else {
+					var tby = jQuery('#topic tbody').empty();
+					for (var i = 0; i < d.length; i++) {
+						var top = d[i];
+						
+					}
+				}
+			},
+			error : function(e) {
+				console.log('api/topic->error');
+			}
+		};
+		jQuery.ajax(options);
+	},
 
 	// 关闭任务（定时任务等）
 	closeTask : function() {
@@ -318,11 +346,39 @@ function Subpub() {
 
 	// 加载模块
 	loading('subpub.html', function() {
-		
+		_t._subpub();
 	});
 }
 
 Subpub.prototype = {
+
+	// 加载subpub
+	_subpub : function() {
+		var _t = this;
+		var options = {
+			url : 'api/subpub',
+			type : 'POST',
+			dataType : 'json',
+			data : {},
+			success : function(d) {
+				if (d.length == 0) {
+					var sTable = jQuery('#subpub');
+					sTable.hide();
+					sTable.parents().append('<span>... no subpub ...</span>');
+				} else {
+					var tby = jQuery('#subpub tbody').empty();
+					for (var i = 0; i < d.length; i++) {
+						var top = d[i];
+						
+					}
+				}
+			},
+			error : function(e) {
+				console.log('api/subpub->error');
+			}
+		};
+		jQuery.ajax(options);
+	},
 
 	// 关闭任务（定时任务等）
 	closeTask : function() {
