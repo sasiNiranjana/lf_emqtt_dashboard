@@ -257,7 +257,7 @@ function Session() {
 Session.prototype = {
 
 	// 加载session
-	_clients : function() {
+	_session : function() {
 		var _t = this;
 		var options = {
 			url : 'api/session',
