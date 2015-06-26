@@ -217,10 +217,16 @@ Clients.prototype = {
 			dataType : 'json',
 			data : {},
 			success : function(d) {
-				var tby = jQuery('#clients tbody').empty();
-				for (var i = 0; i < d.length; i++) {
-					var cli = d[i];
-					tby.append('<tr><td>'+cli['mqtt_client']+'</td><td>'+cli['clientId']+'</td><td>'+cli['ipaddress']+'</td><td>'+cli['session']+'</td></tr>');
+				if (d.length == 0) {
+					var cTable = jQuery('#clients');
+					cTable.hide();
+					cTable.parents().append('<span>... no clients ...</span>');
+				} else {
+					var tby = jQuery('#clients tbody').empty();
+					for (var i = 0; i < d.length; i++) {
+						var cli = d[i];
+						tby.append('<tr><td>'+cli['mqtt_client']+'</td><td>'+cli['clientId']+'</td><td>'+cli['ipaddress']+'</td><td>'+cli['session']+'</td></tr>');
+					}	
 				}
 			},
 			error : function(e) {
@@ -244,11 +250,39 @@ function Session() {
 
 	// 加载模块
 	loading('session.html', function() {
-		
+		_t._session();
 	});
 }
 
 Session.prototype = {
+
+	// 加载session
+	_clients : function() {
+		var _t = this;
+		var options = {
+			url : 'api/session',
+			type : 'POST',
+			dataType : 'json',
+			data : {},
+			success : function(d) {
+				if (d.length == 0) {
+					var sTable = jQuery('#session');
+					sTable.hide();
+					sTable.parents().append('<span>... no session ...</span>');
+				} else {
+					var tby = jQuery('#session tbody').empty();
+					for (var i = 0; i < d.length; i++) {
+						var ses = d[i];
+						
+					}
+				}
+			},
+			error : function(e) {
+				console.log('api/session->error');
+			}
+		};
+		jQuery.ajax(options);
+	},
 
 	// 关闭任务（定时任务等）
 	closeTask : function() {
