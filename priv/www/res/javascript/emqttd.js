@@ -374,7 +374,7 @@ Subpub.prototype = {
 				}
 			},
 			error : function(e) {
-				console.log('api/subpub->error');
+				console.log('api/subscriber->error');
 			}
 		};
 		jQuery.ajax(options);
