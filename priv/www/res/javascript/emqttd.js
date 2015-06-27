@@ -161,6 +161,11 @@ Overview.prototype = {
 			data : {},
 			success : function(d) {
 				jQuery('#ptype_td_1').text(d['tcp_inet']);
+				jQuery('#ptype_td_2').text(d['efile']);
+				jQuery('#ptype_td_3').text(d['2/2']);
+				jQuery('#ptype_td_4').text(d['inet_gethost 4 ']);
+				jQuery('#ptype_td_5').text(d['sh -s disksup 2>&1']);
+				jQuery('#ptype_td_6').text(d['tty_sl -c -e']);
 			},
 			error : function(e) {
 				console.log('api/ptype->error');
