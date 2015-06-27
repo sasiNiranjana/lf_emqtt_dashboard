@@ -356,7 +356,7 @@ Subpub.prototype = {
 	_subpub : function() {
 		var _t = this;
 		var options = {
-			url : 'api/subpub',
+			url : 'api/subscriber',
 			type : 'POST',
 			dataType : 'json',
 			data : {},
@@ -374,7 +374,7 @@ Subpub.prototype = {
 				}
 			},
 			error : function(e) {
-				console.log('api/subpub->error');
+				console.log('api/subscriber->error');
 			}
 		};
 		jQuery.ajax(options);
