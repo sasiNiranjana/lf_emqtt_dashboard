@@ -66,7 +66,7 @@ api(stats, Req) ->
 
 api(ptype, Req) ->
     PortTyeps = emqttd_vm:get_port_types(), 
-    JsonData = list_to_binary(mochijson2:encode([PortTyeps]) ++ <<10>>), 
+    JsonData = list_to_binary(mochijson2:encode(PortTyeps) ++ <<10>>), 
     Req:respond({200, [{"Content-Type","application/json"}], JsonData});
 
 api(memory, Req) ->
