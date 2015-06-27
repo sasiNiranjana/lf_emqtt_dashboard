@@ -273,7 +273,7 @@ Session.prototype = {
 					var tby = jQuery('#session tbody').empty();
 					for (var i = 0; i < d.length; i++) {
 						var ses = d[i];
-						
+						tby.append('<tr><td>'+ses['mqtt_session']+'</td><td>'+ses['clientId']+'</td><td>'+ses['ipaddress']+'</td><td>'+ses['session']+'</td></tr>');
 					}
 				}
 			},
@@ -321,7 +321,7 @@ Topic.prototype = {
 					var tby = jQuery('#topic tbody').empty();
 					for (var i = 0; i < d.length; i++) {
 						var top = d[i];
-						
+						tby.append('<tr><td>'+top['mqtt_topic']+'</td><td>'+top['topic']+'</td><td>'+top['node']+'</td></tr>');
 					}
 				}
 			},
@@ -368,8 +368,8 @@ Subpub.prototype = {
 				} else {
 					var tby = jQuery('#subpub tbody').empty();
 					for (var i = 0; i < d.length; i++) {
-						var top = d[i];
-						
+						var sub = d[i];
+						tby.append('<tr><td>'+sub['mqtt_subscriber']+'</td><td>'+sub['topic']+'</td><td>'+sub['qos']+'</td></tr>');
 					}
 				}
 			},
