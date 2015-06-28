@@ -62,9 +62,8 @@
 			jQuery('#conn_state').text('CONNECTED');
 			console.log("The client connect success.");
 			client.subscribe("/World");
-			var message = new Paho.MQTT.Message("Hello");
-			message.destinationName = "/World";
-			client.send(message);
+			
+			sendMessage("Hello")
 		}});
 	}
 	
