@@ -21,7 +21,6 @@
 	<script src="res/javascript/emqttd.js"></script>
 	<script type="text/javascript">
 	$(document).ready(function() {
-		overview = new Overview();
 		addClick();
 	});
 	</script>
@@ -97,7 +96,7 @@
 						<span class="tab_info">Subpub Info</span>
 					</a>
 				</li>
-				<li class="">
+				<li class="active_tab">
 					<a href="websocket.html" title="Websocket">
 						<span class="tab_label">Websocket</span>
 						<span class="tab_info">Websocket</span>
@@ -106,7 +105,43 @@
 			</ul>
 		</aside>
 
-		<div class="contents" id="contents"></div>
+		<div class="contents" id="contents">
+		<div class="grid_wrapper">
+		
+			<div class="g_6 contents_header">
+				<h3 class="i_16_dashboard tab_label">MQTT Over websocket</h3>
+				<div>
+					<span class="label">websocket</span>
+				</div>
+			</div>
+		
+			<!-- Separator -->
+			<div class="g_12 separator">
+				<span></span>
+			</div>
+		
+			<!-- Simple Table -->
+			<div class="g_12">
+				<div class="widget_header">
+					<h4 class="widget_header_title wwIcon i_16_tables">websocket</h4>
+				</div>
+				<div class="widget_contents noPadding">
+					<table class="tables" id="websocket">
+						<thead>
+							<tr>
+								<th>mqtt_topic</th>
+								<th>topic</th>
+								<th>node</th>
+							</tr>
+						</thead>
+						<tbody>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		
+		</div>
+		</div>
 
 	</div>
 

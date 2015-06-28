@@ -35,9 +35,7 @@ var clients = null;
 var session = null;
 var topic = null;
 var subpub = null;
-$(document).ready(function() {
-	overview = new Overview();
-	
+function addClick() {
 	// 注册单击事件
 	$('#tab_nav>li').each(function(index) {
 		switch (index) {
@@ -75,7 +73,7 @@ $(document).ready(function() {
 			break;
 		}
 	});
-});
+}
 
 function Overview() {
 	var _t = this;
@@ -225,7 +223,7 @@ Clients.prototype = {
 				if (d.length == 0) {
 					var cTable = jQuery('#clients');
 					cTable.hide();
-					cTable.parent().append('<span style="padding: 12px;">... no clients ...</span>');
+					cTable.parent().append('<p style="padding: 12px;">... no clients ...</p>');
 				} else {
 					var tby = jQuery('#clients tbody').empty();
 					for (var i = 0; i < d.length; i++) {
@@ -273,7 +271,7 @@ Session.prototype = {
 				if (d.length == 0) {
 					var sTable = jQuery('#session');
 					sTable.hide();
-					sTable.parent().append('<span style="padding: 12px;">... no session ...</span>');
+					sTable.parent().append('<p style="padding: 12px;">... no session ...</p>');
 				} else {
 					var tby = jQuery('#session tbody').empty();
 					for (var i = 0; i < d.length; i++) {
@@ -321,7 +319,7 @@ Topic.prototype = {
 				if (d.length == 0) {
 					var sTable = jQuery('#topic');
 					sTable.hide();
-					sTable.parent().append('<span style="padding: 12px;">... no topic ...</span>');
+					sTable.parent().append('<p style="padding: 12px;">... no topic ...</p>');
 				} else {
 					var tby = jQuery('#topic tbody').empty();
 					for (var i = 0; i < d.length; i++) {
@@ -369,7 +367,7 @@ Subpub.prototype = {
 				if (d.length == 0) {
 					var sTable = jQuery('#subpub');
 					sTable.hide();
-					sTable.parent().append('<span style="padding: 12px;">... no subpub ...</span>');
+					sTable.parent().append('<p style="padding: 12px;">... no subpub ...</p>');
 				} else {
 					var tby = jQuery('#subpub tbody').empty();
 					for (var i = 0; i < d.length; i++) {
