@@ -34,6 +34,8 @@
  
 -include_lib("stdlib/include/qlc.hrl").
 
+-define(AUTH_CLIENTID_TAB, mqtt_auth_clientid).
+
 handle_request(Req) ->
     Path = Req:get(path),
     lager:info("Dashboard file: ~s ~s", [Req:get(method), Path]),
@@ -87,12 +89,14 @@ api(listeners, Req) ->
 %%-----------------------------------clients--------------------------------------
 %%clients api
 api(clients, Req) ->
-    ClientsTab =  emqttd_cm:table(),
+    F = fun() ->
+        Q = qlc:q([E || E <- mnesia:table(?AUTH_CLIENTID_TAB)]),
+	qlc:e(Q) 
+        end,
+    {atomic, Clients} =  mnesia:transaction(F),
     Bodys = [[{mqtt_client,  Tab},
 	     {clientId, ClientId}, 
-	     {ipaddress, list_to_binary(emqttd_net:ntoa(Ip))}, 
-	     {session, CleanSession}] || {Tab, ClientId, _Pid, Ip, _, _, CleanSession, _ }
-	    <- emqttd_vm:get_ets_object(ClientsTab)],
+	     {ipaddress, list_to_binary(emqttd_net:ntoa(Ipaddr))}] || {Tab, ClientId, Ipaddr, _Password} <- Clients],
     JsonData = 
     if length(Bodys) == 0 ->
 	<<"\[\]">>;
