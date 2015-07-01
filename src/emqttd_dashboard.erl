@@ -58,34 +58,32 @@ docroot() ->
 api(broker, Req) ->
     Funs = [sysdescr, version, uptime, datetime],
     BrokerInfo = [{Fun, list_to_binary(emqttd_broker:Fun())}|| Fun <- Funs],
-    JsonData = list_to_binary(mochijson2:encode(BrokerInfo) ++ <<10>>), 
-    Req:respond({200, [{"Content-Type","application/json"}], JsonData});
-
+    api_respond(Req, BrokerInfo);
+   
 api(stats, Req) ->
     Stats = [{Stat, Val} || {Stat, Val} <- emqttd_stats:getstats()],
-    JsonData = list_to_binary(mochijson2:encode(Stats) ++ <<10>>), 
-    Req:respond({200, [{"Content-Type","application/json"}], JsonData});
-
+    api_respond(Req, Stats);
+   
 api(ptype, Req) ->
     PortTyeps = emqttd_vm:get_port_types(), 
-    JsonData = list_to_binary(mochijson2:encode(PortTyeps) ++ <<10>>), 
-    Req:respond({200, [{"Content-Type","application/json"}], JsonData});
-
+    api_respond(Req, PortTyeps);
+   
 api(memory, Req) ->
     Memory = emqttd_vm:get_memory(), 
-    JsonData = list_to_binary(mochijson2:encode(Memory) ++ <<10>>), 
-    Req:respond({200, [{"Content-Type","application/json"}], JsonData});
-
+    api_respond(Req, Memory);
+    
 api(cpu, Req) ->
     Cpu = emqttd_vm:loads(), 
-    JsonData = list_to_binary(mochijson2:encode(Cpu) ++ <<10>>), 
-    Req:respond({200, [{"Content-Type","application/json"}], JsonData});
-
+    api_respond(Req, Cpu);
+    
+api(metrics, Req) ->
+    Metrics = [{Metric, Val} || {Metric, Val} <- emqttd_metrics:all()],
+    api_respond(Req, Metrics);
+   
 api(listeners, Req) ->
     Llists = [Listeners || {Listeners , _Port} <- esockd:listeners()],
-    JsonData = list_to_binary(mochijson2:encode(Llists) ++ <<10>>), 
-    Req:respond({200, [{"Content-Type","application/json"}], JsonData});
-
+    api_respond(Req, Llists);
+    
 %%-----------------------------------clients--------------------------------------
 %%clients api
 api(clients, Req) ->
@@ -97,14 +95,8 @@ api(clients, Req) ->
     Bodys = [[{mqtt_client,  Tab},
 	     {clientId, ClientId}, 
 	     {ipaddress, list_to_binary(emqttd_net:ntoa(Ipaddr))}] || {Tab, ClientId, Ipaddr, _Password} <- Clients],
-    JsonData = 
-    if length(Bodys) == 0 ->
-	<<"\[\]">>;
-    true ->
-        list_to_binary(mochijson2:encode(Bodys) ++ <<10>>)
-    end,
-    Req:respond({200, [{"Content-Type","application/json"}], JsonData});
-
+    api_respond(Req, Bodys);
+    
 %%-----------------------------------session--------------------------------------
 %%sessin check api
 api(session, Req) ->
@@ -114,14 +106,8 @@ api(session, Req) ->
 	     {ipaddress, list_to_binary(emqttd_net:ntoa(Ip))}, 
 	     {session, CleanSession}] || {Tab, ClientId, _Pid, Ip, _, _, CleanSession, _ }
 	    <- emqttd_vm:get_ets_object(SessionsTab)],
-    JsonData = 
-    if length(Bodys) == 0 ->
-	<<"\[\]">>;
-    true ->
-        list_to_binary(mochijson2:encode(Bodys) ++ <<10>>)
-    end,
-    Req:respond({200, [{"Content-Type","application/json"}], JsonData});
-
+    api_respond(Req, Bodys);
+   
 %%-----------------------------------topic--------------------------------------
 %%topic api
 api(topic, Req) ->
@@ -135,9 +121,8 @@ api(topic, Req) ->
 	     {node, Node} 
 	     ] || {Tab, Topic, Node} <- TopicLists],
  
-    JsonData = list_to_binary(mochijson2:encode(Bodys) ++ <<10>>), 
-    Req:respond({200, [{"Content-Type","application/json"}], JsonData});
-
+    api_respond(Req, Bodys);
+   
 %%-----------------------------------subscribe--------------------------------------
 %%subscribe api
 api(subscriber, Req) ->
@@ -149,6 +134,10 @@ api(subscriber, Req) ->
     Bodys = [[{mqtt_subscriber,  Tab},
              {topic, Topic}, 
              {qos, Qos}] || {Tab, Topic, Qos, Pid} <- SubLists],
+
+    api_respond(Req, Bodys).
+    
+api_respond(Req, Bodys) ->
     JsonData = 
     if length(Bodys) == 0 ->
 	<<"\[\]">>;
@@ -156,4 +145,3 @@ api(subscriber, Req) ->
         list_to_binary(mochijson2:encode(Bodys) ++ <<10>>)
     end,
     Req:respond({200, [{"Content-Type","application/json"}], JsonData}).
-
