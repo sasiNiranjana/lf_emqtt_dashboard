@@ -143,7 +143,7 @@ a:hover {
 }
 
 .main-tab-nav {
-	margin: 48px 0 0 0;
+	margin: 50px 0 0 0;
 }
 
 .main-tab-nav>li {
@@ -165,8 +165,8 @@ a:hover {
 .contents-wrapper {
 	padding-top: 60px;
 	margin-left: 200px;
-	min-width: 1000px;
-	width: 90%;
+	position: fixed;
+	width: 80%;
 }
 
 .contents-wrapper>.contents {
