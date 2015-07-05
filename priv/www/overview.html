@@ -1,194 +1,147 @@
-<div class="grid_wrapper">
-
-	<div class="g_6 contents_header">
-		<h3 class="i_16_dashboard tab_label">Overview</h3>
-		<div>
-			<span class="label">General Informations and Resume</span>
+<div>
+	<h1 class="h1">Overview</h1>
+	<p>&nbsp;</p>
+	<!-- Welcome -->
+	<div class="colgroup leading full">
+		<div class="column full first">
+			<h3 class="h3">Welcome back</h3>
+			<hr />
+			<p>
+				You are currently signed up to the <b class="b">Free Trial Plan</b>.
+				<br>
+				<a href="#">Upgrade now?</a>
+			</p>
 		</div>
 	</div>
-
-	<!-- Separator -->
-	<div class="g_12 separator">
-		<span></span>
-	</div>
-
-	<!-- 系统基本描述 -->
-	<div class="g_12" id="sys_basic_info">
-		<div class="widget_header">
-			<h4 class="widget_header_title wwIcon i_16_tables">System Basic
-				Information</h4>
+	<!-- System Info -->
+	<div class="colgroup leading full" id="sys_basic_info">
+		<h3 class="h3">System Basic Information</h3>
+		<hr />
+		<div class="column width2 first">
+			<b class="b">System Name</b>
+			<p>
+				<a href="#" id="sys_name">value</a>
+			</p>
 		</div>
-		<div class="widget_contents">
-			<div class="label lwParagraph"
-				style="float: left; width: 20%; border-right: 1px solid #ddd;">
-				<h3>System Name</h3>
-				<p id="sys_name" style="line-height: 39px; padding-top: 8px;">value</p>
+		<div class="column width2">
+			<b class="b">Version</b>
+			<p>
+				<a href="#" id="sys_version">value</a>
+			</p>
+		</div>
+		<div class="column width2">
+			<b class="b">Uptime</b>
+			<p>
+				<a href="#" id="sys_uptime">value</a>
+			</p>
+		</div>
+		<div class="column width2">
+			<b class="b">System Time</b>
+			<p>
+				<a href="#" id="sys_time">value</a>
+			</p>
+		</div>
+	</div>
+	<!-- Stats -->
+	<div class="colgroup leading full">
+		<div class="column full first">
+			<h3 class="h3">Stats</h3>
+			<hr />
+			<div>
+				<table class="stylized" id="stats">
+					<thead>
+						<tr>
+							<th>Subscribers Max</th>
+							<th>Topics Count</th>
+							<th>Clients Count</th>
+							<th>Topics Max</th>
+							<th>Queues Count</th>
+							<th>Sessions Count</th>
+							<th>Sessions Max</th>
+							<th>Queues Max</th>
+							<th>Clients Max</th>
+							<th>Subscribers Count</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td id="subscribers_max"></td>
+							<td id="topics_count"></td>
+							<td id="clients_count"></td>
+							<td id="topics_max"></td>
+							<td id="queues_count"></td>
+							<td id="sessions_count"></td>
+							<td id="sessions_max"></td>
+							<td id="queues_max"></td>
+							<td id="clients_max"></td>
+							<td id="subscribers_count"></td>
+						</tr>
+					</tbody>
+				</table>
 			</div>
-			<div class="label lwParagraph"
-				style="float: left; width: 20%; border-right: 1px solid #ddd; padding-left: 18px;">
-				<h3>Version</h3>
-				<p id="sys_version" style="line-height: 39px; padding-top: 8px;">value</p>
+		</div>
+	</div>
+	<!-- ptype -->
+	<div class="colgroup leading full">
+		<div class="column full first">
+			<h3 class="h3">Port Type</h3>
+			<hr />
+			<div>
+				<table class="stylized" id="ptype">
+					<thead>
+						<tr>
+							<th>tcp_inet</th>
+							<th>efile</th>
+							<th>2/2</th>
+							<th>inet_gethost 4</th>
+							<th>sh -s disksup 2>&1</th>
+							<th>tty_sl -c -e</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td id="ptype_td_1"></td>
+							<td id="ptype_td_2"></td>
+							<td id="ptype_td_3"></td>
+							<td id="ptype_td_4"></td>
+							<td id="ptype_td_5"></td>
+							<td id="ptype_td_6"></td>
+						</tr>
+					</tbody>
+				</table>
 			</div>
-			<div class="label lwParagraph"
-				style="float: left; width: 30%; border-right: 1px solid #ddd; padding-left: 18px;">
-				<h3>Uptime</h3>
-				<p id="sys_uptime" style="line-height: 39px; padding-top: 8px;">value</p>
+		</div>
+	</div>
+	<!-- Listening ports -->
+	<div class="colgroup leading full">
+		<div class="column full first">
+			<h3 class="h3">Listening ports</h3>
+			<hr />
+			<div>
+				<table class="stylized width3" id="listeners">
+					<thead>
+						<tr>
+							<th>Protocol</th>
+							<th>Port</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>http</td>
+							<td id="lis_http"></td>
+						</tr>
+						<tr>
+							<td>mqtts</td>
+							<td id="lis_mqtts"></td>
+						</tr>
+						<tr>
+							<td>mqtt</td>
+							<td id="lis_mqtt"></td>
+						</tr>
+					</tbody>
+				</table>
 			</div>
-			<div class="label lwParagraph"
-				style="float: left; width: 20%; padding-left: 18px;">
-				<h3>System Time</h3>
-				<p id="sys_time" style="line-height: 39px; padding-top: 8px;">value</p>
-			</div>
-			<div class="clear"></div>
 		</div>
 	</div>
-
-	<!-- Quick Statistics 
-	<div class="g_3 quick_stats">
-		<div class="big_stats visitor_stats">9827</div>
-		<h5 class="stats_info">New Visitor</h5>
-	</div>
-	<div class="g_3 quick_stats">
-		<div class="big_stats tickets_stats">23</div>
-		<h5 class="stats_info">Open Tickets</h5>
-	</div>
-	<div class="g_3 quick_stats">
-		<div class="big_stats users_stats">982</div>
-		<h5 class="stats_info">Users</h5>
-	</div>
-	<div class="g_3 quick_stats">
-		<div class="big_stats orders_stats">2045</div>
-		<h5 class="stats_info">Orders</h5>
-	</div>
-	 -->
-
-	<div class="g_12">
-		<div class="widget_header">
-			<h4 class="widget_header_title wwIcon i_16_tables">Stats</h4>
-		</div>
-		<div class="widget_contents noPadding">
-			<table class="tables" id="stats">
-				<thead>
-					<tr>
-						<th>Subscribers Max</th>
-						<th>Topics Count</th>
-						<th>Clients Count</th>
-						<th>Topics Max</th>
-						<th>Queues Count</th>
-						<th>Sessions Count</th>
-						<th>Sessions Max</th>
-						<th>Queues Max</th>
-						<th>Clients Max</th>
-						<th>Subscribers Count</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<td id="subscribers_max"></td>
-						<td id="topics_count"></td>
-						<td id="clients_count"></td>
-						<td id="topics_max"></td>
-						<td id="queues_count"></td>
-						<td id="sessions_count"></td>
-						<td id="sessions_max"></td>
-						<td id="queues_max"></td>
-						<td id="clients_max"></td>
-						<td id="subscribers_count"></td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-	</div>
-
-	<div class="g_12">
-		<div class="widget_header">
-			<h4 class="widget_header_title wwIcon i_16_tables">Port Type</h4>
-		</div>
-		<div class="widget_contents noPadding">
-			<table class="tables" id="ptype">
-				<thead>
-					<tr>
-						<th>tcp_inet</th>
-						<th>efile</th>
-						<th>2/2</th>
-						<th>inet_gethost 4 </th>
-						<th>sh -s disksup 2>&1</th>
-						<th>tty_sl -c -e</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<td id="ptype_td_1"></td>
-						<td id="ptype_td_2"></td>
-						<td id="ptype_td_3"></td>
-						<td id="ptype_td_4"></td>
-						<td id="ptype_td_5"></td>
-						<td id="ptype_td_6"></td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-	</div>
-
-	<!-- Separator -->
-	<div class="g_12 separator">
-		<span></span>
-	</div>
-	
-	<!-- Simple Table -->
-	<div class="g_12">
-		<div class="widget_header">
-			<h4 class="widget_header_title wwIcon i_16_tables">Listening ports</h4>
-		</div>
-		<div class="widget_contents noPadding">
-			<table class="tables" id="listeners">
-				<thead>
-					<tr>
-						<th>Protocol</th>
-						<th>Port</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<td>http</td>
-						<td id="lis_http"></td>
-					</tr>
-					<tr>
-						<td>mqtts</td>
-						<td id="lis_mqtts"></td>
-					</tr>
-					<tr>
-						<td>mqtt</td>
-						<td id="lis_mqtt"></td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-	</div>
-
-	<!-- 
-	<div class="g_12">
-		<div class="widget_header">
-			<h4 class="widget_header_title wwIcon i_16_tables">Web contexts</h4>
-		</div>
-		<div class="widget_contents noPadding">
-			<table class="tables">
-				<thead>
-					<tr>
-						<th>Context</th>
-						<th>Port</th>
-						<th>Path</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<td>Mqttd Dashboard</td>
-						<td>18083</td>
-						<td>/</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-	</div>
-	 -->
+	<!-- end -->
 </div>

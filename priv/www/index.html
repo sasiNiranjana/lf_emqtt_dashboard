@@ -1,121 +1,65 @@
 <!DOCTYPE HTML>
-<html lang="en-US">
+<html>
 <head>
-	<meta charset="UTF-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<title>Overview - Emqttd Dashboard</title>
-	<!--[if lt IE 9]>
-		<script src="http://css3-mediaqueries-js.googlecode.com/svn/trunk/css3-mediaqueries.js"></script>
-		<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-		<script src="Javascript/Flot/excanvas.js"></script>
-	<![endif]-->
-	<!-- The Fonts -->
-	<link href="http://fonts.googleapis.com/css?family=Oswald|Droid+Sans:400,700" rel="stylesheet" />
-	<!-- The Main CSS File -->
-	<link rel="stylesheet" href="res/css/style.css" />
-	<!-- jQuery -->
-	<script src="res/javascript/jQuery/jquery-1.7.2.min.js"></script>
-	<!-- jQuryUI -->
-	<script src="res/javascript/jQueryUI/jquery-ui-1.8.21.min.js"></script>
-	<script src="res/javascript/emqttd.js"></script>
-	<script type="text/javascript">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Overview - Emqttd Dashboard</title>
+<!-- The Fonts -->
+<!-- <link href="http://fonts.googleapis.com/css?family=Oswald|Droid+Sans:400,700" rel="stylesheet" /> -->
+<!-- The Main CSS File -->
+<link rel="stylesheet" href="css/style.css" />
+<script src="script/jQuery/jquery-1.7.2.min.js"></script>
+<script src="script/jQueryUI/jquery-ui-1.8.21.min.js"></script>
+<script src="script/emqttd.js"></script>
+<script type="text/javascript">
 	$(document).ready(function() {
 		overview = new Overview();
 		addClick();
 	});
-	</script>
+</script>
 </head>
 <body>
-	<!-- Top Panel 
-	<div class="top_panel">
-		<div class="wrapper">
-			<div class="user">
-				<img src="res/images/user_avatar.png" alt="user_avatar" class="user_avatar" />
-				<span class="label">John Alex</span>
-			</div>
-			<div class="top_links">
-				<ul>
-					<li>
-						<a href="#" title="Log-Out" style="padding-left: 0px;">
-							<span class="label">Log-Out</span>
-						</a>
-					</li>
-					<li class="i_22_settings">
-						<a href="#" title="Settings">
-							<span class="label">Settings</span>
-						</a>
-					</li>
-				</ul>
-			</div>
-		</div>
-	</div>
-	-->
-
-	<header class="main_header">
+	<!-- Top Panel -->
+	<header class="top-panel">
 		<div class="wrapper">
 			<div class="logo">
-				<a href="#" title="Emqtt Home">
-					<img src="res/images/emqtt_logo.png" alt="emqtt_logo" />
+				<a href="#" title="Emqtt Home"> <img src="imgs/emqtt_logo.png"
+					alt="emqtt_logo" height="60px;" />
 				</a>
 			</div>
-			<!-- <nav class="top_buttons"></nav> -->
 		</div>
 	</header>
 
-	<div class="wrapper contents_wrapper">
-		
-		<aside class="sidebar">
-			<ul class="tab_nav" id="tab_nav">
-				<li class="active_tab">
-					<a href="#" title="General Info">
-						<span class="tab_label">Overview</span>
-						<span class="tab_info">General Info</span>
-					</a>
-				</li>
-				<li class="">
-					<a href="#" title="Clients Message">
-						<span class="tab_label">Clients</span>
-						<span class="tab_info">Clients Messages</span>
-					</a>
-				</li>
-				<li class="">
-					<a href="#" title="Session Data">
-						<span class="tab_label">Session</span>
-						<span class="tab_info">Session Data</span>
-					</a>
-				</li>
-				<li class="">
-					<a href="#" title="Topic Messages">
-						<span class="tab_label">Topic</span>
-						<span class="tab_info">Topic Messages</span>
-					</a>
-				</li>
-				<li class="">
-					<a href="#" title="Subpub Messages">
-						<span class="tab_label">Subpub</span>
-						<span class="tab_info">Subpub Info</span>
-					</a>
-				</li>
-				<li class="">
-					<a href="websocket.html" title="Websocket">
-						<span class="tab_label">Websocket</span>
-						<span class="tab_info">Websocket</span>
-					</a>
-				</li>
+	<aside class="sidebar">
+		<nav>
+			<ul class="main-tab-nav" id="tab_nav">
+				<li class="active-tab"><a href="#" title="General">Overview</a></li>
+				<li class=""><a href="#" title="Clients">Clients</a></li>
+				<li class=""><a href="#" title="Session">Session</a></li>
+				<li class=""><a href="#" title="Topic">Topic</a></li>
+				<li class=""><a href="#" title="Subpub">Subpub</a></li>
+				<li class=""><a href="websocket.html" title="Websocket">Websocket</a></li>
 			</ul>
-		</aside>
+		</nav>
+	</aside>
 
-		<div class="contents" id="contents"></div>
+	<div class="wrapper contents-wrapper">
+
+		<div class="contents" id="page"></div>
+		<div class="clear"></div>
 
 	</div>
 
+	<!-- 
 	<footer>
 		<div class="wrapper">
-			<span class="copyright">
-				&copy; Copyright &copy; 2015.Company <a target="_blank" href="http://emqtt.io">emqtt.io</a> All rights reserved.
+			<span class="copyright"> &copy; Copyright &copy; 2015.Company
+				<a target="_blank" href="http://emqtt.io">emqtt.io</a> All rights
+				reserved.
 			</span>
 		</div>
 	</footer>
+	 -->
 </body>
 </html>
