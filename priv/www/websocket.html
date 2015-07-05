@@ -12,31 +12,31 @@
 <script src="script/jQuery/jquery-1.7.2.min.js"></script>
 <script src="script/jQueryUI/jquery-ui-1.8.21.min.js"></script>
 <script src="script/emqttd.js"></script>
-	<script src="res/javascript/mqttws31.js"></script>
-	<script type="text/javascript">
+<script src="res/javascript/mqttws31.js"></script>
+<script type="text/javascript">
 	$(document).ready(function() {
 		addClick();
 		if (!window.WebSocket) {
 			alert("WebSocket not supported by this browser.");
 		}
-		
+
 		$('#connect_btn').click(function() {
 			connect();
 		});
-		
+
 		$('#send_btn').click(function() {
 			var msg = jQuery('#message').val();
 			sendMessage(msg);
 		});
 	});
-	
+
 	// Create a client instance
 	var client = new Paho.MQTT.Client(location.hostname, 8083, "clientId");
 
 	// set callback handlers
 	client.onConnectionLost = onConnectionLost;
 	client.onMessageArrived = onMessageArrived;
-	
+
 	// called when the client loses its connection
 	function onConnectionLost(responseObject) {
 		if (responseObject.errorCode !== 0) {
@@ -48,25 +48,27 @@
 	function onMessageArrived(message) {
 		console.log("onMessageArrived:" + message.payloadString);
 	}
-	
+
 	// the client connect
 	function connect() {
-		client.connect({onSuccess : function() {
-			jQuery('#conn_state').text('CONNECTED');
-			console.log("The client connect success.");
-			client.subscribe("/World");
-			
-			sendMessage("Hello")
-		}});
+		client.connect({
+			onSuccess : function() {
+				jQuery('#conn_state').text('CONNECTED');
+				console.log("The client connect success.");
+				client.subscribe("/World");
+
+				sendMessage("Hello")
+			}
+		});
 	}
-	
+
 	// the client send message
 	function sendMessage(msg) {
 		var message = new Paho.MQTT.Message(msg);
 		message.destinationName = "/World";
 		client.send(message);
 	}
-	</script>
+</script>
 </head>
 <body>
 	<!-- Top Panel -->
@@ -93,63 +95,35 @@
 		</nav>
 	</aside>
 
-	<div class="wrapper contents-wrapper">
+	<div class="wrapper contents-wrapper" id="page">
 
-		<div class="contents" id="page">
-		<div class="grid_wrapper">
-		
-			<div class="g_6 contents_header">
-				<h3 class="i_16_dashboard tab_label">MQTT Over websocket</h3>
-				<div>
-					<span class="label">websocket</span>
-				</div>
-			</div>
-		
-			<!-- Separator -->
-			<div class="g_12 separator">
-				<span></span>
-			</div>
-		
-			<!-- Simple Table -->
-			<div class="g_12">
-				<div class="widget_header">
-					<h4 class="widget_header_title wwIcon i_16_tables">Connect State</h4>
-				</div>
-				<div class="widget_contents noPadding">
-					<div class="line_grid">
-						<div class="g_6">
-							<label class="label">Current State: <span id="conn_state">DISCONNECT</span></label>
+		<div class="contents" id="contents">
+			<div>
+				<h1 class="h1">MQTT Over websocket</h1>
+				<p>&nbsp;</p>
+				<!-- col -->
+				<div class="colgroup leading full">
+					<div class="column full first">
+						<h3 class="h3">Connect State</h3>
+						<hr />
+						<div>
+							<label>Current State: <b id="conn_state">DISCONNECT</b></label>
+							<a id="connect_btn" href="javascript:void();" class="btn">Connect</a>
 						</div>
-						<div class="g_6">
-							<div class="simple_buttons">
-								<div id="connect_btn">Connect</div>
-							</div>
+					</div>
+				</div>
+				<!-- col -->
+				<div class="colgroup leading full">
+					<div class="column full first">
+						<h3 class="h3">Connect State</h3>
+						<hr />
+						<div>
+							<input type="text" name="message" id="message" /> <a
+								href="javascript:void();" class="btn" id="send_btn">Send</a>
 						</div>
-						<div class="clear"></div>
 					</div>
 				</div>
 			</div>
-		
-			<!-- Simple Table -->
-			<div class="g_12">
-				<div class="widget_header">
-					<h4 class="widget_header_title wwIcon i_16_tables">Send Message</h4>
-				</div>
-				<div class="widget_contents noPadding">
-					<div class="line_grid">
-						<div class="g_6">
-							<input type="text" name="message" id="message"/>
-						</div>
-						<div class="g_6">
-							<div class="simple_buttons">
-								<div id="send_btn">Send</div>
-							</div>
-						</div>
-						<div class="clear"></div>
-					</div>
-				</div>
-			</div>
-		</div>
 		</div>
 		<div class="clear"></div>
 
