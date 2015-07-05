@@ -775,11 +775,6 @@ fieldset small {
 	-webkit-focus-ring-color: none;
 }
 
-#page {
-	float: left;
-	width: 100%;
-}
-
 #page a {
 	color: #329ECC;
 	text-decoration: none;
