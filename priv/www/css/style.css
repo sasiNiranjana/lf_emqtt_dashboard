@@ -98,10 +98,8 @@ a:hover {
 }
 
 .top-panel {
-	background: rgba(0, 0, 0, 0.75);
-	color: #e1e1e1;
+	background: #fff;
 	width: 100%;
-	min-width: 1000px;
 	height: 60px;
 	z-index: 9999;
 	position: fixed;
@@ -113,43 +111,66 @@ a:hover {
 }
 
 .top-panel .logo {
-	float: none;
-	width: 284px;
+	background: #353644;
+	width: 200px;
+	float: left;
+	height: 60px;
 }
 
-.sidebar, nav {
-	display: block;
-	position: fixed;
-	width: 84px;
+.top-panel .items-inner {
+	padding-left: 200px;
+	box-shadow: 0 -1px 8px 1px #bbb;
+	margin-left: 200px;
+	height: 60px;
 }
 
 .sidebar {
-	font-size: 16px;
+	display: block;
+	position: fixed;
+	width: 200px;
+	background-color: #22222c;
+	height: 100%;
+	padding-top: 0px;
+	overflow-y: auto;
+	font-size: 14px;
 	top: 60px;
 	left: 0;
-	background-color: #ddd;
-	height: 100%;
-	border: 0;
 	z-index: 9999;
 }
 
-.main-tab-nav {
-	padding: 18px 0 0 0;
+.sidebar a {
+	color: #fff;
 }
 
-.main-tab-nav li {
-	padding: 8px 5px;
+.main-tab-nav {
+	margin: 18px 0 0 0;
+}
+
+.main-tab-nav>li {
+	padding: 8px 0px 8px 12px;
+}
+
+.main-tab-nav>li>a {
+	display: block;
+}
+
+.active-tab {
+	background: #4ba575;
+}
+
+.active-tab>a {
+	color: #fff;
 }
 
 .contents-wrapper {
 	padding-top: 60px;
-	margin-left: 84px;
-	min-width: 800px;
-	width: 80%;
+	margin-left: 200px;
+	min-width: 1000px;
+	width: 90%;
 }
 
-.contents-wrapper .contents {
-	padding: 25px;
+.contents-wrapper>.contents {
+	padding: 60px;
 }
 
 .loading {
