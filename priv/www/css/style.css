@@ -165,7 +165,7 @@ a:hover {
 .contents-wrapper {
 	padding-top: 60px;
 	margin-left: 200px;
-	position: fixed;
+	position: absolute;
 	width: 80%;
 }
 
