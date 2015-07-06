@@ -322,7 +322,7 @@ Topic.prototype = {
 					var tby = jQuery('#topic tbody').empty();
 					for (var i = 0; i < d.length; i++) {
 						var top = d[i];
-						tby.append('<tr><td>'+top['mqtt_topic']+'</td><td>'+top['topic']+'</td><td>'+top['node']+'</td></tr>');
+						tby.append('<tr><td>'+top['topic']+'</td><td>'+top['node']+'</td></tr>');
 					}
 				}
 			},
