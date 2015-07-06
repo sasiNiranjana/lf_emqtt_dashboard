@@ -104,26 +104,82 @@
 			<div>
 				<h1 class="h1">MQTT Over Websocket</h1>
 				<p>&nbsp;</p>
+				
 				<!-- col -->
 				<div class="colgroup leading full">
 					<div class="column full first">
-						<h3 class="h3">Connect State</h3>
+						<h3 class="h3">Connection</h3>
 						<hr />
-						<div>
-							<label>Current State: <b id="conn_state">DISCONNECT</b></label> <a
-								id="connect_btn" href="javascript:void();" class="btn">Connect</a>
+						<div class="colgroup leading full">
+							<div class="column width2 first" style="width: 180px;">									
+								<p>
+									<label for="host">Host:</label><br>
+									<input type="text" id="host" name="host" value="">
+								</p>
+							</div>
+							<div class="column width2" style="width: 90px;">
+								<p>
+									<label for="port">Port:</label><br>
+									<input type="text" id="port" name="port" value="" style="width: 50px;">
+								</p>
+							</div>
+							<div class="column width2" style="width: 70px;">
+								<p>
+									<label for="client_id">Client ID:</label><br>
+									<input type="text" id="client_id" name="client_id" value="" style="width: 50px;">
+								</p>
+							</div>
+						</div>
+						<div class="colgroup leading full">
+							<div class="column width2 first" style="width: 180px;">									
+								<p>
+									<label for="user_name">User Name:</label><br>
+									<input type="text" id="user_name" name="user_name" value="">
+								</p>
+							</div>
+							<div class="column width2" style="width: 90px;">
+								<p>
+									<label for="password">Password:</label><br>
+									<input type="password" id="password" name="password" value="" style="width: 80px;">
+								</p>
+							</div>
+							<div class="column width2" style="width: 70px;">
+								<p>
+									<label for="keep_alive">Keep Alive:</label><br>
+									<input type="text" id="keep_alive" name="keep_alive" value="" style="width: 50px;">
+								</p>
+							</div>
+						</div>
+						<div class="colgroup full">
+						<p class="box">
+						<input type="button" id="connect_btn" name="connect_btn" value="Connect" class="btn btn-green">
+						<label style="padding-left: 10px;">Current State: <b id="conn_state" class="b" style="color: #4ba575;">DISCONNECT</b></label>
+						</p>
 						</div>
 					</div>
 				</div>
+				
 				<!-- col -->
 				<div class="colgroup leading full">
 					<div class="column full first">
 						<h3 class="h3">Send Message</h3>
 						<hr />
 						<div>
-							<input type="text" name="message" id="message" /> <a
-								href="javascript:void();" class="btn" id="send_btn">Send</a>
+							<input type="text" name="message" id="message" />
+							<a href="javascript:void();" class="btn" id="send_btn">Send</a>
 						</div>
+					</div>
+				</div>
+				
+				<!-- col -->
+				<div class="colgroup leading full">
+					<div class="column full first">
+						<h3 class="h3">Receive Message</h3>
+						<hr />
+						<q>
+							onMessageArrived: Hellow worle.
+							<cite>2015-7-6 08:58:41</cite>
+						</q>
 					</div>
 				</div>
 			</div>
