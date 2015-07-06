@@ -92,7 +92,7 @@ function Overview() {
 			_t._broker();
 		}, 1000);
 		_t._stats();
-		_t._ptype();
+		_t._metrics();
 		_t._listeners();
 	});
 }
@@ -147,24 +147,38 @@ Overview.prototype = {
 		jQuery.ajax(options);
 	},
 	
-	// 加载ptype
-	_ptype : function() {
+	// 加载metrics
+	_metrics : function() {
 		var _t = this;
 		var options = {
-			url : 'api/ptype',
+			url : 'api/metrics',
 			type : 'POST',
 			dataType : 'json',
 			data : {},
 			success : function(d) {
-				jQuery('#ptype_td_1').text(d['tcp_inet']);
-				jQuery('#ptype_td_2').text(d['efile']);
-				jQuery('#ptype_td_3').text(d['2/2']);
-				jQuery('#ptype_td_4').text(d['inet_gethost 4 ']);
-				jQuery('#ptype_td_5').text(d['sh -s disksup 2>&1']);
-				jQuery('#ptype_td_6').text(d['tty_sl -c -e']);
+				$('#bytes_received').text(d['bytes/received']);
+				$('#bytes_sent').text(d['bytes/sent']);
+				$('#messages_dropped').text(d['messages/dropped']);
+				$('#messages_received').text(d['messages/received']);
+				$('#messages_retained_count').text(d['messages/retained/count']);
+				$('#messages_sent').text(d['messages/sent']);
+				$('#messages_stored_count').text(d['messages/stored/count']);
+				$('#packets_connack').text(d['packets/connack']);
+				$('#packets_connect').text(d['packets/connect']);
+				$('#packets_disconnect').text(d['packets/disconnect']);
+				$('#packets_pingreq').text(d['packets/pingreq']);
+				$('#packets_pingresp').text(d['packets/pingresp']);
+				$('#packets_publish_received').text(d['packets/publish/received']);
+				$('#packets_publish_sent').text(d['packets/publish/sent']);
+				$('#packets_received').text(d['packets/received']);
+				$('#packets_sent').text(d['packets/sent']);
+				$('#packets_suback').text(d['packets_suback']);
+				$('#packets_subscribe').text(d['packets/subscribe']);
+				$('#packets_unsuback').text(d['packets/unsuback']);
+				$('#packets_unsubscribe').text(d['packets/unsubscribe']);
 			},
 			error : function(e) {
-				console.log('api/ptype->error');
+				console.log('api/metrics->error');
 			}
 		};
 		jQuery.ajax(options);
