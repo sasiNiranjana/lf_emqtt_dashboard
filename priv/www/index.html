@@ -16,7 +16,7 @@
 	$(document).ready(function() {
 		var url = window.location.href;
 		var strs = url.split('#');
-		if (strs.length == 0) {
+		if (strs.length == 1) {
 			overview = new Overview();
 		} else if (strs[1] == '/overview') {
 			overview = new Overview();
@@ -28,6 +28,8 @@
 			topic = new Topic();
 		} else if (strs[1] == '/subpub') {
 			subpub = new Subpub();
+		} else {
+			overview = new Overview();
 		}
 		addClick();
 	});
