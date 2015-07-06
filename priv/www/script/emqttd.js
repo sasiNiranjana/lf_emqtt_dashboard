@@ -234,7 +234,7 @@ Clients.prototype = {
 					var tby = jQuery('#clients tbody').empty();
 					for (var i = 0; i < d.length; i++) {
 						var cli = d[i];
-						tby.append('<tr><td>'+cli['mqtt_client']+'</td><td>'+cli['clientId']+'</td><td>'+cli['ipaddress']+'</td><td>'+cli['session']+'</td></tr>');
+						tby.append('<tr><td>'+cli['clientId']+'</td><td>'+cli['session']+'</td></tr>');
 					}	
 				}
 			},
