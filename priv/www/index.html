@@ -14,23 +14,34 @@
 <script src="script/emqttd.js"></script>
 <script type="text/javascript">
 	$(document).ready(function() {
+		var item = 1;
 		var url = window.location.href;
 		var strs = url.split('#');
 		if (strs.length == 1) {
 			overview = new Overview();
 		} else if (strs[1] == '/overview') {
 			overview = new Overview();
+			item = 1;
 		} else if (strs[1] == '/clients') {
 			clients = new Clients();
+			item = 2;
 		} else if (strs[1] == '/session') {
 			session = new Session();
+			item = 3;
 		} else if (strs[1] == '/topic') {
 			topic = new Topic();
+			item = 4;
 		} else if (strs[1] == '/subpub') {
 			subpub = new Subpub();
+			item = 5;
 		} else {
 			overview = new Overview();
 		}
+		$('#tab_nav>li').each(function(e, i) {
+			if (i == item) {
+				tabClass(e);
+			}
+		});
 		addClick();
 	});
 </script>
