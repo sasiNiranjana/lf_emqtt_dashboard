@@ -55,8 +55,9 @@ var client = null;
 // the client connect
 function connect() {
 	// Create a client instance
-	client = new Paho.MQTT.Client($('#host').val(), $('#port').val(), $('#client_id').val());
-
+	client = new Paho.MQTT.Client($('#host').val(),
+			Number($('#port').val()),
+			$('#client_id').val());
 	// set callback handlers
 	client.onConnectionLost = onConnectionLost;
 	client.onMessageArrived = onMessageArrived;
