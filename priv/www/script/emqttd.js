@@ -201,7 +201,7 @@ Overview.prototype = {
 					var tby = jQuery('#listeners tbody').empty();
 					for (var i = 0; i < d.length; i++) {
 						var lis = d[i];
-						tby.append('<tr><td>'+lis['protocol']+'</td><td>'+lis['port']+'</td><td>'+lis['max_clients']+'</td><td>'+lis['current_clients']+'</td></tr>');
+						tby.append('<tr><td>'+lis['protocol']+'</td><td>'+lis['port']+'</td><td class="ta-right">'+lis['max_clients']+'</td><td class="ta-right">'+lis['current_clients']+'</td></tr>');
 					}	
 				}
 			},

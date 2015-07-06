@@ -14,7 +14,21 @@
 <script src="script/emqttd.js"></script>
 <script type="text/javascript">
 	$(document).ready(function() {
-		overview = new Overview();
+		var url = window.location.href;
+		var strs = url.split('#');
+		if (strs.length == 0) {
+			overview = new Overview();
+		} else if (strs[1] == '/overview') {
+			overview = new Overview();
+		} else if (strs[1] == '/clients') {
+			clients = new Clients();
+		} else if (strs[1] == '/session') {
+			session = new Session();
+		} else if (strs[1] == '/topic') {
+			topic = new Topic();
+		} else if (strs[1] == '/subpub') {
+			subpub = new Subpub();
+		}
 		addClick();
 	});
 </script>
@@ -37,12 +51,12 @@
 	<aside class="sidebar">
 		<nav>
 			<ul class="main-tab-nav" id="tab_nav">
-				<li class="active-tab"><a href="#" title="General">Overview</a></li>
-				<li class=""><a href="#" title="Clients">Clients</a></li>
-				<li class=""><a href="#" title="Session">Session</a></li>
-				<li class=""><a href="#" title="Topic">Topic</a></li>
-				<li class=""><a href="#" title="Subpub">Subpub</a></li>
-				<li class=""><a href="websocket.html" title="Websocket">Websocket</a></li>
+				<li class="active-tab"><a href="/#/overview" title="Overview">Overview</a></li>
+				<li><a href="/#/clients" title="Clients">Clients</a></li>
+				<li><a href="/#/session" title="Session">Session</a></li>
+				<li><a href="/#/topic" title="Topic">Topic</a></li>
+				<li><a href="/#/subpub" title="Subpub">Subpub</a></li>
+				<li><a href="/websocket.html" title="Websocket">Websocket</a></li>
 			</ul>
 		</nav>
 	</aside>
