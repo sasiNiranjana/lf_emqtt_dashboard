@@ -240,6 +240,7 @@ Clients.prototype = {
 			dataType : 'json',
 			data : {},
 			success : function(d) {
+				$('#clients_count').text(d.length);
 				if (d.length == 0) {
 					var cTable = jQuery('#clients');
 					cTable.hide();
@@ -288,6 +289,7 @@ Session.prototype = {
 			dataType : 'json',
 			data : {},
 			success : function(d) {
+				$('#session_count').text(d.length);
 				if (d.length == 0) {
 					var sTable = jQuery('#session');
 					sTable.hide();
@@ -336,6 +338,7 @@ Topic.prototype = {
 			dataType : 'json',
 			data : {},
 			success : function(d) {
+				$('#topic_count').text(d.length);
 				if (d.length == 0) {
 					var sTable = jQuery('#topic');
 					sTable.hide();
@@ -384,6 +387,7 @@ Subpub.prototype = {
 			dataType : 'json',
 			data : {},
 			success : function(d) {
+				$('#subpub_count').text(d.length);
 				if (d.length == 0) {
 					var sTable = jQuery('#subpub');
 					sTable.hide();
