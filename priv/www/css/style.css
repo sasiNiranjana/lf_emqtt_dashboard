@@ -253,8 +253,8 @@ table.stylized th, table.stylized td {
 }
 
 table.stylized th {
-	background-color: #2A7AD2 !important;
-	color: #fff;
+	background: #E0E0E0 !important;
+	color: #696969;
 	text-align: left;
 }
 
