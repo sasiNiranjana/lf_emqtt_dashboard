@@ -179,9 +179,17 @@ Overview.prototype = {
 			dataType : 'json',
 			data : {},
 			success : function(d) {
-				jQuery('#lis_http').text(d['http']);
-				jQuery('#lis_mqtts').text(d['mqtts']);
-				jQuery('#lis_mqtt').text(d['mqtt']);
+				if (d.length == 0) {
+					var lTable = jQuery('#listeners');
+					lTable.hide();
+					lTable.parent().append('<p style="padding: 12px;">... no listeners ...</p>');
+				} else {
+					var tby = jQuery('#listeners tbody').empty();
+					for (var i = 0; i < d.length; i++) {
+						var lis = d[i];
+						tby.append('<tr><td>'+lis['protocol']+'</td><td>'+lis['port']+'</td><td>'+lis['max_clients']+'</td><td>'+lis['current_clients']+'</td></tr>');
+					}	
+				}
 			},
 			error : function(e) {
 				console.log('api/listeners->error');
