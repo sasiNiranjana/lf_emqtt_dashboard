@@ -75,13 +75,25 @@ api(memory, Req) ->
 api(cpu, Req) ->
     Cpu = emqttd_vm:loads(), 
     api_respond(Req, Cpu);
+ 
+api(node, Req) ->
+    Nodes = [node()|nodes()],
+    NodeInfo = lists:map(fun(Node)-> 
+		Memory = rpc:call(Node, emqttd_vm, get_memory, []),
+		[{name, Node}, {memory, proplists:get_value(total, Memory)}]
+	    end, Nodes),
+    api_respond(Req, NodeInfo);
     
 api(metrics, Req) ->
     Metrics = [{Metric, Val} || {Metric, Val} <- emqttd_metrics:all()],
     api_respond(Req, Metrics);
    
 api(listeners, Req) ->
-    Llists = [Listeners || {Listeners , _Port} <- esockd:listeners()],
+    Llists = lists:map(fun({{Protocol, Port}, Pid})-> 
+		MaxClients = esockd:get_max_clients(Pid),	
+	 	CurrentClients = esockd:get_current_clients(Pid),
+	 	[{protocol, Protocol},{port, Port},{max_clients, MaxClients},{current_clients, CurrentClients}] 
+	      end, esockd:listeners()),
     api_respond(Req, Llists);
     
 %%-----------------------------------clients--------------------------------------
@@ -101,10 +113,9 @@ api(clients, Req) ->
 %%sessin check api
 api(session, Req) ->
     SessionsTab =  emqttd_sm:table(),
-    Bodys = [[{mqtt_session,  Tab},
+    Bodys = [[
 	     {clientId, ClientId}, 
-	     {ipaddress, list_to_binary(emqttd_net:ntoa(Ip))}, 
-	     {session, CleanSession}] || {Tab, ClientId, _Pid, Ip, _, _, CleanSession, _ }
+	     {session, CleanSession}] || {CleanSession, ClientId, _SessPid, _MRef }
 	    <- emqttd_vm:get_ets_object(SessionsTab)],
     api_respond(Req, Bodys);
    
@@ -116,7 +127,7 @@ api(topic, Req) ->
 	qlc:e(Q) 
         end,
     {atomic, TopicLists} =  mnesia:transaction(F),
-    Bodys = [[{mqtt_topic,  Tab},
+    Bodys = [[
 	     {topic, Topic}, 
 	     {node, Node} 
 	     ] || {Tab, Topic, Node} <- TopicLists],
