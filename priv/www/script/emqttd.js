@@ -385,21 +385,25 @@ Topic.prototype = {
 		var clientId = "tmojs-";
 		var jClient = new Paho.MQTT.Client("test.mosquitto.org", 8080, clientId);
 
-		jClient.ondisconnect = function(reason) {
-			console.log("disconnected from server.");
-		};
 		jClient.onMessageArrived = onMessage;
+		jClient.onConnectionLost = onConnection;
 		jClient.connect({
 			onSuccess : function() {
-				console.log("connected, now subscribe")
 				jClient.subscribe("$SYS/#");
+				console.log("client connect success, now subscribe.");
 			},
 			cleanSession : true
 		});
 
 		function onMessage(message) {
-			console.log(message.destinationName + "- " + message.payloadString);
+			console.log("onMessageArrived:" + message.destinationName + "-"
+					+ message.payloadString);
 			addNode(message.destinationName, message.payloadString);
+		}
+		function onConnection(responseObject) {
+			if (responseObject.errorCode !== 0) {
+				console.log("onConnectionLost:" + responseObject.errorMessage);
+			}
 		}
 	},
 
