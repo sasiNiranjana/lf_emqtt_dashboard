@@ -37,13 +37,13 @@ $(document).ready(function() {
 // called when the client loses its connection
 function onConnectionLost(responseObject) {
 	if (responseObject.errorCode !== 0) {
-		console.log("onConnectionLost:" + responseObject.errorMessage);
+		console.log("onConnectionLost: " + responseObject.errorMessage);
 	}
 }
 
 // called when a message arrives
 function onMessageArrived(message) {
-	console.log("onMessageArrived:" + message.payloadString);
+	console.log("onMessageArrived: " + message.payloadString);
 	var nowStr = (new Date()).format("yyyy-MM-dd hh:mm:ss");
 	$('#receive_message').append('<q>onMessageArrived: ' 
 		+ message.payloadString + '<cite>' 

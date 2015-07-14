@@ -383,7 +383,7 @@ Topic.prototype = {
 			// clientId += chars.charAt(Math.floor(Math.random()*chars.length));
 		}
 		var clientId = "tmojs-";
-		var jClient = new Paho.MQTT.Client("test.mosquitto.org", 8080, clientId);
+		var jClient = new Paho.MQTT.Client(location.hostname, 8083, clientId);
 
 		jClient.onMessageArrived = onMessage;
 		jClient.onConnectionLost = onConnection;
@@ -396,13 +396,13 @@ Topic.prototype = {
 		});
 
 		function onMessage(message) {
-			console.log("onMessageArrived:" + message.destinationName + "-"
+			console.log("onMessageArrived: " + message.destinationName + "-"
 					+ message.payloadString);
 			addNode(message.destinationName, message.payloadString);
 		}
 		function onConnection(responseObject) {
 			if (responseObject.errorCode !== 0) {
-				console.log("onConnectionLost:" + responseObject.errorMessage);
+				console.log("onConnectionLost: " + responseObject.errorMessage);
 			}
 		}
 	},
