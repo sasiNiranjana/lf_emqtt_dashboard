@@ -377,34 +377,21 @@ Topic.prototype = {
 
 	_loadTree : function() {
 		setup("body");
-
-		var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-		for (var i = 0; i < 15; i++) {
-			// clientId += chars.charAt(Math.floor(Math.random()*chars.length));
-		}
-		var clientId = "tmojs-";
-		var jClient = new Paho.MQTT.Client(location.hostname, 8083, clientId);
-
-		jClient.onMessageArrived = onMessage;
-		jClient.onConnectionLost = onConnection;
-		jClient.connect({
-			onSuccess : function() {
-				jClient.subscribe("$SYS/#");
-				console.log("client connect success, now subscribe.");
+		var options = {
+			url : 'api/topic',
+			type : 'POST',
+			dataType : 'json',
+			data : {},
+			success : function(d) {
+				for (var i = 0; i < d.length; i++) {
+					addNode(d[i][topic], 1);
+				}
 			},
-			cleanSession : true
-		});
-
-		function onMessage(message) {
-			console.log("onMessageArrived: " + message.destinationName + "-"
-					+ message.payloadString);
-			addNode(message.destinationName, message.payloadString);
-		}
-		function onConnection(responseObject) {
-			if (responseObject.errorCode !== 0) {
-				console.log("onConnectionLost: " + responseObject.errorMessage);
+			error : function(e) {
+				console.log('api/topic->error');
 			}
-		}
+		};
+		jQuery.ajax(options);
 	},
 
 	// 关闭任务（定时任务等）

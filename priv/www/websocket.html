@@ -64,8 +64,8 @@ function connect() {
 	
 	client.connect({
 		onSuccess : function() {
-			jQuery('#conn_state').text('CONNECTED');
 			console.log("The client connect success.");
+			jQuery('#conn_state').text('CONNECTED');
 			subscribe("/World");
 
 			sendMessage("Hello world.")
