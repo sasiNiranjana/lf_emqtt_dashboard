@@ -9,8 +9,7 @@ $.ajaxSetup({
 
 function loading(module, fun) {
 	var loadingAjax = jQuery('#contents');
-	loadingAjax.empty().append(
-			'<div class="loading"></div>');
+	loadingAjax.empty().append('<div class="loading"></div>');
 	loadingAjax.load(module, fun);
 }
 
@@ -119,7 +118,7 @@ Overview.prototype = {
 		};
 		jQuery.ajax(options);
 	},
-	
+
 	// 加载stats
 	_stats : function() {
 		var _t = this;
@@ -146,7 +145,7 @@ Overview.prototype = {
 		};
 		jQuery.ajax(options);
 	},
-	
+
 	// 加载metrics
 	_metrics : function() {
 		var _t = this;
@@ -160,7 +159,8 @@ Overview.prototype = {
 				$('#bytes_sent').text(d['bytes/sent']);
 				$('#messages_dropped').text(d['messages/dropped']);
 				$('#messages_received').text(d['messages/received']);
-				$('#messages_retained_count').text(d['messages/retained/count']);
+				$('#messages_retained_count')
+						.text(d['messages/retained/count']);
 				$('#messages_sent').text(d['messages/sent']);
 				$('#messages_stored_count').text(d['messages/stored/count']);
 				$('#packets_connack').text(d['packets/connack']);
@@ -168,7 +168,8 @@ Overview.prototype = {
 				$('#packets_disconnect').text(d['packets/disconnect']);
 				$('#packets_pingreq').text(d['packets/pingreq']);
 				$('#packets_pingresp').text(d['packets/pingresp']);
-				$('#packets_publish_received').text(d['packets/publish/received']);
+				$('#packets_publish_received').text(
+						d['packets/publish/received']);
 				$('#packets_publish_sent').text(d['packets/publish/sent']);
 				$('#packets_received').text(d['packets/received']);
 				$('#packets_sent').text(d['packets/sent']);
@@ -183,7 +184,7 @@ Overview.prototype = {
 		};
 		jQuery.ajax(options);
 	},
-	
+
 	// 加载listeners
 	_listeners : function() {
 		var _t = this;
@@ -196,13 +197,20 @@ Overview.prototype = {
 				if (d.length == 0) {
 					var lTable = jQuery('#listeners');
 					lTable.hide();
-					lTable.parent().append('<p style="padding: 12px;">... no listeners ...</p>');
+					lTable
+							.parent()
+							.append(
+									'<p style="padding: 12px;">... no listeners ...</p>');
 				} else {
 					var tby = jQuery('#listeners tbody').empty();
 					for (var i = 0; i < d.length; i++) {
 						var lis = d[i];
-						tby.append('<tr><td>'+lis['protocol']+'</td><td>'+lis['port']+'</td><td class="ta-right">'+lis['max_clients']+'</td><td class="ta-right">'+lis['current_clients']+'</td></tr>');
-					}	
+						tby.append('<tr><td>' + lis['protocol'] + '</td><td>'
+								+ lis['port'] + '</td><td class="ta-right">'
+								+ lis['max_clients']
+								+ '</td><td class="ta-right">'
+								+ lis['current_clients'] + '</td></tr>');
+					}
 				}
 			},
 			error : function(e) {
@@ -244,13 +252,15 @@ Clients.prototype = {
 				if (d.length == 0) {
 					var cTable = jQuery('#clients');
 					cTable.hide();
-					cTable.parent().append('<p style="padding: 12px;">... no clients ...</p>');
+					cTable.parent().append(
+							'<p style="padding: 12px;">... no clients ...</p>');
 				} else {
 					var tby = jQuery('#clients tbody').empty();
 					for (var i = 0; i < d.length; i++) {
 						var cli = d[i];
-						tby.append('<tr><td>'+cli['clientId']+'</td><td>'+cli['session']+'</td></tr>');
-					}	
+						tby.append('<tr><td>' + cli['clientId'] + '</td><td>'
+								+ cli['session'] + '</td></tr>');
+					}
 				}
 			},
 			error : function(e) {
@@ -259,10 +269,10 @@ Clients.prototype = {
 		};
 		jQuery.ajax(options);
 	},
-	
+
 	// 关闭任务（定时任务等）
 	closeTask : function() {
-		
+
 	}
 
 };
@@ -293,12 +303,16 @@ Session.prototype = {
 				if (d.length == 0) {
 					var sTable = jQuery('#session');
 					sTable.hide();
-					sTable.parent().append('<p style="padding: 12px;">... no session ...</p>');
+					sTable.parent().append(
+							'<p style="padding: 12px;">... no session ...</p>');
 				} else {
 					var tby = jQuery('#session tbody').empty();
 					for (var i = 0; i < d.length; i++) {
 						var ses = d[i];
-						tby.append('<tr><td>'+ses['mqtt_session']+'</td><td>'+ses['clientId']+'</td><td>'+ses['ipaddress']+'</td><td>'+ses['session']+'</td></tr>');
+						tby.append('<tr><td>' + ses['mqtt_session']
+								+ '</td><td>' + ses['clientId'] + '</td><td>'
+								+ ses['ipaddress'] + '</td><td>'
+								+ ses['session'] + '</td></tr>');
 					}
 				}
 			},
@@ -311,7 +325,7 @@ Session.prototype = {
 
 	// 关闭任务（定时任务等）
 	closeTask : function() {
-		
+
 	}
 
 };
@@ -343,12 +357,14 @@ Topic.prototype = {
 				if (d.length == 0) {
 					var sTable = jQuery('#topic');
 					sTable.hide();
-					sTable.parent().append('<p style="padding: 12px;">... no topic ...</p>');
+					sTable.parent().append(
+							'<p style="padding: 12px;">... no topic ...</p>');
 				} else {
 					var tby = jQuery('#topic tbody').empty();
 					for (var i = 0; i < d.length; i++) {
 						var top = d[i];
-						tby.append('<tr><td>'+top['topic']+'</td><td>'+top['node']+'</td></tr>');
+						tby.append('<tr><td>' + top['topic'] + '</td><td>'
+								+ top['node'] + '</td></tr>');
 					}
 				}
 			},
@@ -360,54 +376,36 @@ Topic.prototype = {
 	},
 
 	_loadTree : function() {
-		var width = 960, height = 2000;
+		setup("body");
 
-		var tree = d3.layout.tree()
-		    .size([height, width - 160]);
+		var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+		for (var i = 0; i < 15; i++) {
+			// clientId += chars.charAt(Math.floor(Math.random()*chars.length));
+		}
+		var clientId = "tmojs-";
+		var jClient = new Paho.MQTT.Client("test.mosquitto.org", 8080, clientId);
 
-		var diagonal = d3.svg.diagonal()
-		    .projection(function(d) { return [d.y, d.x]; });
-
-		var svg = d3.select("body").append("svg")
-		    .attr("width", width)
-		    .attr("height", height)
-		    .append("g")
-		    .attr("transform", "translate(40,0)");
-	
-		d3.json("http://bl.ocks.org/mbostock/raw/4063550/flare.json", function(error, json) {
-		  if (error) throw error;
-	
-		  var nodes = tree.nodes(json),
-		      links = tree.links(nodes);
-	
-		  var link = svg.selectAll("path.link")
-		      .data(links)
-		    .enter().append("path")
-		      .attr("class", "link")
-		      .attr("d", diagonal);
-	
-		  var node = svg.selectAll("g.node")
-		      .data(nodes)
-		    .enter().append("g")
-		      .attr("class", "node")
-		      .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; })
-	
-		  node.append("circle")
-		      .attr("r", 4.5);
-	
-		  node.append("text")
-		      .attr("dx", function(d) { return d.children ? -8 : 8; })
-		      .attr("dy", 3)
-		      .attr("text-anchor", function(d) { return d.children ? "end" : "start"; })
-		      .text(function(d) { return d.name; });
+		jClient.ondisconnect = function(reason) {
+			console.log("disconnected from server.");
+		};
+		jClient.onMessageArrived = onMessage;
+		jClient.connect({
+			onSuccess : function() {
+				console.log("connected, now subscribe")
+				jClient.subscribe("$SYS/#");
+			},
+			cleanSession : true
 		});
-	
-		d3.select(self.frameElement).style("height", height + "px");
+
+		function onMessage(message) {
+			console.log(message.destinationName + "- " + message.payloadString);
+			addNode(message.destinationName, message.payloadString);
+		}
 	},
-	
+
 	// 关闭任务（定时任务等）
 	closeTask : function() {
-		
+
 	}
 
 };
@@ -438,12 +436,15 @@ Subpub.prototype = {
 				if (d.length == 0) {
 					var sTable = jQuery('#subpub');
 					sTable.hide();
-					sTable.parent().append('<p style="padding: 12px;">... no subpub ...</p>');
+					sTable.parent().append(
+							'<p style="padding: 12px;">... no subpub ...</p>');
 				} else {
 					var tby = jQuery('#subpub tbody').empty();
 					for (var i = 0; i < d.length; i++) {
 						var sub = d[i];
-						tby.append('<tr><td>'+sub['mqtt_subscriber']+'</td><td>'+sub['topic']+'</td><td>'+sub['qos']+'</td></tr>');
+						tby.append('<tr><td>' + sub['mqtt_subscriber']
+								+ '</td><td>' + sub['topic'] + '</td><td>'
+								+ sub['qos'] + '</td></tr>');
 					}
 				}
 			},
@@ -456,7 +457,7 @@ Subpub.prototype = {
 
 	// 关闭任务（定时任务等）
 	closeTask : function() {
-		
+
 	}
 
 };
