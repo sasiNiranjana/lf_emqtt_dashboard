@@ -118,7 +118,7 @@ Overview.prototype = {
 		c.connect({
 			onSuccess : function() {
 				console.log("The client connect success.");
-				c.subscribe("$SYS/brokers/emqtt@" + location.hostname + "/#'");
+				c.subscribe("$SYS/brokers/emqttd@" + location.hostname + "/#'");
 			}
 		});
 		c.onConnectionLost = onConnectionLost;
