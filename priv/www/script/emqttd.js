@@ -384,7 +384,7 @@ Topic.prototype = {
 			data : {},
 			success : function(d) {
 				for (var i = 0; i < d.length; i++) {
-					addNode(d[i][topic], 1);
+					addNode(d[i]['topic'], 1);
 				}
 			},
 			error : function(e) {
