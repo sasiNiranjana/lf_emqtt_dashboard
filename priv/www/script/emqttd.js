@@ -86,10 +86,6 @@ function Overview() {
 		_t.elements.sysUptime = jQuery('#sys_uptime', sysInfo);
 		_t.elements.sysTime = jQuery('#sys_time', sysInfo);
 		_t._broker();
-		// 定时任务
-		_t.timetask = setInterval(function() {
-			_t._broker();
-		}, 1000);
 		_t._stats();
 		_t._metrics();
 		_t._listeners();
@@ -100,23 +96,43 @@ Overview.prototype = {
 
 	// 加载系统基本信息
 	_broker : function() {
-		var _t = this;
-		var options = {
-			url : 'api/broker',
-			type : 'POST',
-			dataType : 'json',
-			data : {},
-			success : function(d) {
-				_t.elements.sysName.text(d.sysdescr);
-				_t.elements.sysVersion.text(d.version);
-				_t.elements.sysUptime.text(d.uptime);
-				_t.elements.sysTime.text(d.datetime);
-			},
-			error : function(e) {
-				console.log('api/broker->error');
+//		var _t = this;
+//		var options = {
+//			url : 'api/broker',
+//			type : 'POST',
+//			dataType : 'json',
+//			data : {},
+//			success : function(d) {
+//				_t.elements.sysName.text(d.sysdescr);
+//				_t.elements.sysVersion.text(d.version);
+//				_t.elements.sysUptime.text(d.uptime);
+//				_t.elements.sysTime.text(d.datetime);
+//			},
+//			error : function(e) {
+//				console.log('api/broker->error');
+//			}
+//		};
+//		jQuery.ajax(options);
+		
+		var c = new Paho.MQTT.Client(location.hostname, 8083, "c_broker");
+		c.connect({
+			onSuccess : function() {
+				console.log("The client connect success.");
+				c.subscribe("$SYS/brokers/emqtt@" + location.hostname + "/#'");
 			}
-		};
-		jQuery.ajax(options);
+		});
+		c.onConnectionLost = onConnectionLost;
+		c.onMessageArrived = onMessageArrived;
+		// called when the client loses its connection
+		function onConnectionLost(responseObject) {
+			if (responseObject.errorCode !== 0) {
+				console.log("onConnectionLost: " + responseObject.errorMessage);
+			}
+		}
+		// called when a message arrives
+		function onMessageArrived(message) {
+			console.log("onMessageArrived: " + message.payloadString);
+		}
 	},
 
 	// 加载stats
@@ -222,7 +238,7 @@ Overview.prototype = {
 
 	// 关闭任务（定时任务等）
 	closeTask : function() {
-		clearInterval(this.timetask);
+		//clearInterval(this.timetask);
 	}
 
 };
