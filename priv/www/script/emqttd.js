@@ -258,8 +258,7 @@ Clients.prototype = {
 					var tby = jQuery('#clients tbody').empty();
 					for (var i = 0; i < d.length; i++) {
 						var cli = d[i];
-						tby.append('<tr><td>' + cli['clientId'] + '</td><td>'
-								+ cli['session'] + '</td></tr>');
+						tby.append('<tr><td>' + cli['clientId'] + '</td><td>' + cli['username'] + '</td><td>' + cli['ipaddress'] + '</td><td>' + cli['port'] + '</td><td>' + cli['clean_sess'] + '</td><td>' + cli['proto_ver'] + '</td><td>' + cli['keepalive'] + '</td><td>' + cli['connected_at'] + '</td> </tr>');
 					}
 				}
 			},
@@ -309,10 +308,8 @@ Session.prototype = {
 					var tby = jQuery('#session tbody').empty();
 					for (var i = 0; i < d.length; i++) {
 						var ses = d[i];
-						tby.append('<tr><td>' + ses['mqtt_session']
-								+ '</td><td>' + ses['clientId'] + '</td><td>'
-								+ ses['ipaddress'] + '</td><td>'
-								+ ses['session'] + '</td></tr>');
+						tby.append('<tr><td>' + ses['clientId']
+								+ '</td><td>' + ses['persistent'] + '</td><td>' + ses['on_node'] + '</td></tr>');
 					}
 				}
 			},

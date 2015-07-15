@@ -34,8 +34,6 @@
  
 -include_lib("stdlib/include/qlc.hrl").
 
--define(AUTH_CLIENTID_TAB, mqtt_auth_clientid).
-
 handle_request(Req) ->
     Path = Req:get(path),
     lager:info("Dashboard file: ~s ~s", [Req:get(method), Path]),
@@ -99,25 +97,35 @@ api(listeners, Req) ->
 %%-----------------------------------clients--------------------------------------
 %%clients api
 api(clients, Req) ->
-    F = fun() ->
-        Q = qlc:q([E || E <- mnesia:table(?AUTH_CLIENTID_TAB)]),
-	qlc:e(Q) 
-        end,
-    {atomic, Clients} =  mnesia:transaction(F),
-    Bodys = [[{mqtt_client,  Tab},
-	     {clientId, ClientId}, 
-	     {ipaddress, list_to_binary(emqttd_net:ntoa(Ipaddr))}] || {Tab, ClientId, Ipaddr, _Password} <- Clients],
+	Bodys = [[
+		{clientId, ClientId}, 
+		{username, UserName}, 
+		{ipaddress, list_to_binary(emqttd_net:ntoa(Ipaddr))}, 
+		{port, Port}, 
+		{clean_sess, CleanSession}, 
+		{proto_ver, ProtoVer}, 
+		{keepalive, KeepAlvie}, 
+		{connected_at, list_to_binary(connected_at_format(ConnectedAt))}
+		] || {_Tab, ClientId, _ClientPid, UserName, {Ipaddr, Port}, CleanSession, ProtoVer, KeepAlvie, _WillTopic, ConnectedAt}
+		<- emqttd_vm:get_ets_object(mqtt_client)],
     api_respond(Req, Bodys);
     
 %%-----------------------------------session--------------------------------------
 %%sessin check api
 api(session, Req) ->
-    SessionsTab =  emqttd_sm:table(),
+    F = fun() ->
+        Q = qlc:q([E || E <- mnesia:table(session)]),
+	qlc:e(Q) 
+        end,
+    {atomic, Sessions} =  mnesia:transaction(F),
     Bodys = [[
 	     {clientId, ClientId}, 
-	     {session, CleanSession}] || {CleanSession, ClientId, _SessPid, _MRef }
-	    <- emqttd_vm:get_ets_object(SessionsTab)],
+	     %{sess_pid, SessPid}, 
+	     {persistent, Persistent}, 
+	     {on_node, OnNode}] 
+     || {_Tab, ClientId, _SessPid, Persistent, OnNode} <- Sessions],
     api_respond(Req, Bodys);
+  
    
 %%-----------------------------------topic--------------------------------------
 %%topic api
@@ -130,7 +138,7 @@ api(topic, Req) ->
     Bodys = [[
 	     {topic, Topic}, 
 	     {node, Node} 
-	     ] || {Tab, Topic, Node} <- TopicLists],
+	     ] || {_Tab, Topic, Node} <- TopicLists],
  
     api_respond(Req, Bodys);
    
@@ -144,7 +152,7 @@ api(subscriber, Req) ->
     {atomic, SubLists} =  mnesia:transaction(F),
     Bodys = [[{mqtt_subscriber,  Tab},
              {topic, Topic}, 
-             {qos, Qos}] || {Tab, Topic, Qos, Pid} <- SubLists],
+             {qos, Qos}] || {Tab, Topic, _Pid, Qos} <- SubLists],
 
     api_respond(Req, Bodys).
     
@@ -156,3 +164,22 @@ api_respond(Req, Bodys) ->
         list_to_binary(mochijson2:encode(Bodys) ++ <<10>>)
     end,
     Req:respond({200, [{"Content-Type","application/json"}], JsonData}).
+
+connected_at_format(Timestamp) ->
+    Ts = emqttd_util:now_to_secs(Timestamp),
+    strftime(datetime(Ts)).
+
+strftime({{Y,M,D}, {H,MM,S}}) ->
+    Date = string:join([zeropad(I) || I <- [Y,M,D]], "-"),
+    Time = string:join([zeropad(I) || I <- [H, MM, S]], ":"),
+    lists:concat([Date, " ", Time]).
+	        
+datetime(Timestamp) when is_integer(Timestamp) ->
+    Universal = calendar:gregorian_seconds_to_datetime(Timestamp +
+	calendar:datetime_to_gregorian_seconds({{1970,1,1}, {0,0,0}})),
+    calendar:universal_time_to_local_time(Universal).
+
+zeropad(I) when I < 10 ->
+    lists:concat(["0", I]);
+zeropad(I) ->
+    integer_to_list(I).
