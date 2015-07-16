@@ -43,6 +43,37 @@
 			</p>
 		</div>
 	</div>
+
+	<!-- Nodes -->
+	<div class="colgroup leading full">
+		<div class="column full first">
+			<h3 class="h3">Nodes</h3>
+			<hr />
+			<div>
+				<table class="stylized" id="nodes">
+					<thead>
+						<tr>
+							<th>Name</th>
+							<th>Erlang processes<br/>(used / avaliable)</th>
+							<th>Cpu info<br/>(1min load / 5min load / 15min load)</th>
+							<th>Memory info<br/>(used / total)</th>
+							<th>Uptime</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td id="name"></td>
+							<td id="erlang_process"></td>
+							<td id="cpu_info"></td>
+							<td id="memory_info"></td>
+							<td id="uptime"></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+
 	<!-- Stats -->
 	<div class="colgroup leading full">
 		<div class="column full first">
@@ -82,7 +113,7 @@
 			</div>
 		</div>
 	</div>
-	<!-- ptype -->
+	<!-- Metrics -->
 	<div class="colgroup leading full">
 		<div class="column full first">
 			<h3 class="h3">Metrics</h3>

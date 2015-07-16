@@ -86,6 +86,7 @@ function Overview() {
 		_t.elements.sysUptime = jQuery('#sys_uptime', sysInfo);
 		_t.elements.sysTime = jQuery('#sys_time', sysInfo);
 		_t._broker();
+		_t._nodes();
 		_t._stats();
 		_t._metrics();
 		_t._listeners();
@@ -118,7 +119,7 @@ Overview.prototype = {
 		c.connect({
 			onSuccess : function() {
 				console.log("The client connect success.");
-				c.subscribe("$SYS/brokers/emqttd@" + location.hostname + "/#'");
+				c.subscribe("\$SYS/brokers/emqttd@127.0.0.1/#");
 			}
 		});
 		c.onConnectionLost = onConnectionLost;
@@ -134,6 +135,42 @@ Overview.prototype = {
 			console.log("onMessageArrived: " + message.destinationName + "-" + message.payloadString);
 		}
 	},
+
+	// 加载nodes
+	_nodes: function() {
+		var _t = this;
+		var options = {
+			url : 'api/node',
+			type : 'POST',
+			dataType : 'json',
+			data : {},
+			success : function(d) {
+				if (d.length == 0) {
+					var lTable = jQuery('#nodes');
+					lTable.hide();
+					lTable
+							.parent()
+							.append(
+									'<p style="padding: 12px;">... no node...</p>');
+				} else {
+					var tby = jQuery('#nodes tbody').empty();
+					for (var i = 0; i < d.length; i++) {
+						var lis = d[i];
+						tby.append('<tr><td>' + lis['Name'] + '</td><td>'
+								+ lis['Erlang processes'] + '</td><td class="ta-right">'
+								+ lis['Cpu info<br/>(1min load / 5min load / 15min load)']
+								+ '</td><td class="ta-right">'
+								+ lis['Memory info<br/>(used / total)'] + '</td><td class="ta-right">' + lis['Uptime'] + '</td></tr>');
+					}
+				}
+			},
+			error : function(e) {
+				console.log('api/node->error');
+			}
+		};
+		jQuery.ajax(options);
+	},
+
 
 	// 加载stats
 	_stats : function() {

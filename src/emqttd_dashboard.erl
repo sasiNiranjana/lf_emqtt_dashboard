@@ -53,11 +53,6 @@ docroot() ->
 %%-----------------------------------overview--------------------------------------
 
 %% broker info
-api(broker, Req) ->
-    Funs = [sysdescr, version, uptime, datetime],
-    BrokerInfo = [{Fun, list_to_binary(emqttd_broker:Fun())}|| Fun <- Funs],
-    api_respond(Req, BrokerInfo);
-   
 api(stats, Req) ->
     Stats = [{Stat, Val} || {Stat, Val} <- emqttd_stats:getstats()],
     api_respond(Req, Stats);
@@ -73,12 +68,16 @@ api(memory, Req) ->
 api(cpu, Req) ->
     Cpu = emqttd_vm:loads(), 
     api_respond(Req, Cpu);
- 
+
 api(node, Req) ->
     Nodes = [node()|nodes()],
     NodeInfo = lists:map(fun(Node)-> 
-		Memory = rpc:call(Node, emqttd_vm, get_memory, []),
-		[{name, Node}, {memory, proplists:get_value(total, Memory)}]
+		Memory = rpc:call(Node, emqttd_vm, mem_info, []),
+		CpuInfo = [{K, list_to_binary(V)} || {K, V} <- rpc:call(Node, emqttd_vm, loads, [])],
+		ProcessLimit = rpc:call(Node, emqttd_vm, get_process_limit, []),
+		ProcessList = rpc:call(Node, emqttd_vm, get_process_list, []),
+		UpTime = rpc:call(Node, emqttd_broker, uptime, []),
+		Memory ++ [{name, Node}, {process_available, ProcessLimit}, {process_used, length(ProcessList)}, {uptime, list_to_binary(UpTime)}|CpuInfo]
 	    end, Nodes),
     api_respond(Req, NodeInfo);
     
@@ -183,3 +182,5 @@ zeropad(I) when I < 10 ->
     lists:concat(["0", I]);
 zeropad(I) ->
     integer_to_list(I).
+
+  
