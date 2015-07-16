@@ -296,7 +296,7 @@ function walk(parts, node, body) {
 		}
 	} else {
 		// console.log("body");
-		node.data = body;
+		//node.data = body;
 		node.dirty = true;
 
 	}
