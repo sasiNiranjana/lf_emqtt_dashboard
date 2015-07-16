@@ -34,7 +34,7 @@ $(document).ready(function() {
 	});
 
 	$('#disconnect_btn').click(function() {
-		if(client.isConnected()) {
+		if(client != null && client.isConnected()) {
 			disconnect();
 		}else {
 			alert("Don't click");	
