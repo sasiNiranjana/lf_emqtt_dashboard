@@ -88,8 +88,12 @@ function Overview() {
 		_t._broker();
 		_t._nodes();
 		_t._stats();
-		_t._metrics();
 		_t._listeners();
+		_t.timetasks = setInterval(function(){
+			_t._nodes();
+			_t._metrics();
+			_t._stats();
+		}, 10000)
 	});
 }
 
@@ -115,7 +119,8 @@ Overview.prototype = {
 //		};
 //		jQuery.ajax(options);
 		
-		var c = new Paho.MQTT.Client(location.hostname, 8083, "c_broker");
+		_t.client = new Paho.MQTT.Client(location.hostname, 8083, "c_broker");
+		var c = _t.client;
 		c.connect({
 			onSuccess : function() {
 				console.log("The client connect success.");
@@ -173,7 +178,7 @@ Overview.prototype = {
 								+ lis['process_used']+ ' / ' + lis['process_available'] + '</td><td>'
 								+ lis['load1'] + ' / ' +  lis['load5'] + ' / ' + lis['load15']
 								+ '</td><td>'
-								+ lis['free_memory'] + ' / ' + lis['total_memory'] + '</td><td>' + lis['uptime'] + '</td></tr>');
+								+ lis['used_memory'] + ' / ' + lis['total_memory'] + '</td><td>' + lis['uptime'] + '</td></tr>');
 					}
 				}
 			},
@@ -288,7 +293,15 @@ Overview.prototype = {
 
 	// 关闭任务（定时任务等）
 	closeTask : function() {
-		//clearInterval(this.timetask);
+		clearInterval(this.timetasks);
+		if(this.client) {
+			try {
+				this.client.disconnect();
+			}catch (error) {
+
+		}
+
+		}
 	}
 
 };
