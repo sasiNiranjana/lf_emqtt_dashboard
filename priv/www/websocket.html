@@ -25,8 +25,22 @@ $(document).ready(function() {
 	}
 
 	$('#connect_btn').click(function() {
-		connect();
+		if(client == null || !client.isConnected()) {
+			connect();
+		}else {
+			alert("Don't click");	
+		}
+
 	});
+
+	$('#disconnect_btn').click(function() {
+		if(client.isConnected()) {
+			disconnect();
+		}else {
+			alert("Don't click");	
+		}
+	});
+
 
 	$('#send_btn').click(function() {
 		var msg = jQuery('#message').val();
@@ -69,8 +83,24 @@ function connect() {
 			subscribe("/World");
 
 			sendMessage("Hello world.")
+			$('#connect_btn').removeClass("btn-green");
+			$('#disconnect_btn').addClass("btn-green");
+
 		}
 	});
+}
+
+function disconnect() {
+	client.disconnect({
+		onSuccess : function() {
+		}
+
+	});
+	console.log("The client disconnect success.");
+	jQuery('#conn_state').text('DISCONNECTED');
+	$('#connect_btn').addClass("btn-green");	
+	$('#disconnect_btn').removeClass("btn-green");	
+
 }
 
 function subscribe(topic) {
@@ -195,6 +225,7 @@ Date.prototype.format = function(format) {
 						<div class="colgroup full">
 						<p class="box">
 						<input type="button" id="connect_btn" name="connect_btn" value="Connect" class="btn btn-green">
+						<input type="button" id="disconnect_btn" name="disconnect_btn" value="Disconnect" class="btn">
 						<label style="padding-left: 10px;">Current State: <b id="conn_state" class="b" style="color: #4ba575;">DISCONNECT</b></label>
 						</p>
 						</div>
