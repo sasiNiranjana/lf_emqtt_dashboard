@@ -97,7 +97,7 @@ Overview.prototype = {
 
 	// 加载系统基本信息
 	_broker : function() {
-//		var _t = this;
+		var _t = this;
 //		var options = {
 //			url : 'api/broker',
 //			type : 'POST',
@@ -132,7 +132,20 @@ Overview.prototype = {
 		}
 		// called when a message arrives
 		function onMessageArrived(message) {
-			console.log("onMessageArrived: " + message.destinationName + "-" + message.payloadString);
+			console.log("onMessageArrived: " + message.destinationName + "-:-" + message.payloadString);
+			var topic = message.destinationName;
+			var lastNum = topic.lastIndexOf("/");
+			var endStr = topic.substring(lastNum);
+			if (endStr == "/sysdescr"){
+				_t.elements.sysName.text(message.payloadString);
+			} else if (endStr == "/version") {
+				_t.elements.sysVersion.text(message.payloadString);
+			} else if (endStr == "/uptime") {
+				_t.elements.sysUptime.text(message.payloadString);
+			} else {
+				_t.elements.sysTime.text(message.payloadString);
+			}
+
 		}
 	},
 
@@ -156,11 +169,11 @@ Overview.prototype = {
 					var tby = jQuery('#nodes tbody').empty();
 					for (var i = 0; i < d.length; i++) {
 						var lis = d[i];
-						tby.append('<tr><td>' + lis['Name'] + '</td><td>'
-								+ lis['Erlang processes'] + '</td><td class="ta-right">'
-								+ lis['Cpu info<br/>(1min load / 5min load / 15min load)']
-								+ '</td><td class="ta-right">'
-								+ lis['Memory info<br/>(used / total)'] + '</td><td class="ta-right">' + lis['Uptime'] + '</td></tr>');
+						tby.append('<tr><td>' + lis['name'] + '</td><td >'
+								+ lis['process_used']+ ' / ' + lis['process_available'] + '</td><td>'
+								+ lis['load1'] + ' / ' +  lis['load5'] + ' / ' + lis['load15']
+								+ '</td><td>'
+								+ lis['free_memory'] + ' / ' + lis['total_memory'] + '</td><td>' + lis['uptime'] + '</td></tr>');
 					}
 				}
 			},
