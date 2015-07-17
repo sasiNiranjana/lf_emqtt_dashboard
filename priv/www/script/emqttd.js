@@ -88,6 +88,7 @@ function Overview() {
 		_t._broker();
 		_t._nodes();
 		_t._stats();
+		_t._metrics();
 		_t._listeners();
 		_t.timetasks = setInterval(function(){
 			_t._nodes();
