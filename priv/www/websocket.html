@@ -27,10 +27,9 @@ $(document).ready(function() {
 	$('#connect_btn').click(function() {
 		if(client == null || !client.isConnected()) {
 			connect();
-		}else {
+		} else {
 			alert("Don't click");	
 		}
-
 	});
 
 	$('#disconnect_btn').click(function() {
@@ -41,10 +40,14 @@ $(document).ready(function() {
 		}
 	});
 
-
 	$('#send_btn').click(function() {
-		var msg = jQuery('#message').val();
+		var msg = jQuery('#message_txt').val();
 		sendMessage(msg);
+	});
+	
+	$('#subscribe_btn').click(function() {
+		var subscribe = jQuery('#subscribe_txt').val();
+		subscribe(subscribe);
 	});
 });
 
@@ -64,9 +67,7 @@ function onMessageArrived(message) {
 		+ nowStr + '</cite></q>');
 }
 
-// client
 var client = null;
-// the client connect
 function connect() {
 	// Create a client instance
 	client = new Paho.MQTT.Client($('#host').val(),
@@ -80,9 +81,6 @@ function connect() {
 		onSuccess : function() {
 			console.log("The client connect success.");
 			jQuery('#conn_state').text('CONNECTED');
-			subscribe("/World");
-
-			sendMessage("Hello world.")
 			$('#connect_btn').removeClass("btn-green");
 			$('#disconnect_btn').addClass("btn-green");
 
@@ -91,22 +89,17 @@ function connect() {
 }
 
 function disconnect() {
-	client.disconnect({
-		onSuccess : function() {
-		}
-
-	});
+	client.disconnect();
 	console.log("The client disconnect success.");
 	jQuery('#conn_state').text('DISCONNECTED');
 	$('#connect_btn').addClass("btn-green");	
 	$('#disconnect_btn').removeClass("btn-green");	
-
 }
 
 function subscribe(topic) {
 	client.subscribe(topic);
 	var nowStr = (new Date()).format("yyyy-MM-dd hh:mm:ss");
-	$('#sub_topic').append('<q>Subscribe Topic: ' 
+	$('#subscribe').append('<q>Subscribe Topic: ' 
 		+ topic + '<cite>' 
 		+ nowStr + '</cite></q>');
 }
@@ -114,8 +107,12 @@ function subscribe(topic) {
 // the client send message
 function sendMessage(msg) {
 	var message = new Paho.MQTT.Message(msg);
-	message.destinationName = "/World";
+	message.destinationName = $('#msg_topic').val();
 	client.send(message);
+	var nowStr = (new Date()).format("yyyy-MM-dd hh:mm:ss");
+	$('#send_list').append('<q>Send Message: ' 
+			+ msg + '<cite>' 
+			+ nowStr + '</cite></q>');
 }
 
 Date.prototype.format = function(format) {
@@ -242,10 +239,14 @@ Date.prototype.format = function(format) {
 					<div class="column first" style="width: 430px;">
 						<h4 class="h4">Send Message</h4>
 						<hr />
-						<div>
-							<input type="text" name="message" id="message" />
-							<a href="javascript:void();" class="btn" id="send_btn">Send</a>
-						</div>
+						<div><p>
+							<label for="msg_topic">Topic:</label><br>
+							<input type="text" name="msg_topic" id="msg_topic" value="/World"/>
+						</p><p>
+							<label for="message_txt">Message:</label><br>
+							<input type="text" name="message_txt" id="message_txt" value="Hello world!"/>
+						</p><p><a href="javascript:void(0);" class="btn" id="send_btn">Send</a>
+						</p></div>
 					</div>
 					<div class="column full" style="width: 400px;">
 						<h4 class="h4">Send List</h4>
@@ -260,14 +261,14 @@ Date.prototype.format = function(format) {
 						<h4 class="h4">Subscriptions</h4>
 						<hr />
 						<div>
-							<input type="text" name="sub_topic_txt" id="sub_topic_txt" />
-							<a href="javascript:void();" class="btn" id="sub_topic_btn">Subscribe</a>
+							<input type="text" name="subscribe_txt" id="subscribe_txt" value="/World"/>
+							<a href="javascript:void(0);" class="btn" id="subscribe_btn">Subscribe</a>
 						</div>
 					</div>
 					<div class="column" style="width: 400px;">
-						<h4 class="h4">Subscribe Topic</h4>
+						<h4 class="h4">Subscribe List</h4>
 						<hr />
-						<div id="sub_topic"></div>
+						<div id="subscribe"></div>
 					</div>
 				</div>
 				
