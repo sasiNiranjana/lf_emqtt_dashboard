@@ -230,7 +230,24 @@ Date.prototype.format = function(format) {
 					<div class="column" style="width: 400px;">
 						<h4 class="h4">Receive Message</h4>
 						<hr />
-						<div id="receive_message" style="height: 170px;overflow: scroll;"></div>
+						<div id="receive_message" style="height: 170px;overflow: auto;"></div>
+					</div>
+				</div>
+				
+				<!-- col -->
+				<div class="colgroup leading full">
+					<div class="column first" style="width: 430px;">
+						<h4 class="h4">Subscriptions</h4>
+						<hr />
+						<div>
+							<input type="text" name="subscribe_txt" id="subscribe_txt" value="/World"/>
+							<a href="javascript:void(0);" class="btn" id="subscribe_btn">Subscribe</a>
+						</div>
+					</div>
+					<div class="column" style="width: 400px;">
+						<h4 class="h4">Subscribe List</h4>
+						<hr />
+						<div id="subscribe" style="height: 170px;overflow: auto;"></div>
 					</div>
 				</div>
 				
@@ -256,27 +273,9 @@ Date.prototype.format = function(format) {
 					<div class="column full" style="width: 400px;">
 						<h4 class="h4">Send List</h4>
 						<hr />
-						<div id="send_list" style="height: 170px;overflow: scroll;"></div>
+						<div id="send_list" style="height: 170px;overflow:auto;"></div>
 					</div>
 				</div>
-				
-				<!-- col -->
-				<div class="colgroup leading full">
-					<div class="column first" style="width: 430px;">
-						<h4 class="h4">Subscriptions</h4>
-						<hr />
-						<div>
-							<input type="text" name="subscribe_txt" id="subscribe_txt" value="/World"/>
-							<a href="javascript:void(0);" class="btn" id="subscribe_btn">Subscribe</a>
-						</div>
-					</div>
-					<div class="column" style="width: 400px;">
-						<h4 class="h4">Subscribe List</h4>
-						<hr />
-						<div id="subscribe" style="height: 170px;overflow: scroll;"></div>
-					</div>
-				</div>
-				
 			</div>
 		</div>
 		<div class="clear"></div>
