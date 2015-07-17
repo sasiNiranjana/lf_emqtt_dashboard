@@ -179,7 +179,7 @@ Date.prototype.format = function(format) {
 				
 				<!-- col -->
 				<div class="colgroup leading full">
-					<div class="column full first">
+					<div class="column first" style="width: 600px;">
 						<h3 class="h3">Connection</h3>
 						<hr />
 						<div class="colgroup leading full">
@@ -230,11 +230,16 @@ Date.prototype.format = function(format) {
 						</p>
 						</div>
 					</div>
+					<div class="column" style="width: 400px;">
+						<h3 class="h3">Receive Message</h3>
+						<hr />
+						<div id="receive_message"></div>
+					</div>
 				</div>
 				
 				<!-- col -->
 				<div class="colgroup leading full">
-					<div class="column full first">
+					<div class="column first" style="width: 600px;">
 						<h3 class="h3">Send Message</h3>
 						<hr />
 						<div>
@@ -242,23 +247,30 @@ Date.prototype.format = function(format) {
 							<a href="javascript:void();" class="btn" id="send_btn">Send</a>
 						</div>
 					</div>
-				</div>
-				
-				<!-- col -->
-				<div class="colgroup leading full">
-					<div class="column full first" id="receive_message">
-						<h3 class="h3">Receive Message</h3>
+					<div class="column full" style="width: 400px;">
+						<h3 class="h3">Send List</h3>
 						<hr />
+						<div id="send_list"></div>
 					</div>
 				</div>
 				
 				<!-- col -->
 				<div class="colgroup leading full">
-					<div class="column full first" id="sub_topic">
+					<div class="column first" style="width: 600px;">
+						<h3 class="h3">Subscriptions</h3>
+						<hr />
+						<div>
+							<input type="text" name="sub_topic_txt" id="sub_topic_txt" />
+							<a href="javascript:void();" class="btn" id="sub_topic_btn">Subscribe</a>
+						</div>
+					</div>
+					<div class="column" style="width: 400px;">
 						<h3 class="h3">Subscribe Topic</h3>
 						<hr />
+						<div id="sub_topic"></div>
 					</div>
 				</div>
+				
 			</div>
 		</div>
 		<div class="clear"></div>
