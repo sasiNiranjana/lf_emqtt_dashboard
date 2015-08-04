@@ -32,6 +32,7 @@ var clients = null;
 var session = null;
 var topic = null;
 var subpub = null;
+var user = null;
 function addClick() {
 	// 注册单击事件
 	$('#tab_nav>li').each(function(index) {
@@ -66,6 +67,13 @@ function addClick() {
 				subpub = new Subpub();
 			});
 			break;
+		case 5:
+			$(this).click(function() {
+				tabClass(this);
+				user = new User();
+			});
+			break;
+
 		default:
 			break;
 		}
@@ -522,6 +530,29 @@ Subpub.prototype = {
 		};
 		jQuery.ajax(options);
 	},
+
+	// 关闭任务（定时任务等）
+	closeTask : function() {
+
+	}
+
+};
+
+function User() {
+	var _t = this;
+	// 网页标签元素
+	_t.elements = {};
+
+	// 加载模块
+	loading('users.html', function() {
+		_t._users();
+	});
+}
+
+User.prototype = {
+
+	// 加载 users
+	_users: function() {},
 
 	// 关闭任务（定时任务等）
 	closeTask : function() {

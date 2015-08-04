@@ -38,6 +38,9 @@
 		} else if (strs[1] == '/subpub') {
 			subpub = new Subpub();
 			item = 4;
+		} else if (strs[1] == '/users') {
+			user = new User();
+			item = 5;
 		} else {
 			overview = new Overview();
 		}
@@ -73,6 +76,7 @@
 				<li><a href="/#/session" title="Session">Session</a></li>
 				<li><a href="/#/topic" title="Topic">Topic</a></li>
 				<li><a href="/#/subpub" title="Subpub">Subpub</a></li>
+				<li><a href="/#/users" title="Users">Users</a></li>
 				<li><a href="/websocket.html" title="Websocket">Websocket</a></li>
 			</ul>
 		</nav>
