@@ -43,7 +43,7 @@
 
 -define(MQTT_ADMIN_TAB, mqtt_admin).
 
--record(mqtt_admin_user, {username, password}).
+-record(mqtt_admin_user, {username, password, tags}).
 
 
 -spec start_link() -> {ok, pid()} | ignore | {error, any()}.
@@ -75,17 +75,17 @@ init([]) ->
     % Create mqtt_admin table
     ets:new(?MQTT_ADMIN_TAB, [set, public, named_table, {keypos, 1},{write_concurrency, true}]),
     % Init mqtt_admin 
-    ets:insert(?MQTT_ADMIN_TAB, #mqtt_admin_user{username = admin, password = hash(bin("admin"))}),
+    ets:insert(?MQTT_ADMIN_TAB, #mqtt_admin_user{username = admin, password = hash(bin("admin")), tags = administrator}),
     {ok, state}.
 
 handle_call(_Req, _From, State) ->
     {reply, error,  State}.
 
-handle_cast({add_user, User = #mqtt_admin_user{username = Username, password = Password}}, State) ->
+handle_cast({add_user, User = #mqtt_admin_user{username = _Username, password = _Password}}, State) ->
     ets:insert(?MQTT_ADMIN_TAB, User),
     {noreply, State};
 
-handle_cast({remove_user, User = #mqtt_admin_user{username = Username, password = Password}}, State) ->
+handle_cast({remove_user, User = #mqtt_admin_user{username = Username, password = _Password}}, State) ->
     ets:delete(?MQTT_ADMIN_TAB, Username),
     {noreply, State};
 
@@ -120,5 +120,6 @@ salt() ->
     <<Salt:32>>.
 
 bin(S) when is_list(S) -> list_to_binary(S);
+bin(A) when is_atom(A) -> bin(atom_to_list(A));
 bin(B) when is_binary(B) -> B.
 

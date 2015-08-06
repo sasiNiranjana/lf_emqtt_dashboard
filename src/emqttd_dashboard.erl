@@ -153,7 +153,18 @@ api(subscriber, Req) ->
              {topic, Topic}, 
              {qos, Qos}] || {Tab, Topic, _Pid, Qos} <- SubLists],
 
+    api_respond(Req, Bodys);
+ 
+%%-----------------------------------Users--------------------------------------
+%%subscribe api
+api(user, Req) ->
+    Bodys = [[
+	{name, Username}, 
+	{password, Password}, 
+	{tag, Tags}] || {_Tab, Username, Password, Tags}
+		<- emqttd_vm:get_ets_object(mqtt_admin)],
     api_respond(Req, Bodys).
+    
     
 api_respond(Req, Bodys) ->
     JsonData = 
