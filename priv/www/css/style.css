@@ -186,6 +186,21 @@ q cite {
 	color: #fff;
 }
 
+.footer-panel {
+	background: #fff;
+	height: 20px;
+	line-height: 20px;
+	z-index: 9999;
+	position: fixed;
+	display: block;
+	right: 6px;
+	bottom: 6px;;
+	font-size: 12px;
+	white-space: normal;
+	text-align: right;
+	box-shadow: 0 -1px 8px 1px #bbb;
+}
+
 .contents-wrapper {
 	padding-top: 60px;
 	margin-left: 200px;
