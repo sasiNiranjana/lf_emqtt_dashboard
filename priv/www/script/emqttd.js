@@ -623,7 +623,7 @@ User.prototype = {
 			}
 		};
 		jQuery.ajax(options);
-	}
+	},
 	
 	// 关闭任务（定时任务等）
 	closeTask : function() {
