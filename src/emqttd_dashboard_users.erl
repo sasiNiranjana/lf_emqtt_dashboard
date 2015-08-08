@@ -41,9 +41,7 @@
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
          terminate/2, code_change/3]).
 
--define(MQTT_ADMIN_TAB, mqtt_admin).
-
--record(mqtt_admin_user, {username, password, tags}).
+-record(mqtt_admin, {username, password, tags}).
 
 
 -spec start_link() -> {ok, pid()} | ignore | {error, any()}.
@@ -53,30 +51,30 @@ start_link() ->
 %%%=============================================================================
 %%% API 
 %%%=============================================================================
-add_user(User = #mqtt_admin_user{username = _Username, password = _Password}) ->
+add_user(User = #mqtt_admin{username = Username, password = Password}) ->
     gen_server:cast(?MODULE, {add_user, User}).
 
-remove_user(User = #mqtt_admin_user{username = _Username}) ->
+remove_user(User = #mqtt_admin{username = _Username}) ->
     gen_server:cast(?MODULE, {remove_user, User}).
 
 lookup_user(Username) ->
-  case ets:lookup(?MQTT_ADMIN_TAB, Username) of
+  case ets:lookup(mqtt_admin, Username) of
 	[User] -> User;
 	[] -> undefined
 	end.
 
 all_users() ->
-    emqttd_vm:get_ets_object(?MQTT_ADMIN_TAB).
+    emqttd_vm:get_ets_object(mqtt_admin).
 
-check(#mqtt_admin_user{username = undefined}) ->
+check(#mqtt_admin{username = undefined}) ->
     {error, "Username undefined"};
-check(#mqtt_admin_user{password = undefined}) ->
+check(#mqtt_admin{password = undefined}) ->
     {error, "Password undefined"};
-check(#mqtt_admin_user{username = Username, password = Password}) ->
-	case ets:lookup(?MQTT_ADMIN_TAB, Username) of
+check(#mqtt_admin{username = Username, password = Password}) ->
+	case ets:lookup(mqtt_admin, atom(Username)) of
         [] -> 
             {error, "Username Not Found"};
-        [#mqtt_admin_user{password = <<Salt:4/binary, Hash/binary>>}] ->
+        [#mqtt_admin{password = <<Salt:4/binary, Hash/binary>>}] ->
             case Hash =:= md5_hash(Salt, Password) of
                 true -> ok;
                 false -> {error, "Password Not Right"}
@@ -88,20 +86,27 @@ check(#mqtt_admin_user{username = Username, password = Password}) ->
 %%%=============================================================================
 init([]) ->
     % Create mqtt_admin table
-    ets:new(?MQTT_ADMIN_TAB, [set, public, named_table, {keypos, 1},{write_concurrency, true}]),
+    ets:new(mqtt_admin, [set, public, named_table,{keypos, #mqtt_admin.username}, {write_concurrency, true}]),
     % Init mqtt_admin 
-    ets:insert(?MQTT_ADMIN_TAB, #mqtt_admin_user{username = admin, password = hash(bin(admin)), tags = administrator}),
+    User = #mqtt_admin{username = 'admin', password = hash(bin(admin)), tags = administrator},
+    ets:insert(mqtt_admin, User),
     {ok, state}.
 
 handle_call(_Req, _From, State) ->
     {reply, error,  State}.
 
-handle_cast({add_user, User = #mqtt_admin_user{username = _Username, password = _Password}}, State) ->
-    ets:insert(?MQTT_ADMIN_TAB, User),
+handle_cast({add_user, User = #mqtt_admin{username = Username, password = Password, tags = Tags}}, State) ->    
+    case ets:lookup(mqtt_admin, atom(Username)) of
+	[] ->
+		ets:insert(mqtt_admin, User#mqtt_admin{username = atom(Username), password = hash(bin(Password)), tags = atom(Tags)}),
+		ok;
+	[User] ->
+		exist
+    end,
     {noreply, State};
 
-handle_cast({remove_user, User = #mqtt_admin_user{username = Username, password = _Password}}, State) ->
-    ets:delete(?MQTT_ADMIN_TAB, Username),
+handle_cast({remove_user, User = #mqtt_admin{username = Username, password = _Password}}, State) ->
+    ets:delete(mqtt_admin, Username),
     {noreply, State};
 
 handle_cast(_Msg, State) ->
@@ -110,8 +115,8 @@ handle_cast(_Msg, State) ->
 handle_info(_Msg, State) ->
     {noreply, State}.
 
-terminate(_Reason, State) ->
-    ets:delete(?MQTT_ADMIN_TAB),
+terminate(_Reason, _State) ->
+    ets:delete(mqtt_admin),
     ok.
 
 code_change(_OldVsn, State, _Extra) ->
@@ -137,4 +142,8 @@ salt() ->
 bin(S) when is_list(S) -> list_to_binary(S);
 bin(A) when is_atom(A) -> bin(atom_to_list(A));
 bin(B) when is_binary(B) -> B.
+
+atom(S) when is_list(S) -> list_to_atom(S);
+atom(B) when is_binary(B) -> atom(binary_to_list(B));
+atom(A) when is_atom(A) -> A.
 

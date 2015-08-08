@@ -1,5 +1,5 @@
 /*
-	Emqttd Dashboard Javascript.
+	emqttd dashboard Javascript.
  */
 
 // 取消缓存设置
@@ -602,13 +602,23 @@ User.prototype = {
 			return;
 		}
 		
+		if (po.val() == '') {
+			alert("密码不能为空");
+			return;
+		}
+
+		if (po.val() != p2.val()) {
+			alert("两次输入密码不一致");
+			return;
+		}
+	
 		var options = {
 			url : 'api/add_user',
 			type : 'POST',
 			dataType : 'json',
 			data : {user_name: uo.val(), password: po.val(), tag: tg.val()},
 			success : function(d) {
-				if (d.result == 1) {
+				if (d == 1) {
 					uo.val("");
 					po.val("");
 					p2.val("");

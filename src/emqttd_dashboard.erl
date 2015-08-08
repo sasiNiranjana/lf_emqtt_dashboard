@@ -32,7 +32,7 @@
 
 -define(SEPARTOR, $\/).
 
--record(mqtt_admin_user, {username, password, tags}).
+-record(mqtt_admin, {username, password, tags}).
  
 -include_lib("stdlib/include/qlc.hrl").
 
@@ -40,14 +40,12 @@ handle_request(Req) ->
     case authorized(Req) of
 	true ->
 		Path = Req:get(path),
-    		lager:info("Dashboard file: ~s ~s", [Req:get(method), Path]),
     		handle_request(Path, Req);
 	false->
 		Req:respond({401, [{"WWW-Authenticate", "Basic Realm=\"emqttd dashboad\""}], []})
     end.
    
 handle_request("/api/" ++ Path, Req) when length(Path) > 0 ->
-    lager:info("Req: ~s", [Req]),
     api(list_to_atom(Path), Req);
 
 handle_request("/" ++ Rest, Req) ->
@@ -164,14 +162,22 @@ api(subscriber, Req) ->
     api_respond(Req, Bodys);
  
 %%-----------------------------------Users--------------------------------------
-%%subscribe api
-api(user, Req) ->
+%%users api
+api(users, Req) ->
     Bodys = [[
 	{name, Username}, 
-	{password, Password}, 
-	{tag, Tags}] || {_Tab, Username, Password, Tags}
+	{tag, Tags}] || {_Tab, Username, _Password, Tags}
 		<- emqttd_vm:get_ets_object(mqtt_admin)],
-    api_respond(Req, Bodys).
+    api_respond(Req, Bodys);
+ 
+api(add_user, Req) ->
+    User = Req:parse_post(),
+    Username = proplists:get_value("user_name", User),
+    Password = proplists:get_value("password", User),
+    Tag = proplists:get_value("tag", User),
+    Status = emqttd_dashboard_users:add_user(#mqtt_admin{username = Username, password = Password, tags = Tag}),
+    RespondCode = code(Status),
+    api_respond(Req, RespondCode).
     
     
 api_respond(Req, Bodys) ->
@@ -212,8 +218,7 @@ authorized(Req) ->
 		false;
 	"Basic " ++ BasicAuth ->
         {Username, Password} = user_passwd(BasicAuth),
-        lager:error("HTTP Auth failure: username=~s, password=~p", [Username, Password]),
-        case emqttd_dashboard_users:check(#mqtt_admin_user{username = Username, password = Password}) of
+        case emqttd_dashboard_users:check(#mqtt_admin{username = Username, password = Password}) of
             ok ->
                 true;
             {error, Reason} ->
@@ -225,4 +230,5 @@ authorized(Req) ->
 user_passwd(BasicAuth) ->
 	list_to_tuple(binary:split(base64:decode(BasicAuth), <<":">>)). 
 
-
+code(ok) -> 1;
+code(exist) -> 2.
