@@ -552,7 +552,36 @@ function User() {
 User.prototype = {
 
 	// 加载 users
-	_users: function() {},
+	_users: function() {
+		var _t = this;
+		var options = {
+			url : 'api/users',
+			type : 'POST',
+			dataType : 'json',
+			data : {},
+			success : function(d) {
+				$('#users_count').text(d.length);
+				if (d.length == 0) {
+					var sTable = jQuery('#users');
+					sTable.hide();
+					sTable.parent().append(
+							'<p style="padding: 12px;">... no subpub ...</p>');
+				} else {
+					var tby = jQuery('#users tbody').empty();
+					for (var i = 0; i < d.length; i++) {
+						var u = d[i];
+						tby.append('<tr><td>' + u['name']
+								+ '</td><td>●'
+								+ '</td><td>' + u['tag'] + '</td></tr>');
+					}
+				}
+			},
+			error : function(e) {
+				console.log('api/users->error');
+			}
+		};
+		jQuery.ajax(options);
+	},
 
 	// 关闭任务（定时任务等）
 	closeTask : function() {

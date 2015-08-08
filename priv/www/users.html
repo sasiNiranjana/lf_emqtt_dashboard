@@ -4,7 +4,7 @@
 	<!-- col -->
 	<div class="colgroup leading full">
 		<div class="column full first">
-			<h3 class="h3">All Users(<b id="users_count" class="b" style="color: #4ba575;">0</b>)</h3>
+			<h3 class="h3">All users &nbsp;&nbsp;[<b id="users_count" class="b" style="color: #4ba575;">0</b>]</h3>
 			<hr />
 			<div>
 				<table class="stylized" id="users">
@@ -24,10 +24,25 @@
 
 	<div class="colgroup leading full">
 		<div class="column full first">
-			<h3 class="h3">Add Users</h3>
+			<h3 class="h3">Add a users</h3>
 			<hr />
 			<div>
-
+			<p class="column full first" style="margin-bottom: 10px;">
+				<label for="user_name">name:</label><br>
+				<input type="text" name="user_name" id="user_name" value="">
+			</p>
+			<p class="column full first" style="margin-bottom: 10px;">
+				<label for="password">password:</label><br>
+				<input type="password" name="password" id="password" value="">
+				<input type="password" name="passwd_2" id="passwd_2" value="">
+			</p>
+			<p class="column full first" style="margin-bottom: 10px;">
+				<label for="user_name">tag:</label><br>
+				<input type="text" name="tag" id="tag" value="">
+			</p>
+			<p class="box">
+				<input type="button" id="add_btn" name="add_btn" value="Add" class="btn btn-green"/>
+			</p>
 			</div>
 		</div>
 	</div>
