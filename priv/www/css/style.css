@@ -202,6 +202,8 @@ q cite {
 
 .footer-panel a {
 	color: #999999;
+	display: block;
+	padding-left: 12px;
 }
 
 .footer-panel a:hover {
