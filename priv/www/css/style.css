@@ -187,18 +187,25 @@ q cite {
 }
 
 .footer-panel {
-	background: #fff;
-	height: 20px;
-	line-height: 20px;
+	background: #22222c;
+	height: 26px;
+	line-height: 26px;
 	z-index: 9999;
 	position: fixed;
 	display: block;
-	right: 6px;
-	bottom: 6px;;
+	left: 0px;
+	bottom: 2px;;
 	font-size: 12px;
 	white-space: normal;
-	text-align: right;
-	box-shadow: 0 -1px 8px 1px #bbb;
+	width: 200px;
+}
+
+.footer-panel a {
+	color: #999999;
+}
+
+.footer-panel a:hover {
+	color: white;
 }
 
 .contents-wrapper {
