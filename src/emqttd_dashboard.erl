@@ -31,15 +31,23 @@
 -export([handle_request/1]).
 
 -define(SEPARTOR, $\/).
+
+-record(mqtt_admin_user, {username, password, tags}).
  
 -include_lib("stdlib/include/qlc.hrl").
 
 handle_request(Req) ->
-    Path = Req:get(path),
-    lager:info("Dashboard file: ~s ~s", [Req:get(method), Path]),
-    handle_request(Path, Req).
-
+    case authorized(Req) of
+	true ->
+		Path = Req:get(path),
+    		lager:info("Dashboard file: ~s ~s", [Req:get(method), Path]),
+    		handle_request(Path, Req);
+	false->
+		Req:respond({401, [{"WWW-Authenticate", "Basic Realm=\"emqttd dashboad\""}], []})
+    end.
+   
 handle_request("/api/" ++ Path, Req) when length(Path) > 0 ->
+    lager:info("Req: ~s", [Req]),
     api(list_to_atom(Path), Req);
 
 handle_request("/" ++ Rest, Req) ->
@@ -195,3 +203,26 @@ zeropad(I) ->
     integer_to_list(I).
 
   
+%%------------------------------------------------------------------------------
+%% basic authorization
+%%------------------------------------------------------------------------------
+authorized(Req) ->
+    case Req:get_header_value("Authorization") of
+	undefined ->
+		false;
+	"Basic " ++ BasicAuth ->
+        {Username, Password} = user_passwd(BasicAuth),
+        lager:error("HTTP Auth failure: username=~s, password=~p", [Username, Password]),
+        case emqttd_dashboard_users:check(#mqtt_admin_user{username = Username, password = Password}) of
+            ok ->
+                true;
+            {error, Reason} ->
+                lager:error("HTTP Auth failure: username=~s, reason=~p", [Username, Reason]),
+                false
+        end
+	end.
+
+user_passwd(BasicAuth) ->
+	list_to_tuple(binary:split(base64:decode(BasicAuth), <<":">>)). 
+
+

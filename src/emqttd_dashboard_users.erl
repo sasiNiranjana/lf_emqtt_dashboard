@@ -35,7 +35,7 @@
 
 %%mqtt_admin api
 -export([add_user/1, remove_user/1,
-         lookup_user/1, all_users/0]).
+         lookup_user/1, all_users/0,check/1]).
 
 %% gen_server Function Exports
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
@@ -68,6 +68,21 @@ lookup_user(Username) ->
 all_users() ->
     emqttd_vm:get_ets_object(?MQTT_ADMIN_TAB).
 
+check(#mqtt_admin_user{username = undefined}) ->
+    {error, "Username undefined"};
+check(#mqtt_admin_user{password = undefined}) ->
+    {error, "Password undefined"};
+check(#mqtt_admin_user{username = Username, password = Password}) ->
+	case ets:lookup(?MQTT_ADMIN_TAB, Username) of
+        [] -> 
+            {error, "Username Not Found"};
+        [#mqtt_admin_user{password = <<Salt:4/binary, Hash/binary>>}] ->
+            case Hash =:= md5_hash(Salt, Password) of
+                true -> ok;
+                false -> {error, "Password Not Right"}
+            end
+	end.
+	
 %%%=============================================================================
 %%% gen_server callbacks
 %%%=============================================================================
@@ -75,7 +90,7 @@ init([]) ->
     % Create mqtt_admin table
     ets:new(?MQTT_ADMIN_TAB, [set, public, named_table, {keypos, 1},{write_concurrency, true}]),
     % Init mqtt_admin 
-    ets:insert(?MQTT_ADMIN_TAB, #mqtt_admin_user{username = admin, password = hash(bin("admin")), tags = administrator}),
+    ets:insert(?MQTT_ADMIN_TAB, #mqtt_admin_user{username = admin, password = hash(bin(admin)), tags = administrator}),
     {ok, state}.
 
 handle_call(_Req, _From, State) ->
