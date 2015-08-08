@@ -195,15 +195,17 @@ q cite {
 	display: block;
 	left: 0px;
 	bottom: 2px;;
-	font-size: 12px;
+	font-size: 14px;
 	white-space: normal;
-	width: 200px;
+}
+
+.footer-panel>p {
+	padding-left: 12px;
+	color: #999999;
 }
 
 .footer-panel a {
-	color: #999999;
-	display: block;
-	padding-left: 12px;
+	color: #4ba575;
 }
 
 .footer-panel a:hover {
