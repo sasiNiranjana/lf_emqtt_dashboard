@@ -546,6 +546,9 @@ function User() {
 	// 加载模块
 	loading('users.html', function() {
 		_t._users();
+		$('#add_user_btn').click(function() {
+			_t.addUser();
+		});
 	});
 }
 
@@ -583,6 +586,45 @@ User.prototype = {
 		jQuery.ajax(options);
 	},
 
+	addUser : function() {
+		var _t = this;
+		
+		var uo = $('#user_name');
+		var po = $('#password');
+		var p2 = $("#passwd_2")
+		var tg = $('#tag');
+		uo.val(jQuery.trim(uo.val()));
+		po.val(jQuery.trim(po.val()));
+		p2.val(jQuery.trim(p2.val()));
+		tg.val(jQuery.trim(tg.val()));
+		if (uo.val() == '') {
+			alert("用户名不能为空");
+			return;
+		}
+		
+		var options = {
+			url : 'api/add_user',
+			type : 'POST',
+			dataType : 'json',
+			data : {user_name: uo.val(), password: po.val(), tag: tg.val()},
+			success : function(d) {
+				if (d.result == 1) {
+					uo.val("");
+					po.val("");
+					p2.val("");
+					tg.val("");
+					_t._users();
+				} else {
+					alert("失败");
+				}
+			},
+			error : function(e) {
+				console.log('api/users->error');
+			}
+		};
+		jQuery.ajax(options);
+	}
+	
 	// 关闭任务（定时任务等）
 	closeTask : function() {
 
