@@ -574,8 +574,8 @@ User.prototype = {
 					for (var i = 0; i < d.length; i++) {
 						var u = d[i];
 						tby.append('<tr><td>' + u['name']
-								+ '</td><td>●'
-								+ '</td><td>' + u['tag'] + '</td></tr>');
+								+ '</td><td>' + u['tag']
+								+ '</td><td>●</td></tr>');
 					}
 				}
 			},
