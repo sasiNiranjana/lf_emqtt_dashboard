@@ -42,6 +42,9 @@ function tabClass(e) {
 	$('#tab_nav>li').each(function() {
 		$(this).removeClass('active-tab');
 	});
+	$('#tab_nav_2>li').each(function() {
+		$(this).removeClass('active-tab');
+	});
 	$(e).addClass('active-tab');
 }
 
@@ -91,7 +94,13 @@ function addClick() {
 				subpub = new Subpub();
 			});
 			break;
-		case 5:
+		default:
+			break;
+		}
+	});
+	$('#tab_nav_2>li').each(function(index) {
+		switch (index) {
+		case 0:
 			$(this).click(function() {
 				tabClass(this);
 				user = new User();

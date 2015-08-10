@@ -167,7 +167,7 @@ q cite {
 }
 
 .main-tab-nav {
-	margin: 50px 0 0 0;
+	margin: 20px 0 0 0;
 }
 
 .main-tab-nav>li {
@@ -176,6 +176,10 @@ q cite {
 
 .main-tab-nav>li>a {
 	display: block;
+}
+
+.main-tab-nav>li:HOVER {
+	background: #57b382;
 }
 
 .active-tab {
@@ -220,7 +224,7 @@ q cite {
 }
 
 .contents-wrapper>.contents {
-	padding: 60px;
+	padding: 30px;
 }
 
 .loading {

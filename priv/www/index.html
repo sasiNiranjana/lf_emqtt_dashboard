@@ -18,12 +18,10 @@
 <script src="script/emqttd.js"></script>
 <script type="text/javascript">
 	$(document).ready(function() {
-		var item = 0;
+		var item = -1;
 		var url = window.location.href;
 		var strs = url.split('#');
-		if (strs.length == 1) {
-			overview = new Overview();
-		} else if (strs[1] == '/overview') {
+		if (strs.length == 1 || strs[1] == '/overview') {
 			overview = new Overview();
 			item = 0;
 		} else if (strs[1] == '/clients') {
@@ -40,9 +38,14 @@
 			item = 4;
 		} else if (strs[1] == '/users') {
 			user = new User();
-			item = 5;
+			$('#tab_nav_2>li').each(function(i, e) {
+				if (i == 0) {
+					tabClass(e);
+				}
+			});
 		} else {
 			overview = new Overview();
+			item = 0;
 		}
 		$('#tab_nav>li').each(function(i, e) {
 			if (i == item) {
