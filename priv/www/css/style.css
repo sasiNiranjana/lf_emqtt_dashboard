@@ -163,22 +163,20 @@ q cite {
 }
 
 .sidebar a {
-	color: #fff;
+	color: #999999;
 }
 
 .main-tab-nav {
 	margin: 20px 0 0 0;
 }
 
-.main-tab-nav>li {
+.main-tab-nav>li>a {
+	display: block;
 	padding: 8px 0px 8px 12px;
 }
 
-.main-tab-nav>li>a {
-	display: block;
-}
-
-.main-tab-nav>li:HOVER {
+.main-tab-nav>li>a:HOVER {
+	color: white;
 	background: #57b382;
 }
 
