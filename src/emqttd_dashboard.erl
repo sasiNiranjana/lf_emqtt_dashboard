@@ -118,19 +118,13 @@ api(clients, Req) ->
 %%-----------------------------------session--------------------------------------
 %%sessin check api
 api(session, Req) ->
-    F = fun() ->
-        Q = qlc:q([E || E <- mnesia:table(session)]),
-	qlc:e(Q) 
-        end,
-    {atomic, Sessions} =  mnesia:transaction(F),
-    Bodys = [[
-	     {clientId, ClientId}, 
-	     %{sess_pid, SessPid}, 
-	     {persistent, Persistent}, 
-	     {on_node, OnNode}] 
-     || {_Tab, ClientId, _SessPid, Persistent, OnNode} <- Sessions],
+    Records = [emqttd_vm:get_ets_object(Tab)||Tab <- [mqtt_transient_session, mqtt_persistent_session]],
+    AllSession = lists:append(Records),
+    Bodys = 
+    lists:map(fun({ClientId, Session}) ->
+	 	[{clientId, ClientId} | session_table(Session)]
+       	    end, AllSession),
     api_respond(Req, Bodys);
-  
    
 %%-----------------------------------topic--------------------------------------
 %%topic api
@@ -232,3 +226,24 @@ user_passwd(BasicAuth) ->
 
 code(ok) -> 1;
 code(exist) -> 2.
+
+session_table(Session) ->
+    [{Topic, Qos}] = proplists:get_value(subscriptions, Session),
+    New1 = [{topic, Topic}|Session],
+    CreatedAt = list_to_binary(connected_at_format(proplists:get_value(created_at, New1))),
+    New2 = lists:keyreplace(created_at, 1, New1, {created_at, CreatedAt}),
+
+    NewSession = [{qos, Qos} | lists:keydelete(subscriptions, 1, New2)],
+
+    InfoKeys = [clean_sess, 
+                max_inflight,
+                inflight_queue,
+                message_queue,
+                awaiting_rel,
+                awaiting_ack,
+                awaiting_comp,
+                created_at,
+		topic,
+		qos],
+	[{Key, proplists:get_value(Key, NewSession)} || Key <- InfoKeys].
+	
