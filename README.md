@@ -32,3 +32,12 @@ make
 ./bin/emqttd_ctl load emqttd_dashboard
 ```
 
+## Login 
+
+URL: http://host:18083
+
+Username: admin
+
+Password: admin
+
+
