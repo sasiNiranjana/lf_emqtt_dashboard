@@ -430,7 +430,7 @@ Session.prototype = {
 					for (var i = 0; i < d.length; i++) {
 						var ses = d[i];
 						tby.append('<tr><td>' + ses['clientId']
-								+ '</td><td>' + ses['persistent'] + '</td><td>' + ses['on_node'] + '</td></tr>');
+								+ '</td><td>' + ses['clean_sess'] + '</td><td>' + ses['topic'] + '</td><td>' + ses['qos'] + '</td><td>' + ses['max_inflight'] + '</td><td>' + ses['inflight_queue'] + '</td><td>' + ses['message_queue'] + '</td><td>' + ses['awaiting_rel'] + '</td><td>' + ses['awaiting_ack'] + '</td><td>' + ses['awaiting_comp'] + '</td><td>' + ses['created_at'] + '</td></tr>');
 					}
 				}
 			},
