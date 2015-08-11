@@ -631,17 +631,17 @@ User.prototype = {
 		p2.val(jQuery.trim(p2.val()));
 		tg.val(jQuery.trim(tg.val()));
 		if (uo.val() == '') {
-			alert("用户名不能为空");
+			alert("username is required");
 			return;
 		}
 		
 		if (po.val() == '') {
-			alert("密码不能为空");
+			alert("password is required");
 			return;
 		}
 
 		if (po.val() != p2.val()) {
-			alert("两次输入密码不一致");
+			alert("passwords do not match");
 			return;
 		}
 	
@@ -658,7 +658,7 @@ User.prototype = {
 					tg.val("");
 					_t._users();
 				} else {
-					alert("失败");
+					alert("failure");
 				}
 			},
 			error : function(e) {
