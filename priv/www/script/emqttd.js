@@ -161,7 +161,7 @@ Overview.prototype = {
 //		};
 //		jQuery.ajax(options);
 		
-		_t.client = new Paho.MQTT.Client(location.hostname, 8083, "c_broker");
+		_t.client = new Paho.MQTT.Client(location.hostname, 8083, 'C_' + new Date().getTime());
 		var c = _t.client;
 		c.connect({
 			onSuccess : function() {
