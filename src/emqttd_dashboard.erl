@@ -236,7 +236,13 @@ code(ok) -> 1;
 code(exist) -> 2.
 
 session_table(Session) ->
-    [{Topic, Qos}] = proplists:get_value(subscriptions, Session, [{undefined, undefined}]),
+    [{Topic, Qos}] = 
+    case proplists:get_value(subscriptions, Session) of
+    	[] ->
+		[{loading, loading}];
+	L ->
+		L
+    end,
     New1 = [{topic, Topic}|Session],
     CreatedAt = list_to_binary(connected_at_format(proplists:get_value(created_at, New1))),
     New2 = lists:keyreplace(created_at, 1, New1, {created_at, CreatedAt}),
