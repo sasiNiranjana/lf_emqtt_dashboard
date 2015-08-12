@@ -34,7 +34,7 @@
 -export([start_link/0]).
 
 %%mqtt_admin api
--export([add_user/1, remove_user/1,
+-export([add_user/1, remove_user/1, update_user/1,
          lookup_user/1, all_users/0,check/1]).
 
 %% gen_server Function Exports
@@ -51,11 +51,14 @@ start_link() ->
 %%%=============================================================================
 %%% API 
 %%%=============================================================================
-add_user(User = #mqtt_admin{username = Username, password = Password}) ->
+add_user(User) ->
     gen_server:cast(?MODULE, {add_user, User}).
 
-remove_user(User = #mqtt_admin{username = _Username}) ->
-    gen_server:cast(?MODULE, {remove_user, User}).
+remove_user(Username) ->
+    gen_server:cast(?MODULE, {remove_user, Username}).
+
+update_user(User) ->
+    gen_server:cast(?MODULE, {update_user, User}).
 
 lookup_user(Username) ->
   case ets:lookup(mqtt_admin, Username) of
@@ -100,13 +103,30 @@ handle_cast({add_user, User = #mqtt_admin{username = Username, password = Passwo
 	[] ->
 		ets:insert(mqtt_admin, User#mqtt_admin{username = atom(Username), password = hash(bin(Password)), tags = atom(Tags)}),
 		ok;
-	[User] ->
-		exist
+	[_OldUser] ->
+		ets:insert(mqtt_admin, User#mqtt_admin{username = atom(Username), password = hash(bin(Password)), tags = atom(Tags)}),
+		ok
     end,
     {noreply, State};
 
-handle_cast({remove_user, User = #mqtt_admin{username = Username, password = _Password}}, State) ->
-    ets:delete(mqtt_admin, Username),
+handle_cast({update_user, User = #mqtt_admin{username = Username, password = Password, tags = Tags}}, State) ->
+    case ets:lookup(mqtt_admin, atom(Username)) of
+	[_OldUser] ->
+		ets:insert(mqtt_admin, User#mqtt_admin{username = atom(Username), password = hash(bin(Password)), tags = atom(Tags)}),
+		ok;
+	[] ->
+		lager:error("cannot find Username: ~p", [atom(Username)])
+    end,
+    {noreply, State};
+
+
+handle_cast({remove_user, Username}, State) ->
+    case ets:lookup(mqtt_admin, atom(Username)) of
+	[_User] ->
+    		ets:delete(mqtt_admin, Username);
+	[] ->
+		lager:error("cannot find Username: ~p", [atom(Username)])
+    end,
     {noreply, State};
 
 handle_cast(_Msg, State) ->

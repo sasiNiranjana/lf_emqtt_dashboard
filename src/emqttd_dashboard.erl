@@ -118,7 +118,7 @@ api(clients, Req) ->
 %%-----------------------------------session--------------------------------------
 %%sessin check api
 api(session, Req) ->
-    Records = [emqttd_vm:get_ets_object(Tab)||Tab <- [mqtt_transient_session, mqtt_persistent_session]],
+    Records = [emqttd_vm:get_ets_object(Tab) || Tab <- [mqtt_transient_session, mqtt_persistent_session]],
     AllSession = lists:append(Records),
     Bodys = 
     lists:map(fun({ClientId, Session}) ->
@@ -164,6 +164,15 @@ api(users, Req) ->
 		<- emqttd_vm:get_ets_object(mqtt_admin)],
     api_respond(Req, Bodys);
  
+api(update_user, Req) ->
+    User = Req:parse_post(),
+    Username = proplists:get_value("user_name", User),
+    Password = proplists:get_value("password", User),
+    Tag = proplists:get_value("tag", User),
+    Status = emqttd_dashboard_users:update_user(#mqtt_admin{username = Username, password = Password, tags = Tag}),
+    RespondCode = code(Status),
+    api_respond(Req, RespondCode);
+ 
 api(add_user, Req) ->
     User = Req:parse_post(),
     Username = proplists:get_value("user_name", User),
@@ -172,8 +181,7 @@ api(add_user, Req) ->
     Status = emqttd_dashboard_users:add_user(#mqtt_admin{username = Username, password = Password, tags = Tag}),
     RespondCode = code(Status),
     api_respond(Req, RespondCode).
-    
-    
+ 
 api_respond(Req, Bodys) ->
     JsonData = 
     if length(Bodys) == 0 ->
@@ -228,7 +236,7 @@ code(ok) -> 1;
 code(exist) -> 2.
 
 session_table(Session) ->
-    [{Topic, Qos}] = proplists:get_value(subscriptions, Session),
+    [{Topic, Qos}] = proplists:get_value(subscriptions, Session, [{undefined, undefined}]),
     New1 = [{topic, Topic}|Session],
     CreatedAt = list_to_binary(connected_at_format(proplists:get_value(created_at, New1))),
     New2 = lists:keyreplace(created_at, 1, New1, {created_at, CreatedAt}),
@@ -245,5 +253,5 @@ session_table(Session) ->
                 created_at,
 		topic,
 		qos],
-	[{Key, proplists:get_value(Key, NewSession)} || Key <- InfoKeys].
+    [{Key, proplists:get_value(Key, NewSession)} || Key <- InfoKeys].
 	
