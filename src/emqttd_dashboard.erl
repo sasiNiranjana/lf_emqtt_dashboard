@@ -173,6 +173,13 @@ api(update_user, Req) ->
     RespondCode = code(Status),
     api_respond(Req, RespondCode);
  
+api(remove_user, Req) ->
+    User = Req:parse_post(),
+    Username = proplists:get_value("user_name", User),
+    Status = emqttd_dashboard_users:remove_user(Username),
+    RespondCode = code(Status),
+    api_respond(Req, RespondCode);
+ 
 api(add_user, Req) ->
     User = Req:parse_post(),
     Username = proplists:get_value("user_name", User),
@@ -233,7 +240,7 @@ user_passwd(BasicAuth) ->
 	list_to_tuple(binary:split(base64:decode(BasicAuth), <<":">>)). 
 
 code(ok) -> 1;
-code(exist) -> 2.
+code(ignore) -> 2.
 
 session_table(Session) ->
     [{Topic, Qos}] = 

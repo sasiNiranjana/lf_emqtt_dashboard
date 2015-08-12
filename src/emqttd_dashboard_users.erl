@@ -61,7 +61,7 @@ update_user(User) ->
     gen_server:cast(?MODULE, {update_user, User}).
 
 lookup_user(Username) ->
-  case ets:lookup(mqtt_admin, Username) of
+  case ets:lookup(mqtt_admin, atom(Username)) of
 	[User] -> User;
 	[] -> undefined
 	end.
@@ -115,7 +115,8 @@ handle_cast({update_user, User = #mqtt_admin{username = Username, password = Pas
 		ets:insert(mqtt_admin, User#mqtt_admin{username = atom(Username), password = hash(bin(Password)), tags = atom(Tags)}),
 		ok;
 	[] ->
-		lager:error("cannot find Username: ~p", [atom(Username)])
+		lager:error("cannot find Username: ~p", [atom(Username)]),
+		ignore
     end,
     {noreply, State};
 
@@ -123,9 +124,11 @@ handle_cast({update_user, User = #mqtt_admin{username = Username, password = Pas
 handle_cast({remove_user, Username}, State) ->
     case ets:lookup(mqtt_admin, atom(Username)) of
 	[_User] ->
-    		ets:delete(mqtt_admin, Username);
+    		ets:delete(mqtt_admin, atom(Username)),
+		ok;
 	[] ->
-		lager:error("cannot find Username: ~p", [atom(Username)])
+		lager:error("cannot find Username: ~p", [atom(Username)]),
+		ignore
     end,
     {noreply, State};
 
