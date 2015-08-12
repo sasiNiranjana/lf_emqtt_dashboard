@@ -585,6 +585,15 @@ function User() {
 	});
 }
 
+User.del = function(userName) {
+	user.delUser(userName);
+}
+
+User.edit = function(tro) {
+	$('#title_user').text('Edit a user');
+	$('#add_user_btn').attr('value', 'Edit a user');
+}
+
 User.prototype = {
 
 	// 加载 users
@@ -608,7 +617,9 @@ User.prototype = {
 						var u = d[i];
 						tby.append('<tr><td>' + u['name']
 								+ '</td><td>' + u['tag']
-								+ '</td><td>●</td></tr>');
+								+ '</td><td>●</td>'
+								+ '<td><a href="javascript:void(0);" onclick="User.edit(this)">edit</a>'
+								+ '&nbsp;<a href="javascript:void(0);" onclick="User.del(\''+u['name']+'\')">delete</a></td></tr>');
 					}
 				}
 			},
@@ -619,6 +630,29 @@ User.prototype = {
 		jQuery.ajax(options);
 	},
 
+	delUser : function(userName) {
+		var _t = this;
+		if (confirm('确定要删除?')) {
+			var options = {
+				url : 'api/remove_user',
+				type : 'POST',
+				dataType : 'json',
+				data : {user_name: userName},
+				success : function(d) {
+					if (d == 1) {
+						_t._users();
+					} else {
+						alert("failure");
+					}
+				},
+				error : function(e) {
+					console.log('api/remover_user->error');
+				}
+			};
+			jQuery.ajax(options);
+		}
+	},
+	
 	addUser : function() {
 		var _t = this;
 		
@@ -662,7 +696,7 @@ User.prototype = {
 				}
 			},
 			error : function(e) {
-				console.log('api/users->error');
+				console.log('api/user_user->error');
 			}
 		};
 		jQuery.ajax(options);
