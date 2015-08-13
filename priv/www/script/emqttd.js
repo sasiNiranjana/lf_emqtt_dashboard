@@ -220,7 +220,7 @@ Overview.prototype = {
 								+ lis['process_used']+ ' / ' + lis['process_available'] + '</td><td>'
 								+ lis['load1'] + ' / ' +  lis['load5'] + ' / ' + lis['load15']
 								+ '</td><td>'
-								+ lis['used_memory'] + ' / ' + lis['total_memory'] + '</td><td>' + lis['uptime'] + '</td></tr>');
+								+ lis['used_memory'] + ' / ' + lis['total_memory'] + '</td><td>' + lis['max_fds'] + '</td><td>' + lis['uptime'] + '</td></tr>');
 					}
 				}
 			},

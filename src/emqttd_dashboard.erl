@@ -79,11 +79,13 @@ api(node, Req) ->
     Nodes = [node()|nodes()],
     NodeInfo = lists:map(fun(Node)-> 
 		Memory = rpc:call(Node, emqttd_vm, mem_info, []),
+		CheckIoList  = rpc:call(Node, emqttd_vm, get_system_info, [check_io]),
+		MaxFds = [{K, V}|| {K, V} <- CheckIoList, K == max_fds],
 		CpuInfo = [{K, list_to_binary(V)} || {K, V} <- rpc:call(Node, emqttd_vm, loads, [])],
 		ProcessLimit = rpc:call(Node, emqttd_vm, get_process_limit, []),
 		ProcessList = rpc:call(Node, emqttd_vm, get_process_list, []),
 		UpTime = rpc:call(Node, emqttd_broker, uptime, []),
-		Memory ++ [{name, Node}, {process_available, ProcessLimit}, {process_used, length(ProcessList)}, {uptime, list_to_binary(UpTime)}|CpuInfo]
+		MaxFds ++ Memory ++ [{name, Node}, {process_available, ProcessLimit}, {process_used, length(ProcessList)}, {uptime, list_to_binary(UpTime)}|CpuInfo]
 	    end, Nodes),
     api_respond(Req, NodeInfo);
     
