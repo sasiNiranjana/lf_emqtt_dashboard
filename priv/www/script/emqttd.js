@@ -60,6 +60,7 @@ var session = null;
 var topic = null;
 var subpub = null;
 var user = null;
+var httpApi = null;
 function addClick() {
 	// 注册单击事件
 	$('#tab_nav>li').each(function(index) {
@@ -106,7 +107,12 @@ function addClick() {
 				user = new User();
 			});
 			break;
-
+		case 1:
+			$(this).click(function() {
+				tabClass(this);
+				httpApi = new HttpApi();
+			});
+			break;
 		default:
 			break;
 		}
@@ -709,3 +715,12 @@ User.prototype = {
 	}
 
 };
+
+function HttpApi() {
+	var _t = this;
+	// 网页标签元素
+	_t.elements = {};
+
+	// 加载模块
+	loading('http_api.html', function() {});
+}
