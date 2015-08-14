@@ -113,7 +113,7 @@ api(clients, Req) ->
 		{proto_ver, ProtoVer}, 
 		{keepalive, KeepAlvie}, 
 		{connected_at, list_to_binary(connected_at_format(ConnectedAt))}
-		] || {_Tab, ClientId, _ClientPid, UserName, {Ipaddr, Port}, CleanSession, ProtoVer, KeepAlvie, _WillTopic, ConnectedAt}
+		] || {_Tab, ClientId, _ClientPid, UserName, {Ipaddr, Port}, CleanSession, ProtoVer, KeepAlvie, _WillTopic, _Headers,  ConnectedAt}
 		<- emqttd_vm:get_ets_object(mqtt_client)],
     api_respond(Req, Bodys);
     
@@ -245,18 +245,18 @@ code(ok) -> 1;
 code(ignore) -> 2.
 
 session_table(Session) ->
-    [{Topic, Qos}] = 
-    case proplists:get_value(subscriptions, Session) of
-    	[] ->
-		[{loading, loading}];
-	L ->
-		L
-    end,
-    New1 = [{topic, Topic}|Session],
-    CreatedAt = list_to_binary(connected_at_format(proplists:get_value(created_at, New1))),
-    New2 = lists:keyreplace(created_at, 1, New1, {created_at, CreatedAt}),
+  %  [{Topic, Qos}] = 
+  %  case proplists:get_value(subscriptions, Session) of
+  %  	[] ->
+  %      	[{loading, loading}];
+  %      L ->
+  %      	L
+  %  end,
+%    New1 = [{topic, Topic}|Session],
+    CreatedAt = list_to_binary(connected_at_format(proplists:get_value(created_at, Session))),
+    NewSession = lists:keyreplace(created_at, 1, Session, {created_at, CreatedAt}),
 
-    NewSession = [{qos, Qos} | lists:keydelete(subscriptions, 1, New2)],
+%    NewSession = [{qos, Qos} | lists:keydelete(subscriptions, 1, New2)],
 
     InfoKeys = [clean_sess, 
                 max_inflight,
@@ -266,8 +266,8 @@ session_table(Session) ->
                 awaiting_rel,
                 awaiting_ack,
                 awaiting_comp,
-                created_at,
-		topic,
-		qos],
+                created_at],
+%		topic,
+%		qos],
     [{Key, proplists:get_value(Key, NewSession)} || Key <- InfoKeys].
 	
