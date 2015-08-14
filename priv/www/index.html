@@ -19,6 +19,7 @@
 <script type="text/javascript">
 	$(document).ready(function() {
 		var item = -1;
+		var item2 = -1;
 		var url = window.location.href;
 		var strs = url.split('#');
 		if (strs.length == 1 || strs[1] == '/overview') {
@@ -38,17 +39,21 @@
 			item = 4;
 		} else if (strs[1] == '/users') {
 			user = new User();
-			$('#tab_nav_2>li').each(function(i, e) {
-				if (i == 0) {
-					tabClass(e);
-				}
-			});
+			item2 = 0;
+		} else if (strs[1] == '/http_api') {
+			httpApi = new HttpApi();
+			item2 = 1;
 		} else {
 			overview = new Overview();
 			item = 0;
 		}
 		$('#tab_nav>li').each(function(i, e) {
 			if (i == item) {
+				tabClass(e);
+			}
+		});
+		$('#tab_nav_2>li').each(function(i, e) {
+			if (i == item2) {
 				tabClass(e);
 			}
 		});
@@ -85,7 +90,7 @@
 		<nav>
 			<ul class="main-tab-nav" id="tab_nav_2">
 				<li><a href="/#/users" title="Admins">Admins</a></li>
-				<li><a href="/http_api.html" title="Http API">Http API</a></li>
+				<li><a href="/#/http_api" title="Http API">Http API</a></li>
 			</ul>
 		</nav>
 	</aside>
