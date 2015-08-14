@@ -262,6 +262,7 @@ session_table(Session) ->
                 max_inflight,
                 inflight_queue,
                 message_queue,
+                message_dropped,
                 awaiting_rel,
                 awaiting_ack,
                 awaiting_comp,
