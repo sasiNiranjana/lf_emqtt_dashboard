@@ -165,7 +165,7 @@ Overview.prototype = {
 		var c = _t.client;
 		c.connect({
 			onSuccess : function() {
-				console.log("The client connect success.");
+				//console.log("The client connect success.");
 				c.subscribe("\$SYS/brokers/emqttd@127.0.0.1/#");
 			}
 		});
@@ -174,12 +174,12 @@ Overview.prototype = {
 		// called when the client loses its connection
 		function onConnectionLost(responseObject) {
 			if (responseObject.errorCode !== 0) {
-				console.log("onConnectionLost: " + responseObject.errorMessage);
+				//console.log("onConnectionLost: " + responseObject.errorMessage);
 			}
 		}
 		// called when a message arrives
 		function onMessageArrived(message) {
-			console.log("onMessageArrived: " + message.destinationName + "-:-" + message.payloadString);
+			//console.log("onMessageArrived: " + message.destinationName + "-:-" + message.payloadString);
 			var topic = message.destinationName;
 			var lastNum = topic.lastIndexOf("/");
 			var endStr = topic.substring(lastNum);
@@ -225,7 +225,7 @@ Overview.prototype = {
 				}
 			},
 			error : function(e) {
-				console.log('api/node->error');
+				//console.log('api/node->error');
 			}
 		};
 		jQuery.ajax(options);
@@ -253,7 +253,7 @@ Overview.prototype = {
 				jQuery('#subscribers_count').text(d['subscribers/count']);
 			},
 			error : function(e) {
-				console.log('api/stats->error');
+				//console.log('api/stats->error');
 			}
 		};
 		jQuery.ajax(options);
@@ -292,7 +292,7 @@ Overview.prototype = {
 				$('#packets_unsubscribe').text(d['packets/unsubscribe']);
 			},
 			error : function(e) {
-				console.log('api/metrics->error');
+				//console.log('api/metrics->error');
 			}
 		};
 		jQuery.ajax(options);
@@ -327,7 +327,7 @@ Overview.prototype = {
 				}
 			},
 			error : function(e) {
-				console.log('api/listeners->error');
+				//console.log('api/listeners->error');
 			}
 		};
 		jQuery.ajax(options);
@@ -384,7 +384,7 @@ Clients.prototype = {
 				}
 			},
 			error : function(e) {
-				console.log('api/clients->error');
+				//console.log('api/clients->error');
 			}
 		};
 		jQuery.ajax(options);
@@ -435,7 +435,7 @@ Session.prototype = {
 				}
 			},
 			error : function(e) {
-				console.log('api/session->error');
+				//console.log('api/session->error');
 			}
 		};
 		jQuery.ajax(options);
@@ -487,7 +487,7 @@ Topic.prototype = {
 				}
 			},
 			error : function(e) {
-				console.log('api/topic->error');
+				//console.log('api/topic->error');
 			}
 		};
 		jQuery.ajax(options);
@@ -506,7 +506,7 @@ Topic.prototype = {
 				}
 			},
 			error : function(e) {
-				console.log('api/topic->error');
+				//console.log('api/topic->error');
 			}
 		};
 		jQuery.ajax(options);
@@ -558,7 +558,7 @@ Subpub.prototype = {
 				}
 			},
 			error : function(e) {
-				console.log('api/subscriber->error');
+				//console.log('api/subscriber->error');
 			}
 		};
 		jQuery.ajax(options);
@@ -625,7 +625,7 @@ User.prototype = {
 				}
 			},
 			error : function(e) {
-				console.log('api/users->error');
+				//console.log('api/users->error');
 			}
 		};
 		jQuery.ajax(options);
@@ -647,7 +647,7 @@ User.prototype = {
 					}
 				},
 				error : function(e) {
-					console.log('api/remover_user->error');
+					//console.log('api/remover_user->error');
 				}
 			};
 			jQuery.ajax(options);
@@ -697,7 +697,7 @@ User.prototype = {
 				}
 			},
 			error : function(e) {
-				console.log('api/user_user->error');
+				//console.log('api/user_user->error');
 			}
 		};
 		jQuery.ajax(options);
