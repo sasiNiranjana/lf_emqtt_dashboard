@@ -84,8 +84,8 @@ api(node, Req) ->
 		CpuInfo = [{K, list_to_binary(V)} || {K, V} <- rpc:call(Node, emqttd_vm, loads, [])],
 		ProcessLimit = rpc:call(Node, emqttd_vm, get_process_limit, []),
 		ProcessList = rpc:call(Node, emqttd_vm, get_process_list, []),
-		UpTime = rpc:call(Node, emqttd_broker, uptime, []),
-		MaxFds ++ Memory ++ [{name, Node}, {process_available, ProcessLimit}, {process_used, length(ProcessList)}, {uptime, list_to_binary(UpTime)}|CpuInfo]
+		%UpTime = rpc:call(Node, emqttd_broker, uptime, []),
+		MaxFds ++ Memory ++ [{name, Node}, {process_available, ProcessLimit}, {process_used, length(ProcessList)}|CpuInfo]
 	    end, Nodes),
     api_respond(Req, NodeInfo);
     
