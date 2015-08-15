@@ -32,6 +32,10 @@
 
 -define(SEPARTOR, $\/).
 
+-define(KB, 1024).
+-define(MB, (1024*1024)).
+-define(GB, (1024*1024*1024)).
+
 -record(mqtt_admin, {username, password, tags}).
  
 -include_lib("stdlib/include/qlc.hrl").
@@ -81,8 +85,8 @@ api(node, Req) ->
 			    CpuInfo = [{K, list_to_binary(V)} || {K, V} <- rpc:call(Node, emqttd_vm, loads, [])],
 			    Memory = rpc(Node, emqttd_vm, get_memory, []),
 			    [{name, Node},
-		             {total_memory, byte2mb(proplists:get_value(allocated, Memory))},
-			     {used_memory, byte2mb(proplists:get_value(used, Memory))},
+		             {total_memory, kmg(proplists:get_value(allocated, Memory))},
+			     {used_memory, kmg(proplists:get_value(used, Memory))},
 			     {process_available, rpc(Node, emqttd_vm, get_process_limit, [])},
 			     {process_used, length(rpc(Node, emqttd_vm, get_process_list, []))},
 			     {max_fds, proplists:get_value(max_fds,rpc(Node, emqttd_vm, get_system_info, [check_io]))}|CpuInfo]
@@ -293,22 +297,15 @@ session_table(Session, InfoKeys) ->
 rpc(Node, M, F, A) ->
    rpc:call(Node, M, F, A).
 
-byte2mb(Byte) when is_integer(Byte) ->
-    float(Byte / (1024 * 1024), 2);
-byte2mb(Byte) ->
-    float(tointeger(Byte) / (1024 * 1024), 2).
+kmg(Byte) when Byte > ?GB ->
+    float(Byte / ?GB, "G");
+kmg(Byte) when Byte > ?MB ->
+    float(Byte / ?MB, "M");
+kmg(Byte) when Byte > ?KB ->
+    float(Byte / ?MB, "K");
+kmg(Byte) ->
+    Byte.
 
-byte2gb(Byte) when is_integer(Byte) ->
-    float(Byte / (1024 * 1024 * 1024), 2);
-byte2gb(Byte) ->
-    float(tointeger(Byte) / (1024 * 1024 * 1024), 2).
-
-tointeger(L) when is_list(L) -> 
-    list_to_integer(L);
-tointeger(I) ->
-    I.
-
-float(Number, X) ->
-     N = math:pow(10,X),
-     round(Number*N)/N.
+float(F, S) ->
+    iolist_to_binary(io_lib:format("~.2f~s", [F, S])).
 
