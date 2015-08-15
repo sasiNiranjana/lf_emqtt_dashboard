@@ -229,7 +229,7 @@ Overview.prototype = {
 								+ lis['process_used']+ ' / ' + lis['process_available'] + '</td><td>'
 								+ lis['load1'] + ' / ' +  lis['load5'] + ' / ' + lis['load15']
 								+ '</td><td>'
-								+ lis['used_memory'] + ' / ' + lis['total_memory'] + '</td><td>' + lis['max_fds'] + '</td></tr>');
+								+ lis['used_memory'] + 'MB / ' + lis['total_memory'] + 'MB</td><td>' + lis['max_fds'] + '</td></tr>');
 					}
 				}
 			},
@@ -564,7 +564,7 @@ Subpub.prototype = {
 					var tby = jQuery('#subpub tbody').empty();
 					for (var i = 0; i < d.length; i++) {
 						var sub = d[i];
-						tby.append('<tr><td>' + sub['mqtt_subscriber']
+						tby.append('<tr><td>' + sub['clientId']
 								+ '</td><td>' + sub['topic'] + '</td><td>'
 								+ sub['qos'] + '</td></tr>');
 					}
