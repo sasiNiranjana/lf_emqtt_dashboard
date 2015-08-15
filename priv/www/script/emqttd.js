@@ -581,8 +581,8 @@ Subpub.prototype = {
 					for (var i = 0; i < d.length; i++) {
 						var sub = d[i];
 						tby.append('<tr><td>' + sub['clientId']
-								+ '</td><td>' + sub['topic'] + '</td><td>'
-								+ sub['qos'] + '</td></tr>');
+								+ '</td><td>'
+								+ sub['subscriptions'] + '</td></tr>');
 					}
 				}
 			},
