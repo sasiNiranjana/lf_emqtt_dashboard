@@ -93,7 +93,7 @@ init([]) ->
 
     % Init mqtt_admin 
     Keys = mnesia:dirty_all_keys(mqtt_admin),
-    if length(Keys) == 0 ->
+    if length(Keys) =/= 0 ->
     	ignore;
     true ->
     	User = #mqtt_admin{username = 'admin', password = hash(bin(admin)), tags = atom(administrator)},
