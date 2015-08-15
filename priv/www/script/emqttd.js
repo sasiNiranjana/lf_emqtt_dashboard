@@ -361,6 +361,7 @@ function Clients() {
 	var _t = this;
 	// 网页标签元素
 	_t.elements = {};
+	jQuery('#model_title').text("Clients");
 
 	// 加载模块
 	loading('clients.html', function() {
