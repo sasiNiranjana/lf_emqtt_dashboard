@@ -176,11 +176,11 @@ api(topic, Req) ->
 api(subscriber, Req) ->
     Records = [emqttd_vm:get_ets_object(Tab) || Tab <- [mqtt_transient_session, mqtt_persistent_session]],
     AllSession = lists:append(Records),
-    InfoKeys = [topic,qos],
 
     Bodys = 
     lists:map(fun({ClientId, Session}) ->
-	 	[{clientId, ClientId} | session_table(Session, InfoKeys)]
+		 Subscriptions = format(subscriptions, proplists:get_value(subscriptions, Session)),
+		 [{clientId, ClientId}, {subscriptions, list_to_binary(Subscriptions)}]
        	    end, AllSession),
     api_respond(Req, Bodys);
    
@@ -279,19 +279,8 @@ code(ok) -> 1;
 code(ignore) -> 2.
 
 session_table(Session, InfoKeys) ->
-    [{Topic, Qos}] = 
-    case proplists:get_value(subscriptions, Session) of
-    	[] ->
-        	[{loading, loading}];
-        L ->
-        	L
-    end,
-    New1 = [{topic, Topic}|Session],
-    CreatedAt = list_to_binary(connected_at_format(proplists:get_value(created_at, New1))),
-    New2 = lists:keyreplace(created_at, 1, New1, {created_at, CreatedAt}),
-
-    NewSession = [{qos, Qos} | lists:keydelete(subscriptions, 1, New2)],
-
+    CreatedAt = list_to_binary(connected_at_format(proplists:get_value(created_at, Session))),
+    NewSession = lists:keyreplace(created_at, 1, Session, {created_at, CreatedAt}),
     [{Key, proplists:get_value(Key, NewSession)} || Key <- InfoKeys].
 
 rpc(Node, M, F, A) ->
@@ -308,4 +297,8 @@ kmg(Byte) ->
 
 float(F, S) ->
     iolist_to_binary(io_lib:format("~.2f~s", [F, S])).
+
+format(subscriptions, List) ->
+    string:join([io_lib:format("~s:~w", [Topic, Qos]) || {Topic, Qos} <- List], ",").
+
 
