@@ -213,8 +213,14 @@ api(add_user, Req) ->
     Tag = proplists:get_value("tag", User),
     Status = emqttd_dashboard_users:add_user(#mqtt_admin{username = Username, password = Password, tags = Tag}),
     RespondCode = code(Status),
-    api_respond(Req, RespondCode).
+    api_respond(Req, RespondCode);
  
+api(current_user, Req) ->
+    "Basic " ++ BasicAuth =  Req:get_header_value("Authorization"),
+    {Username, _Password} = user_passwd(BasicAuth),
+    api_respond(Req, [{username, Username}]).
+
+
 api_respond(Req, Bodys) ->
     JsonData = 
     if length(Bodys) == 0 ->
