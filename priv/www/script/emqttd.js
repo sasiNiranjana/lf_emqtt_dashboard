@@ -411,6 +411,7 @@ function Session() {
 	var _t = this;
 	// 网页标签元素
 	_t.elements = {};
+	jQuery('#model_title').text("Sessions");
 
 	// 加载模块
 	loading('session.html', function() {
@@ -462,6 +463,7 @@ function Topic() {
 	var _t = this;
 	// 网页标签元素
 	_t.elements = {};
+	jQuery('#model_title').text("Topics");
 
 	// 加载模块
 	loading('topic.html', function() {
@@ -533,6 +535,7 @@ function Subpub() {
 	var _t = this;
 	// 网页标签元素
 	_t.elements = {};
+	jQuery('#model_title').text("Subscribers");
 
 	// 加载模块
 	loading('subpub.html', function() {
@@ -585,6 +588,7 @@ function User() {
 	var _t = this;
 	// 网页标签元素
 	_t.elements = {};
+	jQuery('#model_title').text("Admins");
 
 	// 加载模块
 	loading('users.html', function() {
@@ -724,6 +728,7 @@ function HttpApi() {
 	var _t = this;
 	// 网页标签元素
 	_t.elements = {};
+	jQuery('#model_title').text("Http API");
 
 	// 加载模块
 	loading('http_api.html', function() {});
