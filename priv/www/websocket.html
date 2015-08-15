@@ -78,15 +78,27 @@ function connect() {
 	client.onConnectionLost = onConnectionLost;
 	client.onMessageArrived = onMessageArrived;
 	
-	client.connect({
+	var options = {
 		onSuccess : function() {
 			console.log("The client connect success.");
 			jQuery('#conn_state').text('CONNECTED');
 			$('#connect_btn').removeClass("btn-green");
 			$('#disconnect_btn').addClass("btn-green");
-
 		}
-	});
+	};
+	var userName = $('user_name').val();
+	var password = $('password').val();
+	var keepAlive = $('keep_alive').val();
+	if (userName != "") {
+		options.userName = userName;
+	}
+	if (password != "") {
+		options.password = password;
+	}
+	if (keepAlive != "") {
+		options.keepAliveInterval = Number(keepAlive);
+	}
+	client.connect(options);
 }
 
 function disconnect() {
