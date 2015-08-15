@@ -631,8 +631,7 @@ User.prototype = {
 						var u = d[i];
 						tby.append('<tr><td>' + u['name']
 								+ '</td><td>' + u['tag']
-								+ '</td><td>●</td>'
-								+ '<td>'
+								+ '</td><td>'
 								+ '&nbsp;<a href="javascript:void(0);" onclick="User.del(\''+u['name']+'\')">delete</a></td></tr>');
 						//<a href="javascript:void(0);" onclick="User.edit(this)">edit</a>
 					}
