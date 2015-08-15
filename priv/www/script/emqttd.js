@@ -123,6 +123,7 @@ function Overview() {
 	var _t = this;
 	// 网页标签元素
 	_t.elements = {};
+	jQuery('#model_title').text("Overview");
 
 	// 加载overview模块
 	loading('overview.html', function() {
@@ -168,13 +169,14 @@ Overview.prototype = {
 //		jQuery.ajax(options);
 		
 		_t.client = new Paho.MQTT.Client(location.hostname, 8083, 'dashboard_' + new Date().getTime());
-		_t.client.username_pw_set("dashboard", "");
 		var c = _t.client;
 		c.connect({
 			onSuccess : function() {
 				//console.log("The client connect success.");
 				c.subscribe("\$SYS/brokers/emqttd@127.0.0.1/#");
-			}
+			},
+			userName : "dashboard",
+			password : ""
 		});
 		c.onConnectionLost = onConnectionLost;
 		c.onMessageArrived = onMessageArrived;
