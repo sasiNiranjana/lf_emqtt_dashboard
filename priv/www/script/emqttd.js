@@ -185,7 +185,7 @@ Overview.prototype = {
 		c.connect({
 			onSuccess : function() {
 				//console.log("The client connect success.");
-				c.subscribe("\$SYS/brokers/emqttd@127.0.0.1/#");
+				c.subscribe("\$SYS/brokers/emqttd@127.0.0.1/+");
 			},
 			userName : "dashboard",
 			password : ""
