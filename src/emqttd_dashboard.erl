@@ -78,15 +78,15 @@ api(cpu, Req) ->
 api(node, Req) ->
     Nodes = [node()|nodes()],
     NodeInfo = lists:map(fun(Node)-> 
-		Memory = rpc:call(Node, emqttd_vm, mem_info, []),
-		CheckIoList  = rpc:call(Node, emqttd_vm, get_system_info, [check_io]),
-		MaxFds = [{K, V}|| {K, V} <- CheckIoList, K == max_fds],
-		CpuInfo = [{K, list_to_binary(V)} || {K, V} <- rpc:call(Node, emqttd_vm, loads, [])],
-		ProcessLimit = rpc:call(Node, emqttd_vm, get_process_limit, []),
-		ProcessList = rpc:call(Node, emqttd_vm, get_process_list, []),
-		%UpTime = rpc:call(Node, emqttd_broker, uptime, []),
-		MaxFds ++ Memory ++ [{name, Node}, {process_available, ProcessLimit}, {process_used, length(ProcessList)}|CpuInfo]
-	    end, Nodes),
+			    CpuInfo = [{K, list_to_binary(V)} || {K, V} <- rpc:call(Node, emqttd_vm, loads, [])],
+			    Memory = rpc(Node, emqttd_vm, get_memory, []),
+			    [{name, Node},
+		             {total_memory, byte2mb(proplists:get_value(allocated, Memory))},
+			     {used_memory, byte2mb(proplists:get_value(used, Memory))},
+			     {process_available, rpc(Node, emqttd_vm, get_process_limit, [])},
+			     {process_used, length(rpc(Node, emqttd_vm, get_process_list, []))},
+			     {max_fds, proplists:get_value(max_fds,rpc(Node, emqttd_vm, get_system_info, [check_io]))}|CpuInfo]
+     			 end, Nodes),
     api_respond(Req, NodeInfo);
     
 api(metrics, Req) ->
@@ -122,9 +122,21 @@ api(clients, Req) ->
 api(session, Req) ->
     Records = [emqttd_vm:get_ets_object(Tab) || Tab <- [mqtt_transient_session, mqtt_persistent_session]],
     AllSession = lists:append(Records),
+    InfoKeys = [clean_sess, 
+                max_inflight,
+                inflight_queue,
+                message_queue,
+                message_dropped,
+                awaiting_rel,
+                awaiting_ack,
+                awaiting_comp,
+                created_at],
+%		topic,
+%		qos],
+
     Bodys = 
     lists:map(fun({ClientId, Session}) ->
-	 	[{clientId, ClientId} | session_table(Session)]
+	 	[{clientId, ClientId} | session_table(Session, InfoKeys)]
        	    end, AllSession),
     api_respond(Req, Bodys);
    
@@ -145,18 +157,30 @@ api(topic, Req) ->
    
 %%-----------------------------------subscribe--------------------------------------
 %%subscribe api
-api(subscriber, Req) ->
-    F = fun() ->
-        Q = qlc:q([E || E <- mnesia:table(subscriber)]),
-	qlc:e(Q) 
-        end,
-    {atomic, SubLists} =  mnesia:transaction(F),
-    Bodys = [[{mqtt_subscriber,  Tab},
-             {topic, Topic}, 
-             {qos, Qos}] || {Tab, Topic, _Pid, Qos} <- SubLists],
-
-    api_respond(Req, Bodys);
+%api(subscriber, Req) ->
+%    F = fun() ->
+%        Q = qlc:q([E || E <- mnesia:table(subscriber)]),
+%	qlc:e(Q) 
+%        end,
+%    {atomic, SubLists} =  mnesia:transaction(F),
+%    Bodys = [[{mqtt_subscriber,  Tab},
+%             {topic, Topic}, 
+%             {qos, Qos}] || {Tab, Topic, _Pid, Qos} <- SubLists],
+%
+%    api_respond(Req, Bodys);
  
+api(subscriber, Req) ->
+    Records = [emqttd_vm:get_ets_object(Tab) || Tab <- [mqtt_transient_session, mqtt_persistent_session]],
+    AllSession = lists:append(Records),
+    InfoKeys = [topic,qos],
+
+    Bodys = 
+    lists:map(fun({ClientId, Session}) ->
+	 	[{clientId, ClientId} | session_table(Session, InfoKeys)]
+       	    end, AllSession),
+    api_respond(Req, Bodys);
+   
+
 %%-----------------------------------Users--------------------------------------
 %%users api
 api(users, Req) ->
@@ -244,30 +268,41 @@ user_passwd(BasicAuth) ->
 code(ok) -> 1;
 code(ignore) -> 2.
 
-session_table(Session) ->
-  %  [{Topic, Qos}] = 
-  %  case proplists:get_value(subscriptions, Session) of
-  %  	[] ->
-  %      	[{loading, loading}];
-  %      L ->
-  %      	L
-  %  end,
-%    New1 = [{topic, Topic}|Session],
-    CreatedAt = list_to_binary(connected_at_format(proplists:get_value(created_at, Session))),
-    NewSession = lists:keyreplace(created_at, 1, Session, {created_at, CreatedAt}),
+session_table(Session, InfoKeys) ->
+    [{Topic, Qos}] = 
+    case proplists:get_value(subscriptions, Session) of
+    	[] ->
+        	[{loading, loading}];
+        L ->
+        	L
+    end,
+    New1 = [{topic, Topic}|Session],
+    CreatedAt = list_to_binary(connected_at_format(proplists:get_value(created_at, New1))),
+    New2 = lists:keyreplace(created_at, 1, New1, {created_at, CreatedAt}),
 
-%    NewSession = [{qos, Qos} | lists:keydelete(subscriptions, 1, New2)],
+    NewSession = [{qos, Qos} | lists:keydelete(subscriptions, 1, New2)],
 
-    InfoKeys = [clean_sess, 
-                max_inflight,
-                inflight_queue,
-                message_queue,
-                message_dropped,
-                awaiting_rel,
-                awaiting_ack,
-                awaiting_comp,
-                created_at],
-%		topic,
-%		qos],
     [{Key, proplists:get_value(Key, NewSession)} || Key <- InfoKeys].
-	
+
+rpc(Node, M, F, A) ->
+   rpc:call(Node, M, F, A).
+
+byte2mb(Byte) when is_integer(Byte) ->
+    float(Byte / (1024 * 1024), 2);
+byte2mb(Byte) ->
+    float(tointeger(Byte) / (1024 * 1024), 2).
+
+byte2gb(Byte) when is_integer(Byte) ->
+    float(Byte / (1024 * 1024 * 1024), 2);
+byte2gb(Byte) ->
+    float(tointeger(Byte) / (1024 * 1024 * 1024), 2).
+
+tointeger(L) when is_list(L) -> 
+    list_to_integer(L);
+tointeger(I) ->
+    I.
+
+float(Number, X) ->
+     N = math:pow(10,X),
+     round(Number*N)/N.
+
