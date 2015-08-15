@@ -61,21 +61,18 @@ update_user(User) ->
     gen_server:cast(?MODULE, {update_user, User}).
 
 lookup_user(Username) ->
-  case ets:lookup(mqtt_admin, atom(Username)) of
-	[User] -> User;
-	[] -> undefined
-	end.
+    mnesia:dirty_read(mqtt_admin, atom(Username)).
 
 all_users() ->
-    emqttd_vm:get_ets_object(mqtt_admin).
+    mnesia:dirty_all_keys(mqtt_admin).
 
 check(#mqtt_admin{username = undefined}) ->
     {error, "Username undefined"};
 check(#mqtt_admin{password = undefined}) ->
     {error, "Password undefined"};
 check(#mqtt_admin{username = Username, password = Password}) ->
-	case ets:lookup(mqtt_admin, atom(Username)) of
-        [] -> 
+    case mnesia:dirty_read(mqtt_admin, atom(Username)) of
+	[] -> 
             {error, "Username Not Found"};
         [#mqtt_admin{password = <<Salt:4/binary, Hash/binary>>}] ->
             case Hash =:= md5_hash(Salt, Password) of
@@ -89,30 +86,42 @@ check(#mqtt_admin{username = Username, password = Password}) ->
 %%%=============================================================================
 init([]) ->
     % Create mqtt_admin table
-    ets:new(mqtt_admin, [set, public, named_table,{keypos, #mqtt_admin.username}, {write_concurrency, true}]),
+    mnesia:create_table(mqtt_admin, [
+	{disc_copies, [node()]},
+	{attributes, record_info(fields, mqtt_admin)}]),
+    mnesia:add_table_copy(mqtt_admin, node(), ram_copies),
+
     % Init mqtt_admin 
-    User = #mqtt_admin{username = 'admin', password = hash(bin(admin)), tags = administrator},
-    ets:insert(mqtt_admin, User),
+    Keys = mnesia:dirty_all_keys(mqtt_admin),
+    if length(Keys) == 0 ->
+    	ignore;
+    true ->
+    	User = #mqtt_admin{username = 'admin', password = hash(bin(admin)), tags = atom(administrator)},
+    	mnesia:transaction(fun() -> mnesia:write(User) end)
+    end,
     {ok, state}.
 
 handle_call(_Req, _From, State) ->
     {reply, error,  State}.
 
 handle_cast({add_user, User = #mqtt_admin{username = Username, password = Password, tags = Tags}}, State) ->    
-    case ets:lookup(mqtt_admin, atom(Username)) of
+    case mnesia:dirty_read(mqtt_admin, atom(Username)) of
 	[] ->
-		ets:insert(mqtt_admin, User#mqtt_admin{username = atom(Username), password = hash(bin(Password)), tags = atom(Tags)}),
+    		User1 = #mqtt_admin{username = atom(Username), password = hash(bin(Password)), tags = atom(Tags)},
+    		mnesia:transaction(fun() -> mnesia:write(User1) end),
 		ok;
 	[_OldUser] ->
-		ets:insert(mqtt_admin, User#mqtt_admin{username = atom(Username), password = hash(bin(Password)), tags = atom(Tags)}),
+		User1 = #mqtt_admin{username = atom(Username), password = hash(bin(Password)), tags = atom(Tags)},
+    		mnesia:transaction(fun() -> mnesia:write(User1) end),
 		ok
     end,
     {noreply, State};
 
 handle_cast({update_user, User = #mqtt_admin{username = Username, password = Password, tags = Tags}}, State) ->
-    case ets:lookup(mqtt_admin, atom(Username)) of
+    case mnesia:dirty_read(mqtt_admin, atom(Username)) of
 	[_OldUser] ->
-		ets:insert(mqtt_admin, User#mqtt_admin{username = atom(Username), password = hash(bin(Password)), tags = atom(Tags)}),
+		User1 = #mqtt_admin{username = atom(Username), password = hash(bin(Password)), tags = atom(Tags)},
+    		mnesia:transaction(fun() -> mnesia:write(User1) end),
 		ok;
 	[] ->
 		lager:error("cannot find Username: ~p", [atom(Username)]),
@@ -122,9 +131,9 @@ handle_cast({update_user, User = #mqtt_admin{username = Username, password = Pas
 
 
 handle_cast({remove_user, Username}, State) ->
-    case ets:lookup(mqtt_admin, atom(Username)) of
+    case mnesia:dirty_read(mqtt_admin, atom(Username)) of
 	[_User] ->
-    		ets:delete(mqtt_admin, atom(Username)),
+    		mnesia:transaction(fun() -> mnesia:delete({mqtt_admin, atom(Username)}) end),
 		ok;
 	[] ->
 		lager:error("cannot find Username: ~p", [atom(Username)]),
@@ -139,7 +148,6 @@ handle_info(_Msg, State) ->
     {noreply, State}.
 
 terminate(_Reason, _State) ->
-    ets:delete(mqtt_admin),
     ok.
 
 code_change(_OldVsn, State, _Extra) ->
