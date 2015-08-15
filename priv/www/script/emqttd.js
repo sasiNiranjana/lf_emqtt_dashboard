@@ -62,6 +62,18 @@ var subpub = null;
 var user = null;
 var httpApi = null;
 function addClick() {
+	//load current_user
+	var option = {
+			url : 'api/current_user',
+			type : 'POST',
+			dataType : 'json',
+			success : function(d) {
+				jQuery('#current_user').text(d.username);
+			},
+			error : function(e) {
+			}
+		};
+	jQuery.ajax(option);
 	// 注册单击事件
 	$('#tab_nav>li').each(function(index) {
 		switch (index) {
