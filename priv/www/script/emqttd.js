@@ -61,7 +61,7 @@ var topic = null;
 var subpub = null;
 var user = null;
 var httpApi = null;
-function addClick() {
+function showCurrentUser(){
 	//load current_user
 	var option = {
 			url : 'api/current_user',
@@ -74,6 +74,10 @@ function addClick() {
 			}
 		};
 	jQuery.ajax(option);
+}
+
+function addClick() {
+	showCurrentUser();
 	// 注册单击事件
 	$('#tab_nav>li').each(function(index) {
 		switch (index) {
@@ -631,6 +635,7 @@ User.prototype = {
 			dataType : 'json',
 			data : {},
 			success : function(d) {
+				showCurrentUser();
 				$('#users_count').text(d.length);
 				if (d.length == 0) {
 					var sTable = jQuery('#users');
