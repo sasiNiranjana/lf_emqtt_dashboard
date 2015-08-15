@@ -139,13 +139,11 @@ q cite {
 }
 
 .top-panel .items-inner {
-	padding-left: 200px;
 	box-shadow: 0 -1px 8px 1px #bbb;
 	margin-left: 200px;
 	height: 60px;
 	line-height: 60px;
-	text-align: right;
-	padding-right: 30px;
+	font-size: 14px;
 }
 
 .sidebar {

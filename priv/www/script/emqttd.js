@@ -168,6 +168,7 @@ Overview.prototype = {
 //		jQuery.ajax(options);
 		
 		_t.client = new Paho.MQTT.Client(location.hostname, 8083, 'dashboard_' + new Date().getTime());
+		_t.client.username_pw_set("dashboard", "");
 		var c = _t.client;
 		c.connect({
 			onSuccess : function() {
