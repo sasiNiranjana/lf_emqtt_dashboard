@@ -4,15 +4,15 @@
 	<!-- col -->
 	<div class="colgroup leading full">
 		<div class="column full first">
-			<h3 class="h3">All Admin &nbsp;&nbsp;<b class="b">[<i id="users_count" style="color: #4ba575;">0</i>]</b></h3>
+			<h3 class="h3">All Admin &nbsp;&nbsp;<b class="b">[<i id="users_count" style="color: #4ba575;font-size: 13px;">0</i>]</b></h3>
 			<hr />
 			<div>
 				<table class="stylized" id="users">
 					<thead>
 						<tr>
 							<th>Name</th>
-							<th>Tags</th>
-							<th>operation</th>
+							<th>Remark</th>
+							<th>Operation</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -24,25 +24,27 @@
 
 	<div class="colgroup leading full">
 		<div class="column full first">
-			<h3 class="h3" id="title_user">Add / Edit a user</h3>
+			<h3 class="h3">Add or Edit a Admin</h3>
 			<hr />
 			<div>
 			<p class="column full first" style="margin-bottom: 10px;">
-				<label for="user_name">name:</label><br>
-				<input type="text" name="user_name" id="user_name" value="">
+				<label for="user_name">Name:</label><br>
+				<input type="text" name="user_name" id="user_name" value="" class="width2">
 			</p>
 			<p class="column full first" style="margin-bottom: 10px;">
-				<label for="password">password:</label><br>
-				<input type="password" name="password" id="password" value="">
+				<label for="password">Password:</label><br>
+				<input type="password" name="password" id="password" value="" class="width2">
 				<br/>
-				<input type="password" name="passwd_2" id="passwd_2" value="">
+				<input type="password" name="passwd_2" id="passwd_2" value="" class="width2 leading">
 			</p>
 			<p class="column full first" style="margin-bottom: 10px;">
-				<label for="tag">tag:</label><br>
-				<input type="text" name="tag" id="tag" value="">
+				<label for="tag">Remark:</label><br>
+				<input type="text" name="tag" id="tag" value="" class="width2">
 			</p>
 			<p class="column full first box">
-				<input type="button" id="add_user_btn" name="add_user_btn" value="Add a user" class="btn btn-green"/>
+				<input type="button" id="add_user_btn" name="add_user_btn" value="Add" class="btn btn-green"/>
+				&nbsp;
+				<a href="javascript:void(0);" id="add_user_span" style="display: none;" onclick="User.add();">Add a admin.</a>
 			</p>
 			</div>
 		</div>

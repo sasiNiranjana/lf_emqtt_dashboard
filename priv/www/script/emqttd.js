@@ -620,8 +620,29 @@ User.del = function(userName) {
 }
 
 User.edit = function(tro) {
-	$('#title_user').text('Edit a user');
-	$('#add_user_btn').attr('value', 'Edit a user');
+	var uo = $('#user_name');
+	var tg = $('#tag');
+	uo.val();
+	tg.val();
+	
+	$('#add_user_span').show();
+	$('#add_user_btn').attr('value', 'Update');
+	uo.attr('disabled', true);
+}
+
+User.add = function() {
+	$('#add_user_span').hide();
+	$('#add_user_btn').attr('value', 'Add');
+	
+	var uo = $('#user_name');
+	var po = $('#password');
+	var p2 = $("#passwd_2")
+	var tg = $('#tag');
+	uo.attr('disabled', false);
+	uo.val('');
+	po.val('');
+	p2.val('');
+	tg.val('');
 }
 
 User.prototype = {
@@ -648,9 +669,8 @@ User.prototype = {
 						var u = d[i];
 						tby.append('<tr><td>' + u['name']
 								+ '</td><td>' + u['tag']
-								+ '</td><td>'
+								+ '</td><td>' + '<a href="javascript:void(0);" onclick="User.edit(this)">edit</a>'
 								+ '&nbsp;<a href="javascript:void(0);" onclick="User.del(\''+u['name']+'\')">delete</a></td></tr>');
-						//<a href="javascript:void(0);" onclick="User.edit(this)">edit</a>
 					}
 				}
 			},
