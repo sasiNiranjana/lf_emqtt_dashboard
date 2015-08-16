@@ -619,11 +619,16 @@ User.del = function(userName) {
 	user.delUser(userName);
 }
 
-User.edit = function(tro) {
+User.edit = function(eo) {
 	var uo = $('#user_name');
 	var tg = $('#tag');
-	uo.val();
-	tg.val();
+	$(eo).parent('td').each(function(i) {
+		if (i == 0) {
+			uo.val($(this).text());
+		} else if (i == 1) {
+			tg.val($(this).text());
+		}
+	});
 	
 	$('#add_user_span').show();
 	$('#add_user_btn').attr('value', 'Update');
