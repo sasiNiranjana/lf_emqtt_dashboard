@@ -622,11 +622,11 @@ User.del = function(userName) {
 User.edit = function(eo) {
 	var uo = $('#user_name');
 	var tg = $('#tag');
-	$(eo).parent('td').each(function(i) {
+	$(eo).closest('tr').find('td').each(function(i, e) {
 		if (i == 0) {
-			uo.val($(this).text());
+			uo.val($(e).text());
 		} else if (i == 1) {
-			tg.val($(this).text());
+			tg.val($(e).text());
 		}
 	});
 	
