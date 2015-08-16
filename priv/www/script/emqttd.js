@@ -630,12 +630,14 @@ User.edit = function(eo) {
 		}
 	});
 	
+	$('#user_title').text('Edit a Admin');
 	$('#add_user_span').show();
 	$('#add_user_btn').attr('value', 'Update');
 	uo.attr('disabled', true);
 }
 
 User.add = function() {
+	$('#user_title').text('Add a Admin');
 	$('#add_user_span').hide();
 	$('#add_user_btn').attr('value', 'Add');
 	
