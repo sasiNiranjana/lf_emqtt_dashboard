@@ -79,6 +79,10 @@ function showCurrentUser(){
 function addClick() {
 	showCurrentUser();
 	// 注册单击事件
+	$('#logout').click(function(){
+		document.execCommand('ClearAuthenticationCache');
+		window.parent.location.href='/';
+	});
 	$('#tab_nav>li').each(function(index) {
 		switch (index) {
 		case 0:
@@ -690,7 +694,7 @@ User.prototype = {
 
 	delUser : function(userName) {
 		var _t = this;
-		if (confirm('确定要删除?')) {
+		if (confirm('Are you sure? This object cannot be recovered after deletion')) {
 			var options = {
 				url : 'api/remove_user',
 				type : 'POST',
