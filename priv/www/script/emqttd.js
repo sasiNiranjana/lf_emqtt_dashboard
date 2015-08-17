@@ -76,12 +76,72 @@ function showCurrentUser(){
 	jQuery.ajax(option);
 }
 
+function createXMLObject()
+{
+	try
+	{
+		if(window.XMLHttpRequest)
+		{
+			xmlhttp = new XMLHttpRequest();
+		}
+		 //code for IE5、IE6
+		 else if(window.ActiveXObject)
+		 {
+		 xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+		 }
+		 }
+		 catch(e)
+		 {
+		 xmlhttp=false;
+		 }
+		 return xmlhttp;
+		 }
+
+function clearAuth()
+{
+	try
+	{
+		if(navigator.userAgent.indexOf("MSIE")>0) //IE浏览器实现注销功能
+		{
+			document.execCommand("ClearAuthenticationCache");
+		}
+		else if(isFirefox=navigator.userAgent.indexOf("Firefox")>0) //Firefox实现注销功能
+		{
+			var xmlhttp = createXMLObject();
+			xmlhttp.open("GET",".force_logout_offer_login_mozilla",true,"logout","logout");
+			xmlhttp.send("");
+			xmlhttp.abort();
+		}
+		else //Google Chrome等浏览器实现注销功能
+		{
+			var options = {
+			url : 'api/logout',
+			type : 'POST',
+			dataType : 'json',
+			data : {},
+			success : function(d) {
+			},
+			error : function(e) {
+			}
+			};
+		jQuery.ajax(options);
+
+		}
+	}
+	catch(e)
+	{
+		alert("there was an error");
+		return false;
+	}
+	window.parent.location.href='/';
+}
+
+
 function addClick() {
 	showCurrentUser();
 	// 注册单击事件
 	$('#logout').click(function(){
-		document.execCommand('ClearAuthenticationCache');
-		window.parent.location.href='/';
+		clearAuth();
 	});
 	$('#tab_nav>li').each(function(index) {
 		switch (index) {

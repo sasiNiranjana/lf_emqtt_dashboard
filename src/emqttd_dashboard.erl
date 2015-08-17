@@ -207,6 +207,7 @@ api(remove_user, Req) ->
     User = Req:parse_post(),
     Username = proplists:get_value("user_name", User),
     Status = emqttd_dashboard_users:remove_user(Username),
+    lager:error("Status =~p", [Status]),
     RespondCode = code(Status),
     api_respond(Req, RespondCode);
  
@@ -222,7 +223,10 @@ api(add_user, Req) ->
 api(current_user, Req) ->
     "Basic " ++ BasicAuth =  Req:get_header_value("Authorization"),
     {Username, _Password} = user_passwd(BasicAuth),
-    api_respond(Req, [{username, Username}]).
+    api_respond(Req, [{username, Username}]);
+
+api(logout, Req) ->
+    Req:respond({401, [{"WWW-Authenticate", "Basic Realm=\"emqttd dashboad\""}], []}).
 
 
 api_respond(Req, Bodys) ->
