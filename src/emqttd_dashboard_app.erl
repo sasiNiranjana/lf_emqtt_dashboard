@@ -17,15 +17,13 @@ start(_StartType, _StartArgs) ->
     {ok, Sup}.
 
 stop(_State) ->
-    ok.
+    {ok, {_Proto, Port, _Opts}} = application:get_env(emqttd_dashboard, listener),
+    mochiweb:stop_http(Port).
 
 %% open http port
 open_listener({_Http, Port, Options}) ->
     MFArgs = {emqttd_dashboard, handle_request, []},
 	mochiweb:start_http(Port, Options, MFArgs).
-
-close_listener(Port) ->
-    mochiweb:stop_http(Port).
 
 worker_spec(Name) ->
     {Name,
