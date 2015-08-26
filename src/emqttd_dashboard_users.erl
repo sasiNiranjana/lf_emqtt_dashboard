@@ -104,7 +104,7 @@ init([]) ->
 handle_call(_Req, _From, State) ->
     {reply, error,  State}.
 
-handle_cast({add_user, User = #mqtt_admin{username = Username, password = Password, tags = Tags}}, State) ->    
+handle_cast({add_user, #mqtt_admin{username = Username, password = Password, tags = Tags}}, State) ->    
     case mnesia:dirty_read(mqtt_admin, atom(Username)) of
 	[] ->
     		User1 = #mqtt_admin{username = atom(Username), password = hash(bin(Password)), tags = atom(Tags)},
@@ -117,7 +117,7 @@ handle_cast({add_user, User = #mqtt_admin{username = Username, password = Passwo
     end,
     {noreply, State};
 
-handle_cast({update_user, User = #mqtt_admin{username = Username, password = Password, tags = Tags}}, State) ->
+handle_cast({update_user, #mqtt_admin{username = Username, password = Password, tags = Tags}}, State) ->
     case mnesia:dirty_read(mqtt_admin, atom(Username)) of
 	[_OldUser] ->
 		User1 = #mqtt_admin{username = atom(Username), password = hash(bin(Password)), tags = atom(Tags)},
