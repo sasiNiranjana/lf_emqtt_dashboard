@@ -505,7 +505,7 @@ Session.prototype = {
 	_session : function() {
 		var _t = this;
 		var options = {
-			url : 'api/session',
+			url : 'api/sessions',
 			type : 'POST',
 			dataType : 'json',
 			data : {},
@@ -558,7 +558,7 @@ Topic.prototype = {
 	_topic : function() {
 		var _t = this;
 		var options = {
-			url : 'api/topic',
+			url : 'api/topics',
 			type : 'POST',
 			dataType : 'json',
 			data : {},
@@ -588,7 +588,7 @@ Topic.prototype = {
 	_loadTree : function() {
 		setup("body");
 		var options = {
-			url : 'api/topic',
+			url : 'api/topics',
 			type : 'POST',
 			dataType : 'json',
 			data : {},
@@ -629,7 +629,7 @@ Subpub.prototype = {
 	_subpub : function() {
 		var _t = this;
 		var options = {
-			url : 'api/subscriber',
+			url : 'api/subscribers',
 			type : 'POST',
 			dataType : 'json',
 			data : {},
@@ -835,7 +835,7 @@ function HttpApi() {
 	var _t = this;
 	// 网页标签元素
 	_t.elements = {};
-	jQuery('#model_title').text("Http API");
+	jQuery('#model_title').text("HTTP API");
 
 	// 加载模块
 	loading('http_api.html', function() {});
