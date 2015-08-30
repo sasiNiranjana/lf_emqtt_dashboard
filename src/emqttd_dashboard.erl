@@ -123,7 +123,7 @@ api(clients, Req) ->
     
 %%-----------------------------------session--------------------------------------
 %%sessin check api
-api(session, Req) ->
+api(sessions, Req) ->
     Records = [emqttd_vm:get_ets_object(Tab) || Tab <- [mqtt_transient_session, mqtt_persistent_session]],
     AllSession = lists:append(Records),
     InfoKeys = [clean_sess, 
@@ -146,7 +146,7 @@ api(session, Req) ->
    
 %%-----------------------------------topic--------------------------------------
 %%topic api
-api(topic, Req) ->
+api(topics, Req) ->
     F = fun() ->
         Q = qlc:q([E || E <- mnesia:table(topic)]),
 	qlc:e(Q) 
@@ -173,7 +173,7 @@ api(topic, Req) ->
 %
 %    api_respond(Req, Bodys);
  
-api(subscriber, Req) ->
+api(subscribers, Req) ->
     Records = [emqttd_vm:get_ets_object(Tab) || Tab <- [mqtt_transient_session, mqtt_persistent_session]],
     AllSession = lists:append(Records),
 
@@ -226,8 +226,11 @@ api(current_user, Req) ->
     api_respond(Req, [{username, Username}]);
 
 api(logout, Req) ->
-    Req:respond({401, [{"WWW-Authenticate", "Basic Realm=\"emqttd dashboad\""}], []}).
+    Req:respond({401, [{"WWW-Authenticate", "Basic Realm=\"emqttd dashboad\""}], []});
 
+api(bnode, Req) ->
+    Node = node(),
+    api_respond(Req, [{node, Node}]).
 
 api_respond(Req, Bodys) ->
     JsonData = 

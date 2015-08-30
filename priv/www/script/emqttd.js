@@ -250,14 +250,27 @@ Overview.prototype = {
 		
 		_t.client = new Paho.MQTT.Client(location.hostname, 8083, 'dashboard_' + new Date().getTime());
 		var c = _t.client;
-		c.connect({
+		var options = {
+			url : 'api/bnode',
+			type : 'POST',
+			dataType : 'json',
+			success : function(d) {
+				c.connect({
 			onSuccess : function() {
 				//console.log("The client connect success.");
-				c.subscribe("\$SYS/brokers/emqttd@127.0.0.1/+");
+				c.subscribe("\$SYS/brokers/"+ d.node +"/+");
 			},
 			userName : "dashboard",
 			password : ""
 		});
+
+			},
+		error : function(e) {
+			//console.log('api/node->error');
+		}
+	};
+	jQuery.ajax(options);
+
 		c.onConnectionLost = onConnectionLost;
 		c.onMessageArrived = onMessageArrived;
 		// called when the client loses its connection
