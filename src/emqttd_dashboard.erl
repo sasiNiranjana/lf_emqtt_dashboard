@@ -36,8 +36,6 @@
 -define(MB, (1024*1024)).
 -define(GB, (1024*1024*1024)).
 
--record(mqtt_admin, {username, password, tags}).
- 
 -include_lib("stdlib/include/qlc.hrl").
 
 handle_request(Req) ->
@@ -199,14 +197,14 @@ api(update_user, Req) ->
     Username = proplists:get_value("user_name", User),
     Password = proplists:get_value("password", User),
     Tag = proplists:get_value("tag", User),
-    Status = emqttd_dashboard_users:update_user(#mqtt_admin{username = Username, password = Password, tags = Tag}),
+    Status = emqttd_dashboard_users:update_user(bin(Username), bin(Password), bin(Tag)),
     RespondCode = code(Status),
     api_respond(Req, RespondCode);
  
 api(remove_user, Req) ->
     User = Req:parse_post(),
     Username = proplists:get_value("user_name", User),
-    Status = emqttd_dashboard_users:remove_user(Username),
+    Status = emqttd_dashboard_users:remove_user(bin(Username)),
     lager:error("Status =~p", [Status]),
     RespondCode = code(Status),
     api_respond(Req, RespondCode);
@@ -216,7 +214,7 @@ api(add_user, Req) ->
     Username = proplists:get_value("user_name", User),
     Password = proplists:get_value("password", User),
     Tag = proplists:get_value("tag", User),
-    Status = emqttd_dashboard_users:add_user(#mqtt_admin{username = Username, password = Password, tags = Tag}),
+    Status = emqttd_dashboard_users:add_user(bin(Username), bin(Password), bin(Tag)),
     RespondCode = code(Status),
     api_respond(Req, RespondCode);
  
@@ -270,7 +268,7 @@ authorized(Req) ->
 		false;
 	"Basic " ++ BasicAuth ->
         {Username, Password} = user_passwd(BasicAuth),
-        case emqttd_dashboard_users:check(#mqtt_admin{username = Username, password = Password}) of
+        case emqttd_dashboard_users:check(bin(Username),  bin(Password)) of
             ok ->
                 true;
             {error, Reason} ->
@@ -307,5 +305,9 @@ float(F, S) ->
 
 format(subscriptions, List) ->
     string:join([io_lib:format("~s:~w", [Topic, Qos]) || {Topic, Qos} <- List], ",").
+
+bin(S) when is_list(S) -> list_to_binary(S);
+bin(A) when is_atom(A) -> bin(atom_to_list(A));
+bin(B) when is_binary(B) -> B.
 
 

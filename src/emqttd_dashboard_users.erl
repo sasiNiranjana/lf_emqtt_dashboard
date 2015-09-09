@@ -34,8 +34,8 @@
 -export([start_link/0]).
 
 %%mqtt_admin api
--export([add_user/1, remove_user/1, update_user/1,
-         lookup_user/1, all_users/0,check/1]).
+-export([add_user/3, remove_user/1, update_user/3,
+         lookup_user/1, all_users/0,check/2]).
 
 %% gen_server Function Exports
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
@@ -51,27 +51,29 @@ start_link() ->
 %%%=============================================================================
 %%% API 
 %%%=============================================================================
-add_user(User) ->
+add_user(Username, Password, Tags) ->
+    User = #mqtt_admin{username = Username, password = hash(Password), tags = Tags},
     gen_server:cast(?MODULE, {add_user, User}).
 
 remove_user(Username) ->
     gen_server:cast(?MODULE, {remove_user, Username}).
 
-update_user(User) ->
+update_user(Username, Password, Tags) ->
+    User = #mqtt_admin{username = Username, password = hash(Password), tags = Tags},
     gen_server:cast(?MODULE, {update_user, User}).
 
 lookup_user(Username) ->
-    mnesia:dirty_read(mqtt_admin, atom(Username)).
+    mnesia:dirty_read(mqtt_admin, bin(Username)).
 
 all_users() ->
     mnesia:dirty_all_keys(mqtt_admin).
 
-check(#mqtt_admin{username = undefined}) ->
+check(undefined, _) ->
     {error, "Username undefined"};
-check(#mqtt_admin{password = undefined}) ->
+check(_, undefined) ->
     {error, "Password undefined"};
-check(#mqtt_admin{username = Username, password = Password}) ->
-    case mnesia:dirty_read(mqtt_admin, atom(Username)) of
+check(Username, Password) ->
+    case mnesia:dirty_read(mqtt_admin, Username) of
 	[] -> 
             {error, "Username Not Found"};
         [#mqtt_admin{password = <<Salt:4/binary, Hash/binary>>}] ->
@@ -96,7 +98,7 @@ init([]) ->
     if length(Keys) =/= 0 ->
     	ignore;
     true ->
-    	User = #mqtt_admin{username = 'admin', password = hash(bin(admin)), tags = atom(administrator)},
+    	User = #mqtt_admin{username = bin(admin), password = hash(bin(admin)), tags = bin(administrator)},
     	mnesia:transaction(fun() -> mnesia:write(User) end)
     end,
     {ok, state}.
@@ -105,22 +107,22 @@ handle_call(_Req, _From, State) ->
     {reply, error,  State}.
 
 handle_cast({add_user, #mqtt_admin{username = Username, password = Password, tags = Tags}}, State) ->    
-    case mnesia:dirty_read(mqtt_admin, atom(Username)) of
+    case mnesia:dirty_read(mqtt_admin, Username) of
 	[] ->
-    		User1 = #mqtt_admin{username = atom(Username), password = hash(bin(Password)), tags = atom(Tags)},
+    		User1 = #mqtt_admin{username = Username, password = Password, tags = Tags},
     		mnesia:transaction(fun() -> mnesia:write(User1) end),
 		ok;
 	[_OldUser] ->
-		User1 = #mqtt_admin{username = atom(Username), password = hash(bin(Password)), tags = atom(Tags)},
+		User1 = #mqtt_admin{username = Username, password = Password, tags = Tags},
     		mnesia:transaction(fun() -> mnesia:write(User1) end),
 		ok
     end,
     {noreply, State};
 
 handle_cast({update_user, #mqtt_admin{username = Username, password = Password, tags = Tags}}, State) ->
-    case mnesia:dirty_read(mqtt_admin, atom(Username)) of
+    case mnesia:dirty_read(mqtt_admin, Username) of
 	[_OldUser] ->
-		User1 = #mqtt_admin{username = atom(Username), password = hash(bin(Password)), tags = atom(Tags)},
+		User1 = #mqtt_admin{username = Username, password = Password, tags = Tags},
     		mnesia:transaction(fun() -> mnesia:write(User1) end),
 		ok;
 	[] ->
@@ -131,9 +133,9 @@ handle_cast({update_user, #mqtt_admin{username = Username, password = Password, 
 
 
 handle_cast({remove_user, Username}, State) ->
-    case mnesia:dirty_read(mqtt_admin, atom(Username)) of
+    case mnesia:dirty_read(mqtt_admin, Username) of
 	[_User] ->
-    		mnesia:transaction(fun() -> mnesia:delete({mqtt_admin, atom(Username)}) end),
+    		mnesia:transaction(fun() -> mnesia:delete({mqtt_admin, Username}) end),
 		ok;
 	[] ->
 		lager:error("cannot find Username: ~p", [atom(Username)]),
@@ -169,12 +171,12 @@ salt() ->
     random:seed(A1, A2, A3),
     Salt = random:uniform(16#ffffffff),
     <<Salt:32>>.
+atom(S) when is_list(S) -> list_to_atom(S);
+atom(B) when is_binary(B) -> atom(binary_to_list(B));
+atom(A) when is_atom(A) -> A.
 
 bin(S) when is_list(S) -> list_to_binary(S);
 bin(A) when is_atom(A) -> bin(atom_to_list(A));
 bin(B) when is_binary(B) -> B.
 
-atom(S) when is_list(S) -> list_to_atom(S);
-atom(B) when is_binary(B) -> atom(binary_to_list(B));
-atom(A) when is_atom(A) -> A.
 
