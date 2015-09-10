@@ -23,7 +23,8 @@
 %%% web dashboard admin authentication with username and password.
 %%%
 %%% @end
-%%%-
+%%%-----------------------------------------------------------------------------
+
 -module(emqttd_dashboard_users).
 
 -author('huangdan').
@@ -35,7 +36,7 @@
 
 %%mqtt_admin api
 -export([add_user/3, remove_user/1, update_user/3,
-         lookup_user/1, all_users/0,check/2]).
+         lookup_user/1, all_users/0, check/2]).
 
 %% gen_server Function Exports
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
@@ -52,15 +53,27 @@ start_link() ->
 %%% API 
 %%%=============================================================================
 add_user(Username, Password, Tags) ->
-    User = #mqtt_admin{username = Username, password = hash(Password), tags = Tags},
-    gen_server:cast(?MODULE, {add_user, User}).
+    Admin = #mqtt_admin{username = Username, password = hash(Password), tags = Tags},
+    mnesia:transaction(fun mnesia:write/1, [Admin]).
 
 remove_user(Username) ->
-    gen_server:cast(?MODULE, {remove_user, Username}).
+    case mnesia:dirty_read(mqtt_admin, Username) of
+	[_User] ->
+        mnesia:transaction(fun mnesia:delete/1, [{mqtt_admin, Username}]);
+	[] ->
+		lager:error("Cannot find Username: ~s", [Username]),
+		{error, not_found}
+    end.
 
 update_user(Username, Password, Tags) ->
-    User = #mqtt_admin{username = Username, password = hash(Password), tags = Tags},
-    gen_server:cast(?MODULE, {update_user, User}).
+    Admin = #mqtt_admin{username = Username, password = hash(Password), tags = Tags},
+    case mnesia:dirty_read(mqtt_admin, Username) of
+	[_] ->
+        mnesia:transaction(fun mnesia:write/1, [Admin]);
+	[] ->
+		lager:error("Cannot find admin: ~s", [Username]),
+		ignore
+    end.
 
 lookup_user(Username) ->
     mnesia:dirty_read(mqtt_admin, bin(Username)).
@@ -75,12 +88,12 @@ check(_, undefined) ->
 check(Username, Password) ->
     case mnesia:dirty_read(mqtt_admin, Username) of
 	[] -> 
-            {error, "Username Not Found"};
-        [#mqtt_admin{password = <<Salt:4/binary, Hash/binary>>}] ->
-            case Hash =:= md5_hash(Salt, Password) of
-                true -> ok;
-                false -> {error, "Password Not Right"}
-            end
+        {error, "Username Not Found"};
+    [#mqtt_admin{password = <<Salt:4/binary, Hash/binary>>}] ->
+        case Hash =:= md5_hash(Salt, Password) of
+            true -> ok;
+            false -> {error, "Password Error"}
+        end
 	end.
 	
 %%%=============================================================================
@@ -89,35 +102,43 @@ check(Username, Password) ->
 init([]) ->
     % Create mqtt_admin table
     mnesia:create_table(mqtt_admin, [
-	{disc_copies, [node()]},
-	{attributes, record_info(fields, mqtt_admin)}]),
+            {disc_copies, [node()]},
+            {attributes, record_info(fields, mqtt_admin)}]),
     mnesia:add_table_copy(mqtt_admin, node(), ram_copies),
-
-    % Init mqtt_admin 
-    Keys = mnesia:dirty_all_keys(mqtt_admin),
-    if length(Keys) =/= 0 ->
-    	ignore;
-    true ->
-    	User = #mqtt_admin{username = bin(admin), password = hash(bin(admin)), tags = bin(administrator)},
-    	mnesia:transaction(fun() -> mnesia:write(User) end)
+    mnesia:wait_for_tables([mqtt_admin], 5000),
+    % Init mqtt_admin table
+    case mnesia:table_info(mqtt_admin, size) of
+        0 ->
+            Admin = case application:get_env(emqttd_dashboard, default_admin) of
+                {ok, Default} ->
+                    #mqtt_admin{username = bin(proplists:get_value(login, Default)),
+                                password = hash(bin(proplists:get_value(password, Default))),
+                                 tags = <<"administrator">>};
+                undefined -> %% 
+                    #mqtt_admin{username = <<"admin">>,
+                                password = hash(<<"admin">>),
+                                tags = <<"administrator">>}
+            end,
+            mnesia:transaction(fun mnesia:write/1, [Admin]);
+        _ ->
+            %% Fix issue #24 
+            mnesia:transaction(fun() ->
+                AtomNames = [Key || Key <- mnesia:all_keys(mqtt_admin), is_atom(Key)],
+                lists:foreach(fun(Name) ->
+                    case mnesia:read(mqtt_admin, Name, write) of
+                        [Admin] ->
+                            mnesia:delete({mqtt_admin, Name}),
+                            mnesia:write(Admin#mqtt_admin{username = bin(Admin)});
+                        [] ->
+                            ok
+                    end
+                end, AtomNames)
+           end)
     end,
     {ok, state}.
 
 handle_call(_Req, _From, State) ->
     {reply, error,  State}.
-
-handle_cast({add_user, #mqtt_admin{username = Username, password = Password, tags = Tags}}, State) ->    
-    case mnesia:dirty_read(mqtt_admin, Username) of
-	[] ->
-    		User1 = #mqtt_admin{username = Username, password = Password, tags = Tags},
-    		mnesia:transaction(fun() -> mnesia:write(User1) end),
-		ok;
-	[_OldUser] ->
-		User1 = #mqtt_admin{username = Username, password = Password, tags = Tags},
-    		mnesia:transaction(fun() -> mnesia:write(User1) end),
-		ok
-    end,
-    {noreply, State};
 
 handle_cast({update_user, #mqtt_admin{username = Username, password = Password, tags = Tags}}, State) ->
     case mnesia:dirty_read(mqtt_admin, Username) of
@@ -126,7 +147,7 @@ handle_cast({update_user, #mqtt_admin{username = Username, password = Password, 
     		mnesia:transaction(fun() -> mnesia:write(User1) end),
 		ok;
 	[] ->
-		lager:error("cannot find Username: ~p", [atom(Username)]),
+		lager:error("cannot find Username: ~s", [Username]),
 		ignore
     end,
     {noreply, State};
@@ -138,7 +159,7 @@ handle_cast({remove_user, Username}, State) ->
     		mnesia:transaction(fun() -> mnesia:delete({mqtt_admin, Username}) end),
 		ok;
 	[] ->
-		lager:error("cannot find Username: ~p", [atom(Username)]),
+		lager:error("Cannot find Username: ~s", [Username]),
 		ignore
     end,
     {noreply, State};
@@ -171,9 +192,6 @@ salt() ->
     random:seed(A1, A2, A3),
     Salt = random:uniform(16#ffffffff),
     <<Salt:32>>.
-atom(S) when is_list(S) -> list_to_atom(S);
-atom(B) when is_binary(B) -> atom(binary_to_list(B));
-atom(A) when is_atom(A) -> A.
 
 bin(S) when is_list(S) -> list_to_binary(S);
 bin(A) when is_atom(A) -> bin(atom_to_list(A));

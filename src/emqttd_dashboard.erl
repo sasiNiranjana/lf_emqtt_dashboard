@@ -123,7 +123,6 @@ api(clients, Req) ->
 %%sessin check api
 api(sessions, Req) ->
     Records = [emqttd_vm:get_ets_object(Tab) || Tab <- [mqtt_transient_session, mqtt_persistent_session]],
-    AllSession = lists:append(Records),
     InfoKeys = [clean_sess, 
                 max_inflight,
                 inflight_queue,
@@ -133,14 +132,12 @@ api(sessions, Req) ->
                 awaiting_ack,
                 awaiting_comp,
                 created_at],
-%		topic,
-%		qos],
 
-    Bodys = 
-    lists:map(fun({ClientId, Session}) ->
-	 	[{clientId, ClientId} | session_table(Session, InfoKeys)]
-       	    end, AllSession),
-    api_respond(Req, Bodys);
+    Sessions = [ [{clientId, ClientId} | session_table(Session, InfoKeys)]
+                    || {{ClientId, _Pid}, Session} <- lists:append(Records)],
+    io:format("~p~n", [Sessions]),
+
+    api_respond(Req, Sessions);
    
 %%-----------------------------------topic--------------------------------------
 %%topic api
@@ -173,15 +170,12 @@ api(topics, Req) ->
  
 api(subscribers, Req) ->
     Records = [emqttd_vm:get_ets_object(Tab) || Tab <- [mqtt_transient_session, mqtt_persistent_session]],
-    AllSession = lists:append(Records),
-
-    Bodys = 
-    lists:map(fun({ClientId, Session}) ->
+    Subscribers = 
+    lists:map(fun({{ClientId, _Pid}, Session}) ->
 		 Subscriptions = format(subscriptions, proplists:get_value(subscriptions, Session)),
 		 [{clientId, ClientId}, {subscriptions, list_to_binary(Subscriptions)}]
-       	    end, AllSession),
-    api_respond(Req, Bodys);
-   
+       	    end, lists:append(Records)),
+    api_respond(Req, Subscribers);
 
 %%-----------------------------------Users--------------------------------------
 %%users api

@@ -18,6 +18,10 @@ make
 ```
 [
   {emqttd_dashboard, [
+    {default_admin, [
+        {login, "admin"},
+        {password, "public"}
+    ]},
     {listener, 
         {emqttd_dashboard, 18083, [
             {acceptors, 4},
@@ -38,6 +42,6 @@ URL: http://host:18083
 
 Username: admin
 
-Password: admin
+Password: public
 
 
