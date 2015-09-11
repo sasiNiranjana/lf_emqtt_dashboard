@@ -135,7 +135,6 @@ api(sessions, Req) ->
 
     Sessions = [ [{clientId, ClientId} | session_table(Session, InfoKeys)]
                     || {{ClientId, _Pid}, Session} <- lists:append(Records)],
-    io:format("~p~n", [Sessions]),
 
     api_respond(Req, Sessions);
    
