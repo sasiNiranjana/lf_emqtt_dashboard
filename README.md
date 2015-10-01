@@ -33,7 +33,7 @@ make
 ## Load Plugin
 
 ```
-./bin/emqttd_ctl load emqttd_dashboard
+./bin/emqttd_ctl plugins load emqttd_dashboard
 ```
 
 ## Login 
