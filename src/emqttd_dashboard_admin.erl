@@ -103,8 +103,9 @@ init([]) ->
     mnesia:create_table(mqtt_admin, [
             {disc_copies, [node()]},
             {attributes, record_info(fields, mqtt_admin)}]),
-    mnesia:add_table_copy(mqtt_admin, node(), ram_copies),
-    mnesia:wait_for_tables([mqtt_admin], 5000),
+    mnesia:add_table_copy(mqtt_admin, node(), disc_copies),
+    %% Wait???
+    %% mnesia:wait_for_tables([mqtt_admin], 5000),
     % Init mqtt_admin table
     case mnesia:table_info(mqtt_admin, size) of
         0 ->
