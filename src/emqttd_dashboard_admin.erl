@@ -25,9 +25,11 @@
 %%% @end
 %%%-----------------------------------------------------------------------------
 
--module(emqttd_dashboard_users).
+-module(emqttd_dashboard_admin).
 
 -author('huangdan').
+
+-include("emqttd_dashboard.hrl").
 
 -behaviour(gen_server).
 
@@ -41,9 +43,6 @@
 %% gen_server Function Exports
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
          terminate/2, code_change/3]).
-
--record(mqtt_admin, {username, password, tags}).
-
 
 -spec start_link() -> {ok, pid()} | ignore | {error, any()}.
 start_link() ->

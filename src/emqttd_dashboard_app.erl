@@ -11,7 +11,7 @@
 
 start(_StartType, _StartArgs) ->
     {ok, Sup} = emqttd_dashboard_sup:start_link(),
-    {ok, _ChiId} = supervisor:start_child(Sup, worker_spec(emqttd_dashboard_users)),
+    {ok, _ChiId} = supervisor:start_child(Sup, worker_spec(emqttd_dashboard_admin)),
     {ok, Listener} = application:get_env(emqttd_dashboard, listener),
     open_listener(Listener),
     {ok, Sup}.
