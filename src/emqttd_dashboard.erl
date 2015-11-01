@@ -115,15 +115,15 @@ api(clients, Req) ->
                          proto_ver = ProtoVer, keepalive = KeepAlvie,
                          connected_at = ConnectedAt}) ->
         [{clientId, ClientId}, 
-		 {username, UserName}, 
-		 {ipaddress, list_to_binary(emqttd_net:ntoa(Ipaddr))}, 
+		 {username, Username}, 
+		 {ipaddress, list_to_binary(emqttd_net:ntoa(IpAddr))}, 
 		 {port, Port},
-         {clean_sess, CleanSession},
+         {clean_sess, CleanSess},
          {proto_ver, ProtoVer},
          {keepalive, KeepAlvie},
          {connected_at, list_to_binary(connected_at_format(ConnectedAt))}]
     end,
-    api_respond(Req, [Fun(Client) || Client <- emqttd_vm:get_ets_object(mqtt_client)]);
+    api_respond(Req, [F(Client) || Client <- emqttd_vm:get_ets_object(mqtt_client)]);
     
 %%-----------------------------------session--------------------------------------
 %%sessin check api
