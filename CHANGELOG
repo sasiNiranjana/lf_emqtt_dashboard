@@ -1,0 +1,10 @@
+
+0.13.0-beta (2015-11-05)
+-------------------------
+
+Bugfix: emqttd-0.12.3 release: metrics are not right (#36)
+
+Bugfix: Overview page add new metrics (#35)
+
+Bugfix: No Overview broker informations on non-anonymous sessions (#33)
+
