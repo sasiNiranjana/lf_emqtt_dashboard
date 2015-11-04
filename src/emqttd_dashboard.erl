@@ -28,6 +28,10 @@
 
 -author("Feng Lee <feng@emqtt.io>").
 
+-include("emqttd_dashboard.hrl").
+
+-include("../../../include/emqttd.hrl").
+
 -export([handle_request/1]).
 
 -define(SEPARTOR, $\/).
@@ -106,18 +110,20 @@ api(listeners, Req) ->
 %%-----------------------------------clients--------------------------------------
 %%clients api
 api(clients, Req) ->
-	Bodys = [[
-		{clientId, ClientId}, 
-		{username, UserName}, 
-		{ipaddress, list_to_binary(emqttd_net:ntoa(Ipaddr))}, 
-		{port, Port}, 
-		{clean_sess, CleanSession}, 
-		{proto_ver, ProtoVer}, 
-		{keepalive, KeepAlvie}, 
-		{connected_at, list_to_binary(connected_at_format(ConnectedAt))}
-		] || {_Tab, ClientId, _ClientPid, UserName, {Ipaddr, Port}, CleanSession, ProtoVer, KeepAlvie, _WillTopic, _Headers,  ConnectedAt}
-		<- emqttd_vm:get_ets_object(mqtt_client)],
-    api_respond(Req, Bodys);
+    F = fun(#mqtt_client{client_id = ClientId, peername = {IpAddr, Port},
+                         username = Username, clean_sess = CleanSess,
+                         proto_ver = ProtoVer, keepalive = KeepAlvie,
+                         connected_at = ConnectedAt}) ->
+        [{clientId, ClientId}, 
+		 {username, Username}, 
+		 {ipaddress, list_to_binary(emqttd_net:ntoa(IpAddr))}, 
+		 {port, Port},
+         {clean_sess, CleanSess},
+         {proto_ver, ProtoVer},
+         {keepalive, KeepAlvie},
+         {connected_at, list_to_binary(connected_at_format(ConnectedAt))}]
+    end,
+    api_respond(Req, [F(Client) || Client <- emqttd_vm:get_ets_object(mqtt_client)]);
     
 %%-----------------------------------session--------------------------------------
 %%sessin check api
@@ -141,31 +147,14 @@ api(sessions, Req) ->
 %%-----------------------------------topic--------------------------------------
 %%topic api
 api(topics, Req) ->
-    F = fun() ->
-        Q = qlc:q([E || E <- mnesia:table(topic)]),
-	qlc:e(Q) 
-        end,
-    {atomic, TopicLists} =  mnesia:transaction(F),
-    Bodys = [[
-	     {topic, Topic}, 
-	     {node, Node} 
-	     ] || {_Tab, Topic, Node} <- TopicLists],
- 
-    api_respond(Req, Bodys);
+    F = fun() -> qlc:e(qlc:q([E || E <- mnesia:table(topic)])) end,
+    {atomic, Topics} =  mnesia:transaction(F),
+    Body = [[{topic, Topic}, {node, Node}] || #mqtt_topic{topic = Topic,
+                                                          node = Node} <- Topics],
+    api_respond(Req, Body);
    
 %%-----------------------------------subscribe--------------------------------------
 %%subscribe api
-%api(subscriber, Req) ->
-%    F = fun() ->
-%        Q = qlc:q([E || E <- mnesia:table(subscriber)]),
-%	qlc:e(Q) 
-%        end,
-%    {atomic, SubLists} =  mnesia:transaction(F),
-%    Bodys = [[{mqtt_subscriber,  Tab},
-%             {topic, Topic}, 
-%             {qos, Qos}] || {Tab, Topic, _Pid, Qos} <- SubLists],
-%
-%    api_respond(Req, Bodys);
  
 api(subscribers, Req) ->
     Records = [emqttd_vm:get_ets_object(Tab) || Tab <- [mqtt_transient_session, mqtt_persistent_session]],
@@ -179,25 +168,24 @@ api(subscribers, Req) ->
 %%-----------------------------------Users--------------------------------------
 %%users api
 api(users, Req) ->
-    Bodys = [[
-	{name, Username}, 
-	{tag, Tags}] || {_Tab, Username, _Password, Tags}
-		<- emqttd_vm:get_ets_object(mqtt_admin)],
-    api_respond(Req, Bodys);
+    F = fun(#mqtt_admin{username = Username, tags = Tags}) ->
+            [{name, Username}, {tag, Tags}]
+        end,
+    api_respond(Req, [F(Admin) || Admin <- emqttd_vm:get_ets_object(mqtt_admin)]);
  
 api(update_user, Req) ->
     User = Req:parse_post(),
     Username = proplists:get_value("user_name", User),
     Password = proplists:get_value("password", User),
     Tag = proplists:get_value("tag", User),
-    Status = emqttd_dashboard_users:update_user(bin(Username), bin(Password), bin(Tag)),
+    Status = emqttd_dashboard_admin:update_user(bin(Username), bin(Password), bin(Tag)),
     RespondCode = code(Status),
     api_respond(Req, RespondCode);
  
 api(remove_user, Req) ->
     User = Req:parse_post(),
     Username = proplists:get_value("user_name", User),
-    Status = emqttd_dashboard_users:remove_user(bin(Username)),
+    Status = emqttd_dashboard_admin:remove_user(bin(Username)),
     lager:error("Status =~p", [Status]),
     RespondCode = code(Status),
     api_respond(Req, RespondCode);
@@ -207,7 +195,7 @@ api(add_user, Req) ->
     Username = proplists:get_value("user_name", User),
     Password = proplists:get_value("password", User),
     Tag = proplists:get_value("tag", User),
-    Status = emqttd_dashboard_users:add_user(bin(Username), bin(Password), bin(Tag)),
+    Status = emqttd_dashboard_admin:add_user(bin(Username), bin(Password), bin(Tag)),
     RespondCode = code(Status),
     api_respond(Req, RespondCode);
  
@@ -223,13 +211,11 @@ api(bnode, Req) ->
     Node = node(),
     api_respond(Req, [{node, Node}]).
 
-api_respond(Req, Bodys) ->
-    JsonData = 
-    if length(Bodys) == 0 ->
-	<<"\[\]">>;
-    true ->
-        list_to_binary(mochijson2:encode(Bodys) ++ <<10>>)
-    end,
+api_respond(Req, Body) ->
+    JsonData = if
+                   length(Body) == 0 -> <<"\[\]">>;
+                   true -> list_to_binary(mochijson2:encode(Body) ++ <<10>>)
+               end,
     Req:respond({200, [{"Content-Type","application/json"}], JsonData}).
 
 connected_at_format(Timestamp) ->
@@ -261,7 +247,7 @@ authorized(Req) ->
 		false;
 	"Basic " ++ BasicAuth ->
         {Username, Password} = user_passwd(BasicAuth),
-        case emqttd_dashboard_users:check(bin(Username),  bin(Password)) of
+        case emqttd_dashboard_admin:check(bin(Username),  bin(Password)) of
             ok ->
                 true;
             {error, Reason} ->
@@ -302,5 +288,4 @@ format(subscriptions, List) ->
 bin(S) when is_list(S) -> list_to_binary(S);
 bin(A) when is_atom(A) -> bin(atom_to_list(A));
 bin(B) when is_binary(B) -> B.
-
 

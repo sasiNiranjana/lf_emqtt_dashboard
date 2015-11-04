@@ -342,7 +342,11 @@ Overview.prototype = {
 			type : 'POST',
 			dataType : 'json',
 			data : {},
-			success : function(d) {
+			success : function(data) {
+                for(var key in data) {
+                    $('#' + key.split('/').join('_')).text(data[key]);
+                }
+                /*
 				jQuery('#subscribers_max').text(d['subscribers/max']);
 				jQuery('#topics_count').text(d['topics/count']);
 				jQuery('#clients_count').text(d['clients/count']);
@@ -353,6 +357,7 @@ Overview.prototype = {
 				jQuery('#queues_max').text(d['queues/max']);
 				jQuery('#clients_max').text(d['clients/max']);
 				jQuery('#subscribers_count').text(d['subscribers/count']);
+                */
 			},
 			error : function(e) {
 				//console.log('api/stats->error');
@@ -369,29 +374,10 @@ Overview.prototype = {
 			type : 'POST',
 			dataType : 'json',
 			data : {},
-			success : function(d) {
-				$('#bytes_received').text(d['bytes/received']);
-				$('#bytes_sent').text(d['bytes/sent']);
-				$('#messages_dropped').text(d['messages/dropped']);
-				$('#messages_received').text(d['messages/received']);
-				$('#messages_retained_count')
-						.text(d['messages/retained/count']);
-				$('#messages_sent').text(d['messages/sent']);
-				$('#messages_stored_count').text(d['messages/stored/count']);
-				$('#packets_connack').text(d['packets/connack']);
-				$('#packets_connect').text(d['packets/connect']);
-				$('#packets_disconnect').text(d['packets/disconnect']);
-				$('#packets_pingreq').text(d['packets/pingreq']);
-				$('#packets_pingresp').text(d['packets/pingresp']);
-				$('#packets_publish_received').text(
-						d['packets/publish/received']);
-				$('#packets_publish_sent').text(d['packets/publish/sent']);
-				$('#packets_received').text(d['packets/received']);
-				$('#packets_sent').text(d['packets/sent']);
-				$('#packets_suback').text(d['packets_suback']);
-				$('#packets_subscribe').text(d['packets/subscribe']);
-				$('#packets_unsuback').text(d['packets/unsuback']);
-				$('#packets_unsubscribe').text(d['packets/unsubscribe']);
+			success : function(data) {
+                for(var key in data) {
+                    $('#' + key.split('/').join('_')).text(data[key]);
+                }
 			},
 			error : function(e) {
 				//console.log('api/metrics->error');

@@ -11,12 +11,15 @@
 
 start(_StartType, _StartArgs) ->
     {ok, Sup} = emqttd_dashboard_sup:start_link(),
-    {ok, _ChiId} = supervisor:start_child(Sup, worker_spec(emqttd_dashboard_users)),
+    {ok, _ChiId} = supervisor:start_child(Sup, worker_spec(emqttd_dashboard_admin)),
+
     {ok, Listener} = application:get_env(emqttd_dashboard, listener),
+    ok = emqttd_access_control:register_mod(auth, emqttd_auth_dashboard, [Listener], 9999),
     open_listener(Listener),
     {ok, Sup}.
 
 stop(_State) ->
+    emqttd_access_control:unregister_mod(auth, emqttd_auth_dashboard),
     {ok, {_Proto, Port, _Opts}} = application:get_env(emqttd_dashboard, listener),
     mochiweb:stop_http(Port).
 
