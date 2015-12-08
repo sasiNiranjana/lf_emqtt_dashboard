@@ -1,4 +1,4 @@
-%%%-----------------------------------------------------------------------------
+/%%%-----------------------------------------------------------------------------
 %%% @Copyright (C) 2012-2015, huangdan <wang_yi20081014@163.com>
 %%%
 %%% Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -105,10 +105,17 @@ check(Username, Password) ->
 %%%=============================================================================
 init([]) ->
     % Create mqtt_admin table
-    mnesia:create_table(mqtt_admin, [
-            {disc_copies, [node()]},
-            {attributes, record_info(fields, mqtt_admin)}]),
-    mnesia:add_table_copy(mqtt_admin, node(), disc_copies),
+    _Table = mqtt_admin,
+    _Attrs = [{disc_copies, [node()]}, {attributes, record_info(fields, mqtt_admin)}],
+    case mnesia:create_table(_Table, _Attrs) of
+        {atomic, ok} -> ok;
+        {aborted, {already_exists, _Table}} -> ok;
+        {aborted, {already_exists, _Table, _}} -> ok
+    end,
+    case mnesia:add_table_copy(mqtt_admin, node(), disc_copies) of
+        {atomic, ok} -> ok;
+        {aborted, {already_exists, _Table, _}} -> ok
+    end,
     %% Wait???
     %% mnesia:wait_for_tables([mqtt_admin], 5000),
     % Init mqtt_admin table
