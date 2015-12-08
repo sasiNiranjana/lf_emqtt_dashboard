@@ -53,12 +53,16 @@ start_link() ->
 %%%=============================================================================
 add_user(Username, Password, Tags) ->
     Admin = #mqtt_admin{username = Username, password = hash(Password), tags = Tags},
-    mnesia:transaction(fun mnesia:write/1, [Admin]).
+    {atomic, Result} = mnesia:transaction(fun mnesia:write/1, [Admin]),
+    Result.
 
 remove_user(Username) ->
     case mnesia:dirty_read(mqtt_admin, Username) of
 	[_User] ->
-        mnesia:transaction(fun mnesia:delete/1, [{mqtt_admin, Username}]);
+		{atomic, Result} = mnesia:transaction(
+				     fun mnesia:delete/1,
+				     [{mqtt_admin, Username}]),
+		Result;
 	[] ->
 		lager:error("Cannot find Username: ~s", [Username]),
 		{error, not_found}
@@ -68,7 +72,8 @@ update_user(Username, Password, Tags) ->
     Admin = #mqtt_admin{username = Username, password = hash(Password), tags = Tags},
     case mnesia:dirty_read(mqtt_admin, Username) of
 	[_] ->
-        mnesia:transaction(fun mnesia:write/1, [Admin]);
+                {atomic, Result} = mnesia:transaction(fun mnesia:write/1, [Admin]),
+		Result;
 	[] ->
 		lager:error("Cannot find admin: ~s", [Username]),
 		ignore
