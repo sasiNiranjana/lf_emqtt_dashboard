@@ -346,18 +346,6 @@ Overview.prototype = {
                 for(var key in data) {
                     $('#' + key.split('/').join('_')).text(data[key]);
                 }
-                /*
-				jQuery('#subscribers_max').text(d['subscribers/max']);
-				jQuery('#topics_count').text(d['topics/count']);
-				jQuery('#clients_count').text(d['clients/count']);
-				jQuery('#topics_max').text(d['topics/max']);
-				jQuery('#queues_count').text(d['queues/count']);
-				jQuery('#sessions_count').text(d['sessions/count']);
-				jQuery('#sessions_max').text(d['sessions/max']);
-				jQuery('#queues_max').text(d['queues/max']);
-				jQuery('#clients_max').text(d['clients/max']);
-				jQuery('#subscribers_count').text(d['subscribers/count']);
-                */
 			},
 			error : function(e) {
 				//console.log('api/stats->error');
@@ -614,7 +602,7 @@ function Subpub() {
 	var _t = this;
 	// 网页标签元素
 	_t.elements = {};
-	jQuery('#model_title').text("Subscribers");
+	jQuery('#model_title').text("Subscriptions");
 
 	// 加载模块
 	loading('subpub.html', function() {
@@ -628,7 +616,7 @@ Subpub.prototype = {
 	_subpub : function() {
 		var _t = this;
 		var options = {
-			url : 'api/subscribers',
+			url : 'api/subscriptions',
 			type : 'POST',
 			dataType : 'json',
 			data : {},

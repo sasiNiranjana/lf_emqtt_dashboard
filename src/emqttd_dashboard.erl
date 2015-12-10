@@ -156,7 +156,7 @@ api(topics, Req) ->
 %%-----------------------------------subscribe--------------------------------------
 %%subscribe api
  
-api(subscribers, Req) ->
+api(subscriptions, Req) ->
     Records = [emqttd_vm:get_ets_object(Tab) || Tab <- [mqtt_transient_session, mqtt_persistent_session]],
     Subscribers = 
     lists:map(fun({{ClientId, _Pid}, Session}) ->
