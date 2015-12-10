@@ -535,7 +535,8 @@ function Topic() {
 	// 加载模块
 	loading('topic.html', function() {
 		_t._topic();
-		_t._loadTree();
+        //Don't load topic tree
+		//_t._loadTree();
 	});
 }
 
