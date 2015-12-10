@@ -1,13 +1,13 @@
 {application, emqttd_dashboard,
  [
   {description, "emqttd web dashboard"},
-  {vsn, "0.13.0"},
+  {vsn, "0.14.0"},
   {registered, []},
   {applications, [
                   kernel,
                   stdlib,
-		  mnesia
+                  mnesia
                  ]},
-  {mod, { emqttd_dashboard_app, []}},
+  {mod, {emqttd_dashboard_app, []}},
   {env, []}
  ]}.
