@@ -157,13 +157,18 @@ api(topics, Req) ->
 %%subscribe api
  
 api(subscriptions, Req) ->
-    Records = [emqttd_vm:get_ets_object(Tab) || Tab <- [mqtt_transient_session, mqtt_persistent_session]],
-    Subscribers = 
-    lists:map(fun({{ClientId, _Pid}, Session}) ->
-		 Subscriptions = format(subscriptions, proplists:get_value(subscriptions, Session)),
-		 [{clientId, ClientId}, {subscriptions, list_to_binary(Subscriptions)}]
-       	    end, lists:append(Records)),
-    api_respond(Req, Subscribers);
+    Subscriptions =
+    case catch mnesia:dirty_all_keys(subscription) of
+        {'EXIT', _Error} ->
+            [];
+        Keys ->
+            RowFun = fun(Key) ->
+                       Records = ets:lookup(subscription, Key),
+                       [{clientId, Key}, {subscriptions, format(subscriptions, Records)}]
+                     end,
+            [RowFun(Key) || Key <- Keys]
+    end,
+    api_respond(Req, Subscriptions);
 
 %%-----------------------------------Users--------------------------------------
 %%users api
@@ -282,8 +287,10 @@ kmg(Byte) ->
 float(F, S) ->
     iolist_to_binary(io_lib:format("~.2f~s", [F, S])).
 
-format(subscriptions, List) ->
-    string:join([io_lib:format("~s:~w", [Topic, Qos]) || {Topic, Qos} <- List], ",").
+format(subscriptions, Subscriptions) ->
+    list_to_binary(
+        string:join([io_lib:format("~s:~w", [Topic, Qos]) ||
+                #mqtt_subscription{topic = Topic, qos = Qos} <- Subscriptions], ",")).
 
 bin(S) when is_list(S) -> list_to_binary(S);
 bin(A) when is_atom(A) -> bin(atom_to_list(A));
