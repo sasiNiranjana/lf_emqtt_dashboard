@@ -53,12 +53,16 @@ start_link() ->
 %%%=============================================================================
 add_user(Username, Password, Tags) ->
     Admin = #mqtt_admin{username = Username, password = hash(Password), tags = Tags},
-    mnesia:transaction(fun mnesia:write/1, [Admin]).
+    {atomic, Result} = mnesia:transaction(fun mnesia:write/1, [Admin]),
+    Result.
 
 remove_user(Username) ->
     case mnesia:dirty_read(mqtt_admin, Username) of
 	[_User] ->
-        mnesia:transaction(fun mnesia:delete/1, [{mqtt_admin, Username}]);
+		{atomic, Result} = mnesia:transaction(
+				     fun mnesia:delete/1,
+				     [{mqtt_admin, Username}]),
+		Result;
 	[] ->
 		lager:error("Cannot find Username: ~s", [Username]),
 		{error, not_found}
@@ -68,7 +72,8 @@ update_user(Username, Password, Tags) ->
     Admin = #mqtt_admin{username = Username, password = hash(Password), tags = Tags},
     case mnesia:dirty_read(mqtt_admin, Username) of
 	[_] ->
-        mnesia:transaction(fun mnesia:write/1, [Admin]);
+                {atomic, Result} = mnesia:transaction(fun mnesia:write/1, [Admin]),
+		Result;
 	[] ->
 		lager:error("Cannot find admin: ~s", [Username]),
 		ignore
@@ -100,10 +105,17 @@ check(Username, Password) ->
 %%%=============================================================================
 init([]) ->
     % Create mqtt_admin table
-    mnesia:create_table(mqtt_admin, [
-            {disc_copies, [node()]},
-            {attributes, record_info(fields, mqtt_admin)}]),
-    mnesia:add_table_copy(mqtt_admin, node(), disc_copies),
+    _Table = mqtt_admin,
+    _Attrs = [{disc_copies, [node()]}, {attributes, record_info(fields, mqtt_admin)}],
+    case mnesia:create_table(_Table, _Attrs) of
+        {atomic, ok} -> ok;
+        {aborted, {already_exists, _Table}} -> ok;
+        {aborted, {already_exists, _Table, _}} -> ok
+    end,
+    case mnesia:add_table_copy(mqtt_admin, node(), disc_copies) of
+        {atomic, ok} -> ok;
+        {aborted, {already_exists, _Table, _}} -> ok
+    end,
     %% Wait???
     %% mnesia:wait_for_tables([mqtt_admin], 5000),
     % Init mqtt_admin table
