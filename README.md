@@ -45,5 +45,3 @@ Username: admin
 Password: public (admin before 0.10.4)
 
 
-
-

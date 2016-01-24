@@ -1,5 +1,5 @@
 %%%-----------------------------------------------------------------------------
-%%% @Copyright (C) 2012-2015, huangdan <wang_yi20081014@163.com>
+%%% @Copyright (C) 2012-2016, huangdan <wang_yi20081014@163.com>
 %%%
 %%% Permission is hereby granted, free of charge, to any person obtaining a copy
 %%% of this software and associated documentation files (the "Software"), to deal
@@ -19,11 +19,9 @@
 %%% OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 %%% SOFTWARE.
 %%%-----------------------------------------------------------------------------
-%%% @doc
-%%% Web dashboard admin authentication with username and password.
+%%% @doc Web dashboard admin authentication with username and password.
 %%%
-%%% @end
-%%% @author 'huangdan'
+%%% @author Huang Dan
 %%%-----------------------------------------------------------------------------
 -module(emqttd_dashboard_admin).
 

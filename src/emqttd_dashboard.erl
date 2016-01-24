@@ -1,5 +1,5 @@
 %%%-----------------------------------------------------------------------------
-%%% @Copyright (C) 2012-2015, Feng Lee <feng@emqtt.io>
+%%% @Copyright (C) 2012-2016, Feng Lee <feng@emqtt.io>
 %%%
 %%% Permission is hereby granted, free of charge, to any person obtaining a copy
 %%% of this software and associated documentation files (the "Software"), to deal
@@ -19,14 +19,11 @@
 %%% OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 %%% SOFTWARE.
 %%%-----------------------------------------------------------------------------
-%%% @doc
-%%% emqttd web dashboard.
+%%% @doc emqttd web dashboard.
 %%%
-%%% @end
+%%% @author Huang Dan
 %%%-----------------------------------------------------------------------------
 -module(emqttd_dashboard).
-
--author("Feng Lee <feng@emqtt.io>").
 
 -include("emqttd_dashboard.hrl").
 
