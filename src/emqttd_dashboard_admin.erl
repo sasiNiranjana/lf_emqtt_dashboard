@@ -15,7 +15,6 @@
 %%--------------------------------------------------------------------
 
 %% @doc Web dashboard admin authentication with username and password.
-%% @author Huang Dan
 -module(emqttd_dashboard_admin).
 
 -behaviour(gen_server).
@@ -177,8 +176,7 @@ md5_hash(SaltBin, Password) ->
     erlang:md5(<<SaltBin/binary, Password/binary>>).
 
 salt() ->
-    {A1,A2,A3} = now(),
-    random:seed(A1, A2, A3),
+    emqttd_time:seed(),
     Salt = random:uniform(16#ffffffff),
     <<Salt:32>>.
 
