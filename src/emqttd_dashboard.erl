@@ -15,7 +15,6 @@
 %%--------------------------------------------------------------------
 
 %% @doc emqttd web dashboard.
-%% @author Huang Dan
 -module(emqttd_dashboard).
 
 -include("emqttd_dashboard.hrl").

@@ -15,7 +15,6 @@
 %%--------------------------------------------------------------------
 
 %% @doc emqttd web dashboard application.
-%% @author Huang Dan
 -module(emqttd_dashboard_app).
 
 -behaviour(application).
