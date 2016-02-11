@@ -214,8 +214,7 @@ api_respond(Req, Body) ->
     Req:respond({200, [{"Content-Type","application/json"}], JsonData}).
 
 connected_at_format(Timestamp) ->
-    Ts = emqttd_util:now_to_secs(Timestamp),
-    strftime(datetime(Ts)).
+    strftime(datetime(emqttd_time:now_to_secs(Timestamp))).
 
 strftime({{Y,M,D}, {H,MM,S}}) ->
     Date = string:join([zeropad(I) || I <- [Y,M,D]], "-"),
