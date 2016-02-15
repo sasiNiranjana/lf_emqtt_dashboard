@@ -15,7 +15,6 @@
 %%--------------------------------------------------------------------
 
 %% @doc Dashboard authentication module
-%% @author Feng Lee <feng@emqtt.io>
 -module(emqttd_auth_dashboard).
 
 -include("../../../include/emqttd.hrl").

@@ -15,7 +15,6 @@
 %%--------------------------------------------------------------------
 
 %% @doc emqttd web dashboard dispatcher.
-%% @author Huang Dan
 -module(emqttd_dashboard_dispatcher).
 
 -export([modules/1, build_dispatcher/1]).

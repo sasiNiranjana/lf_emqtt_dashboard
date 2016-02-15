@@ -15,7 +15,6 @@
 %%--------------------------------------------------------------------
 
 %% @doc emqttd web dashboard supervisor.
-%% @author Huang Dan
 -module(emqttd_dashboard_sup).
 
 -behaviour(supervisor).
