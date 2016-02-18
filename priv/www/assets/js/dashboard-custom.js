@@ -584,8 +584,8 @@ function showWebsocket() {
 			onSuccess : function() {
 				console.log("The client connect success.");
 				$('#connect_state').text('CONNECTED');
-				$('#connect_btn').addClass("disabled").removeClass("btn-secondary").addClass("btn-gray");
-				$('#disconnect_btn').removeClass("disabled").removeClass("btn-gray").addClass("btn-secondary");
+				$('#connect_btn').addClass("disabled").removeClass("btn-success").addClass("btn-gray");
+				$('#disconnect_btn').removeClass("disabled").removeClass("btn-gray").addClass("btn-success");
 			}
 		};
 		var userName = $('#user_name').val();
@@ -607,8 +607,8 @@ function showWebsocket() {
 		client.disconnect();
 		console.log("The client disconnect success.");
 		$('#connect_state').text('DISCONNECTED');
-		$('#connect_btn').removeClass("disabled").removeClass("btn-gray").addClass("btn-secondary");
-		$('#disconnect_btn').addClass("disabled").removeClass("btn-secondary").addClass("btn-gray");
+		$('#connect_btn').removeClass("disabled").removeClass("btn-gray").addClass("btn-success");
+		$('#disconnect_btn').addClass("disabled").removeClass("btn-success").addClass("btn-gray");
 	};
 	
 	wSocket.subscribe = function(client) {
@@ -683,7 +683,7 @@ var User = {
 									'<td>' + obj['name'] + '</td>' +
 									'<td>' + obj['tag'] + '</td>' +
 									'<td>' +
-									'<a href="javascript:;" onclick="User.editPage(\''+obj.name+'\',\''+obj.tag+'\')" class="btn btn-secondary btn-sm btn-icon icon-left">' +
+									'<a href="javascript:;" onclick="User.editPage(\''+obj.name+'\',\''+obj.tag+'\')" class="btn btn-success btn-sm btn-icon icon-left">' +
 									'	Edit' +
 									'</a>' +
 									'<a href="javascript:;" onclick="User.delPage(\''+obj.name+'\')" class="btn btn-danger btn-sm btn-icon icon-left">' +
