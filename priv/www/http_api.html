@@ -1,84 +1,100 @@
-
-<div>
-	<h1 class="h1">Emqttd Dashboard HTTP API</h1>
-	<p>&nbsp;</p>
-	<!-- Page Title -->
-	<div class="colgroup leading full">
-		<h3 class="h3">Introduction</h3>
-		<hr />
-		<div>	
-			<p class="ta-left leading">
-		Apart from this help page, all URIs will serve only resources of type application/json, and will require HTTP basic authentication. The default user is admin/admin.	
-			</p>
-			<p class="ta-left leading">
-			The emqttd_dashboard plugin provide emqttd web management interface.The Dashboard include emqttd broker monitor, clients management, sessions management, topics management and so on. The Emqttd Dashboard Plugin Main Interface.
-			</p>
-		</div>
+<div class="row">
+	<div class="col-md-12">
+	<h2>eMQTT(d) Dashboard HTTP API</h2>
+	<div class="vspacer v3"></div>
 	</div>
 
-	<div class="colgroup leading full">
-		<h3 class="h3">Reference</h3>
-		<hr />
-		<div>
-			<table class="no-style">
+	<div class="col-md-12">
+
+		<!-- Flat panel -->
+		<div class="panel panel-flat">
+			<div class="panel-heading">
+				<h3 class="panel-title">Introduction</h3>
+			</div>
+
+			<div class="panel-body">
+
+				<p class="ta-left leading">Apart from this help page, all URIs
+					will serve only resources of type application/json, and will
+					require HTTP basic authentication. The default user is admin/admin.</p>
+				<p class="ta-left leading">The emqttd_dashboard plugin provide
+					eMQTTd web management interface.The Dashboard include eMQTTd broker
+					monitor, clients management, sessions management, topics management
+					and so on. The eMQTTd Dashboard Plugin Main Interface.</p>
+
+			</div>
+		</div>
+
+	</div>
+
+	<div class="col-md-12">
+
+		<div class="panel panel-flat">
+			<div class="panel-heading">
+				<h3 class="panel-title">Reference</h3>
+			</div>
+
+			<table class="table table-condensed">
 				<thead>
 					<tr>
-					<th>GET</th>
-					<th>Path</th>
-					<th>Description</th>
+						<th>GET</th>
+						<th>Path</th>
+						<th>Description</th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr>
-					<td>X</td>
-					<td><a href="/api/stats" >/api/stats </a></td>
-					<td>The emqttd broker statistics of clients, topics, subscriptions</td>
+						<td>X</td>
+						<td><a href="/api/stats">/api/stats </a></td>
+						<td>The eMQTTd broker statistics of clients, topics,
+							subscriptions</td>
 					</tr>
 					<tr>
-					<td>X</td>
-					<td><a href="/api/node" >/api/node</a></td>
-					<td>A list of nodes in the Emqttd broker cluster</td>
+						<td>X</td>
+						<td><a href="/api/node">/api/node</a></td>
+						<td>A list of nodes in the eMQTTd broker cluster</td>
 					</tr>
 					<tr>
-					<td>X</td>
-					<td><a href="/api/metrics" >/api/metrics</a></td>
-					<td>The emqttd broker metrics</td>
+						<td>X</td>
+						<td><a href="/api/metrics">/api/metrics</a></td>
+						<td>The eMQTTd broker metrics</td>
 					</tr>
 					<tr>
-					<td>X</td>
-					<td><a href="/api/listeners" >/api/listeners</a></td>
-					<td>A list of all listeners in the emqttd broker</td>
+						<td>X</td>
+						<td><a href="/api/listeners">/api/listeners</a></td>
+						<td>A list of all listeners in the eMQTTd broker</td>
 					</tr>
 					<tr>
-					<td>X</td>
-					<td><a href="/api/clients" >/api/clients</a></td>
-					<td>A list of all connected clients </td>
+						<td>X</td>
+						<td><a href="/api/clients">/api/clients</a></td>
+						<td>A list of all connected clients</td>
 					</tr>
 					<tr>
-					<td>X</td>
-					<td><a href="/api/sessions" >/api/sessions</a></td>
-					<td>A list of all sessions the emqttd broker</td>
+						<td>X</td>
+						<td><a href="/api/sessions">/api/sessions</a></td>
+						<td>A list of all sessions the eMQTTd broker</td>
 					</tr>
 					<tr>
-					<td>X</td>
-					<td><a href="/api/topics" >/api/topics</a></td>
-					<td>A list of all topic in the emqttd broker</td>
+						<td>X</td>
+						<td><a href="/api/topics">/api/topics</a></td>
+						<td>A list of all topic in the eMQTTd broker</td>
 					</tr>
 					<tr>
-					<td>X</td>
-					<td><a href="/api/subscriptions" >/api/subscriptions</a></td>
-					<td>A list of all subscriber in the emqttd broker</td>
+						<td>X</td>
+						<td><a href="/api/subscriptions">/api/subscriptions</a></td>
+						<td>A list of all subscriber in the eMQTTd broker</td>
 					</tr>
 
 					<tr>
-					<td>X</td>
-					<td><a href="/api/users" >/api/users</a></td>
-					<td>A list of all emqttd_dashboard management user</td>
+						<td>X</td>
+						<td><a href="/api/users">/api/users</a></td>
+						<td>A list of all emqttd_dashboard management user</td>
 					</tr>
 
 				</tbody>
 			</table>
 		</div>
+
 	</div>
 
 </div>

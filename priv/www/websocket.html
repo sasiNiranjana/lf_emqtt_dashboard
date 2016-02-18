@@ -1,290 +1,221 @@
-<!DOCTYPE HTML>
-<html>
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>emqttd dashboard</title>
-<!-- The Fonts -->
-<!-- <link href="http://fonts.googleapis.com/css?family=Oswald|Droid+Sans:400,700" rel="stylesheet" /> -->
-<!-- The Main CSS File -->
-<link rel="shortcut icon" href="imgs/favicon.ico" type="image/x-icon">
-<link rel="stylesheet" href="css/style.css" />
-<script src="script/jQuery/jquery-1.7.2.min.js"></script>
-<script src="script/jQueryUI/jquery-ui-1.8.21.min.js"></script>
-<script src="script/emqttd.js"></script>
-<script src="script/mqttws31.js"></script>
-<script type="text/javascript">
-$(document).ready(function() {
-	addClick();
-	$('#host').val(location.hostname);
-	$('#port').val(8083);
-	$('#client_id').val('C_' + new Date().getTime());
-	
-	if (!window.WebSocket) {
-		alert("WebSocket not supported by this browser.");
-	}
+<div class="row">
+	<div class="col-sm-6">
 
-	$('#connect_btn').click(function() {
-		if(client == null || !client.isConnected()) {
-			connect();
-		} else {
-			alert("Don't click");	
-		}
-	});
-
-	$('#disconnect_btn').click(function() {
-		if(client != null && client.isConnected()) {
-			disconnect();
-		}else {
-			alert("Don't click");	
-		}
-	});
-
-	$('#send_btn').click(function() {
-		var msg = jQuery('#message_txt').val();
-		sendMessage(msg);
-	});
-	
-	$('#subscribe_btn').click(function() {
-		var topic = jQuery('#subscribe_txt').val();
-		subscribe(topic);
-	});
-});
-
-// called when the client loses its connection
-function onConnectionLost(responseObject) {
-	if (responseObject.errorCode !== 0) {
-		console.log("onConnectionLost: " + responseObject.errorMessage);
-	}
-}
-
-// called when a message arrives
-function onMessageArrived(message) {
-	console.log("onMessageArrived: " + message.payloadString);
-	var nowStr = (new Date()).format("yyyy-MM-dd hh:mm:ss");
-	$('#receive_message').append('<q>onMessageArrived: ' 
-		+ message.payloadString + '<cite>' 
-		+ nowStr + '</cite></q>');
-}
-
-var client = null;
-function connect() {
-	// Create a client instance
-	client = new Paho.MQTT.Client($('#host').val(),
-			Number($('#port').val()),
-			$('#client_id').val());
-	// set callback handlers
-	client.onConnectionLost = onConnectionLost;
-	client.onMessageArrived = onMessageArrived;
-	
-	var options = {
-		onSuccess : function() {
-			console.log("The client connect success.");
-			jQuery('#conn_state').text('CONNECTED');
-			$('#connect_btn').removeClass("btn-green");
-			$('#disconnect_btn').addClass("btn-green");
-		}
-	};
-	var userName = $('#user_name').val();
-	var password = $('#password').val();
-	var keepAlive = $('#keep_alive').val();
-	if (userName != "") {
-		options.userName = userName;
-	}
-	if (password != "") {
-		options.password = password;
-	}
-	if (keepAlive != "") {
-		options.keepAliveInterval = Number(keepAlive);
-	}
-	client.connect(options);
-}
-
-function disconnect() {
-	client.disconnect();
-	console.log("The client disconnect success.");
-	jQuery('#conn_state').text('DISCONNECTED');
-	$('#connect_btn').addClass("btn-green");	
-	$('#disconnect_btn').removeClass("btn-green");	
-}
-
-function subscribe(topic) {
-	client.subscribe(topic);
-	var nowStr = (new Date()).format("yyyy-MM-dd hh:mm:ss");
-	$('#subscribe').append('<q>Subscribe Topic: ' 
-		+ topic + '<cite>' 
-		+ nowStr + '</cite></q>');
-}
-
-// the client send message
-function sendMessage(msg) {
-	var message = new Paho.MQTT.Message(msg);
-	message.destinationName = $('#msg_topic').val();
-	client.send(message);
-	var nowStr = (new Date()).format("yyyy-MM-dd hh:mm:ss");
-	$('#send_list').append('<q>Send Message: ' 
-			+ msg + '<cite>' 
-			+ nowStr + '</cite></q>');
-}
-</script>
-</head>
-<body>
-	<!-- Top Panel -->
-	<header class="top-panel">
-		<div class="wrapper">
-			<div class="logo">
-				<a href="#" title="Emqtt Home"> <img src="imgs/emqtt_logo.png"
-					alt="emqtt_logo" height="60px;" />
-				</a>
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">Connection</h3>
 			</div>
-			<div class="items-inner">
-			<div class="column" style="width: 70%;"><b>Home</b><span>&nbsp;/&nbsp;</span><b id="model_title">Websocket</b></div>
-			<div class="column" style="width: 20%;text-align: right;float: right;padding-right: 12px;"><i id='current_user'></i>&nbsp;<a href="javascript:void(0);" id="logout">logout</a></div>
+			<div class="panel-body">
+
+				<form role="form">
+
+                    <div class="row">
+                    
+                    <div class="col-sm-4">
+                    <div class="form-group">
+                        <label for="host">Host:</label> <input type="text"
+                            class="form-control" id="host" placeholder="Host IP">
+                    </div>
+                    </div>
+                    
+                    <div class="col-sm-4">
+                    <div class="form-group">
+                        <label for="port">Port:</label> <input type="text"
+                            class="form-control" id="port"
+                            placeholder="Port">
+                    </div>
+                    </div>
+                    
+                    <div class="col-sm-4">
+                    <div class="form-group">
+                        <label for="client_id">Client ID:</label> <input type="text"
+                            class="form-control" id="client_id"
+                            placeholder="Client ID">
+                    </div>
+                    </div>
+                    
+                    </div>
+                    
+                    <div class="row">
+                    
+                    <div class="col-sm-4">
+                    <div class="form-group">
+                        <label for="user_name">User Name:</label> <input type="text"
+                            class="form-control" id="user_name"
+                            placeholder="User Name">
+                    </div>
+                    </div>
+                    
+                    <div class="col-sm-4">
+                    <div class="form-group">
+                        <label for="password">Password:</label> <input type="password"
+                            class="form-control" id="password"
+                            placeholder="Password">
+                    </div>
+                    </div>
+                    
+                    <div class="col-sm-4">
+                    <div class="form-group">
+                        <label for="keep_alive">Keep Alive:</label> <input type="text"
+                            class="form-control" id="keep_alive"
+                            placeholder="Keep Alive">
+                    </div>
+                    </div>
+                    
+                    </div>
+
+                    <div class="row">
+                    
+                    <div class="col-sm-12">
+                    <div class="form-group">
+                        <button type="button" class="btn btn-secondary btn-single" id="connect_btn">Connect</button>
+                        <button type="button" class="btn btn-gray btn-single disabled" id="disconnect_btn">Disconnect</button>
+                    </div>
+                    <div class="form-group">
+                        <label class="cbr-inline">
+                            Current State: <strong id="connect_state" class="label label-red">DISCONNECT</strong>
+                        </label>
+                    </div>
+                    </div>
+                    
+                    </div>
+					
+
+				</form>
+
 			</div>
 		</div>
-	</header>
-
-	<aside class="sidebar">
-		<nav>
-			<ul class="main-tab-nav" id="tab_nav">
-				<li><a href="/#/overview" title="Overview">Overview</a></li>
-				<li><a href="/#/clients" title="Clients">Clients</a></li>
-				<li><a href="/#/session" title="Sessions">Sessions</a></li>
-				<li><a href="/#/topic" title="Topics">Topics</a></li>
-				<li><a href="/#/subpub" title="Subscriptions">Subscriptions</a></li>
-				<li class="active-tab"><a href="/websocket.html" title="Websocket">Websocket</a></li>
-			</ul>
-		</nav>
-		<nav>
-			<ul class="main-tab-nav" id="tab_nav_2">
-				<li><a href="/#/users" title="Admins">Admins</a></li>
-				<li><a href="/#/http_api" title="HTTP API">HTTP API</a></li>
-			</ul>
-		</nav>
-	</aside>
-
-	<div class="wrapper contents-wrapper" id="page">
-
-		<div class="contents" id="contents">
-			<div>
-				<h1 class="h1">MQTT Over Websocket</h1>
-				<p>&nbsp;</p>
-				
-				<!-- col -->
-				<div class="colgroup leading full">
-					<div class="column first" style="width: 430px;">
-						<h4 class="h4">Connection</h4>
-						<hr />
-						<div class="colgroup leading full">
-							<div class="column width2 first" style="width: 180px;">									
-								<p>
-									<label for="host">Host:</label><br>
-									<input type="text" id="host" name="host" value="">
-								</p>
-							</div>
-							<div class="column width2" style="width: 90px;">
-								<p>
-									<label for="port">Port:</label><br>
-									<input type="text" id="port" name="port" value="" style="width: 50px;">
-								</p>
-							</div>
-							<div class="column width2" style="width: 70px;">
-								<p>
-									<label for="client_id">Client ID:</label><br>
-									<input type="text" id="client_id" name="client_id" value="" style="width: 115px;">
-								</p>
-							</div>
-						</div>
-						<div class="colgroup leading full">
-							<div class="column width2 first" style="width: 180px;">									
-								<p>
-									<label for="user_name">User Name:</label><br>
-									<input type="text" id="user_name" name="user_name" value="">
-								</p>
-							</div>
-							<div class="column width2" style="width: 90px;">
-								<p>
-									<label for="password">Password:</label><br>
-									<input type="password" id="password" name="password" value="" style="width: 80px;">
-								</p>
-							</div>
-							<div class="column width2" style="width: 70px;">
-								<p>
-									<label for="keep_alive">Keep Alive:</label><br>
-									<input type="text" id="keep_alive" name="keep_alive" value="" style="width: 50px;">
-								</p>
-							</div>
-						</div>
-						<div class="colgroup full">
-						<p class="box">
-						<input type="button" id="connect_btn" name="connect_btn" value="Connect" class="btn btn-green">
-						<input type="button" id="disconnect_btn" name="disconnect_btn" value="Disconnect" class="btn">
-						<label style="padding-left: 10px;">Current State: <b id="conn_state" class="b" style="color: #4ba575;font-size: 12px;">DISCONNECT</b></label>
-						</p>
-						</div>
-					</div>
-					<div class="column" style="width: 400px;">
-						<h4 class="h4">Receive Message</h4>
-						<hr />
-						<div id="receive_message" style="height: 170px;overflow: auto;"></div>
-					</div>
-				</div>
-				
-				<!-- col -->
-				<div class="colgroup leading full">
-					<div class="column first" style="width: 430px;">
-						<h4 class="h4">Subscriptions</h4>
-						<hr />
-						<p>
-							<input type="text" name="subscribe_txt" id="subscribe_txt" value="/World"/>
-						</p>
-						<p class="box" style="margin-top: 1em;">
-						<a href="javascript:void(0);" class="btn" id="subscribe_btn">Subscribe</a>
-						</p>
-					</div>
-					<div class="column" style="width: 400px;">
-						<h4 class="h4">Subscribe List</h4>
-						<hr />
-						<div id="subscribe" style="height: 170px;overflow: auto;"></div>
-					</div>
-				</div>
-				
-				<!-- col -->
-				<div class="colgroup leading full">
-					<div class="column first" style="width: 430px;">
-						<h4 class="h4">Send Message</h4>
-						<hr />
-						<div class="colgroup leading full">
-							<p class="column full first" style="margin-bottom: 10px;">
-								<label for="msg_topic">Topic:</label><br>
-								<input type="text" name="msg_topic" id="msg_topic" value="/World"/>
-							</p>
-							<p class="column full first">
-								<label for="message_txt">Message:</label><br>
-								<input type="text" name="message_txt" id="message_txt" value="Hello world!"/>
-							</p>
-						</div>
-						<div class="colgroup full"><p class="box">
-						<a href="javascript:void(0);" class="btn" id="send_btn">Send</a>
-						</p></div>
-					</div>
-					<div class="column full" style="width: 400px;">
-						<h4 class="h4">Send List</h4>
-						<hr />
-						<div id="send_list" style="height: 170px;overflow:auto;"></div>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="clear"></div>
-
 	</div>
+	
+	<div class="col-sm-6">
+	
+	<div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Receive Message</h3>
+            </div>
+            <div class="panel-body" id="receive_message">
 
-	<footer class="footer-panel">
-		<p>Powered by
-			<a target="_blank" href="http://emqtt.io">emqtt.io</a> 
-		</p>
-	</footer>
-</body>
-</html>
+                
+
+            </div>
+        </div>
+	
+	</div>
+</div>
+
+<div class="row">
+    <div class="col-sm-6">
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Subscription</h3>
+            </div>
+            <div class="panel-body">
+
+                <form role="form">
+
+                    <div class="row">
+                    
+                    <div class="col-sm-12">
+                    <div class="form-group">
+                        <label for="subscription">Subscription:</label> <input type="text"
+                            class="form-control" id="subscription"
+                            placeholder="Subscription" value="/World">
+                    </div>
+                    </div>
+                    
+                    </div>
+                    
+                    <div class="row">
+                    
+                    <div class="col-sm-12">
+                    <div class="form-group">
+                        <button type="button" class="btn btn-secondary btn-single" id="subscribe_btn">Subscribe</button>
+                    </div>
+                    </div>
+                    
+                    </div>
+                    
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-sm-6">
+    
+    <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Subscriptions List</h3>
+            </div>
+            <div class="panel-body" id="subscriptions_list">
+
+                
+
+            </div>
+        </div>
+    
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-6">
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Send Message</h3>
+            </div>
+            <div class="panel-body">
+
+                <form role="form">
+
+                    <div class="row">
+                    
+                    <div class="col-sm-12">
+                    <div class="form-group">
+                        <label for="topic">Topic:</label> <input type="text"
+                            class="form-control" id="topic"
+                            placeholder="Topic" value="/World">
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Message:</label> <input type="text"
+                            class="form-control" id="message"
+                            placeholder="Message" value="Hello world!">
+                    </div>
+                    </div>
+                    
+                    </div>
+                    
+                    <div class="row">
+                    
+                    <div class="col-sm-12">
+                    <div class="form-group">
+                        <button type="button" class="btn btn-secondary btn-single" id="send_btn">Send</button>
+                    </div>
+                    </div>
+                    
+                    </div>
+                    
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-sm-6">
+    
+    <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Send Message List</h3>
+            </div>
+            <div class="panel-body" id="send_message_list">
+
+                
+
+            </div>
+        </div>
+    
+    </div>
+</div>
