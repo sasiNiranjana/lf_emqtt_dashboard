@@ -719,14 +719,14 @@ body {
   background: #f8f8f8;
   margin: -30px;
   margin-bottom: 30px;
-  padding: 20px 0;
+  /*padding: 20px 0;*/
   -webkit-box-shadow: 0 1px 0 rgba(0,1,1,.08), inset 0 1px 0 #ededed;
   -moz-box-shadow: 0 1px 0 rgba(0,1,1,.08), inset 0 1px 0 #ededed;
   box-shadow: 0 1px 0 rgba(0,1,1,.08), inset 0 1px 0 #ededed;
 }
 @media screen and (max-width: 768px) {
   .page-container .main-content .page-title {
-    padding: 15px 0;
+    /*padding: 15px 0;*/
   }
 }
 .page-container .main-content .page-title.full-width .title-env {
@@ -764,7 +764,7 @@ body {
   color: #979898;
 }
 .page-container .main-content .page-title .breadcrumb-env {
-  float: right;
+  /*float: right;*/
   padding-right: 30px;
 }
 @media screen and (max-width: 480px) {
@@ -794,7 +794,7 @@ body {
   z-index: 1;
 }
 .sidebar-menu .logo-env {
-  padding: 30px 18px;
+  padding: 28px 18px;
   border-bottom: 1px solid #313437;
 }
 .sidebar-menu .logo-env .logo {
@@ -836,7 +836,7 @@ body {
   color: #979898;
   text-decoration: none;
   display: block;
-  padding: 12px 8px;
+  padding: 12px 10px;
   border-bottom: 1px solid #313437;
 }
 .sidebar-menu .main-menu a > i {
@@ -2053,7 +2053,7 @@ body.chat-open .user-info-navbar a[data-toggle="chat"] {
   display: block;
   padding: 30px 20px;
   color: #979898;
-  border-bottom: 1px solid #ffffff;
+  /*border-bottom: 1px solid #ffffff;*/
   top: 1px;
   z-index: 5;
 }
