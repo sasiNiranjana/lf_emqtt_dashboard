@@ -284,3 +284,104 @@ bin(S) when is_list(S) -> list_to_binary(S);
 bin(A) when is_atom(A) -> bin(atom_to_list(A));
 bin(B) when is_binary(B) -> B.
 
+
+count(TableName) ->
+    case list(TableName) of
+	{error, Msg} -> {error, Msg};
+	{ok, []}     -> 0;
+	{ok, L}      -> length(L)
+    end.
+
+count(TableName, Where) ->
+    case list(TableName, Where) of
+	{error, Msg} -> {error, Msg};
+	{ok, []}     -> 0;
+	{ok, L}      -> length(L)
+    end.
+
+list(Table) ->
+    F = fun() ->
+	qlc:e(qlc:q([X || X <- mnesia:table(Table)]))
+    end,
+    {atomic, L} = mnesia:transaction(F),
+    {ok, L}.
+
+list(Table, Where) ->
+    case query_fun(Table, Where) of 
+	{error, Msg} -> {error, Msg};
+	{ok, F}      -> 
+		{atomic, L} = mnesia:transaction(F),
+    		{ok, L}
+    end.
+
+list(Table, Offset, Limit) ->
+	if is_integer(Offset) and is_integer(Limit)
+		and (Offset > 0) and (Limit >0) ->
+		F = fun()-> 
+			QH = qlc:q([X || X<- mnesia:table(Table)]),
+			Qc = qlc:cursor(QH),
+			case Offset of
+				1 -> skip;
+				_ -> qlc:next_answers(Qc, Offset-1)
+			end,
+			qlc:next_answers(Qc, Limit)
+	end,
+	{atomic, L} = mnesia:transaction(F),
+	{ok ,L};
+	true ->
+ 	{error, badarg}	
+	end.
+
+list(Table, Offset, Limit, Where) ->
+    if is_integer(Offset) and is_integer(Limit)
+		and (Offset > 0) and (Limit >0) ->
+	case query_fun(Table, Offset, Limit, Where) of
+		{error, Msg} -> {error, Msg};
+		{ok, F} ->
+			{atomic, L} = mnesia:transaction(F),
+			{ok, L}
+
+	end;
+    true ->
+ 	{error, badarg}	
+    end.
+
+query_fun(Table, Where) ->
+    case query_cond(Table, Where) of
+	    {ok, QH} ->
+		    {ok, fun() -> qlc:e(QH) end};
+	    {error, Msg} ->
+		    {error, Msg}
+    end.
+
+query_fun(Table, Offset, Limit, Where) ->
+    case query_cond(Table, Where) of
+	{ok, QH} ->
+		{ok , fun()-> 
+			Qc = qlc:cursor(QH),
+			case Offset of
+				1 -> skip;
+				_ -> qlc:next_answers(Qc, Limit)
+		       	end 
+		      end};
+	{error, Msg} ->
+		{error, Msg}
+    end.
+
+query_cond(mqtt_client, Where) ->
+    case Where of
+	[{username, Username}] ->
+		QH = qlc:q([X || X <- mnesia:table(mqtt_client), match(X#mqtt_client.username, Username)]),
+		{ok, QH};
+	[] ->
+		{error, badarg}
+    end;
+
+query_cond(_, _) ->
+	{error, badarg}.
+
+match(DbContent, WContent) ->
+    case string:str(DbContent, WContent) of
+	1 -> true;
+	_ -> false
+    end.
