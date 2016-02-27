@@ -1,3 +1,79 @@
+// checks whether the content is in RTL mode
+function rtl() {
+	if (typeof window.isRTL == 'boolean')
+		return window.isRTL;
+
+	window.isRTL = jQuery("html").get(0).dir == 'rtl' ? true : false;
+
+	return window.isRTL;
+}
+
+// Page Loader
+function show_loading_bar(options) {
+	var defaults = {
+		pct : 0,
+		delay : 1.3,
+		wait : 0,
+		before : function() {
+		},
+		finish : function() {
+		},
+		resetOnEnd : true
+	};
+
+	if (typeof options == 'object')
+		defaults = jQuery.extend(defaults, options);
+	else if (typeof options == 'number')
+		defaults.pct = options;
+
+	if (defaults.pct > 100)
+		defaults.pct = 100;
+	else if (defaults.pct < 0)
+		defaults.pct = 0;
+
+	var $ = jQuery, $loading_bar = $(".xenon-loading-bar");
+
+	if ($loading_bar.length == 0) {
+		$loading_bar = $('<div class="xenon-loading-bar progress-is-hidden"><span data-pct="0"></span></div>');
+		public_vars.$body.append($loading_bar);
+	}
+
+	var $pct = $loading_bar.find('span'), current_pct = $pct.data('pct'), is_regress = current_pct > defaults.pct;
+
+	defaults.before(current_pct);
+
+	TweenMax.to($pct, defaults.delay, {
+		css : {
+			width : defaults.pct + '%'
+		},
+		delay : defaults.wait,
+		ease : is_regress ? Expo.easeOut : Expo.easeIn,
+		onStart : function() {
+			$loading_bar.removeClass('progress-is-hidden');
+		},
+		onComplete : function() {
+			var pct = $pct.data('pct');
+
+			if (pct == 100 && defaults.resetOnEnd) {
+				hide_loading_bar();
+			}
+
+			defaults.finish(pct);
+		},
+		onUpdate : function() {
+			$pct.data('pct', parseInt($pct.get(0).style.width, 10));
+		}
+	});
+}
+
+function hide_loading_bar() {
+	var $ = jQuery, $loading_bar = $(".xenon-loading-bar"), $pct = $loading_bar
+			.find('span');
+
+	$loading_bar.addClass('progress-is-hidden');
+	$pct.width(0).data('pct', 0);
+}
+
 Date.prototype.format = function(format) {
 	var o = {
 		"M+" : this.getMonth() + 1, // month
@@ -346,7 +422,7 @@ function showOverview() {
 
 function showClients() {
 	// 标题导航条
-	$('#title_bar .description').text("Clients List");
+	//$('#title_bar .description').text("Clients List");
 	$('#title_bar .title').text("Clients");
 	$('#title_bar .breadcrumb-env').html(
 			'<ol class="breadcrumb bc-1">' +
@@ -389,7 +465,7 @@ function showClients() {
 
 function showSessions() {
 	// 标题导航条
-	$('#title_bar .description').text("Sessions List");
+	//$('#title_bar .description').text("Sessions List");
 	$('#title_bar .title').text("Sessions");
 	$('#title_bar .breadcrumb-env').html(
 			'<ol class="breadcrumb bc-1">' +
@@ -401,7 +477,7 @@ function showSessions() {
 	loading('sessions.html', function() {
 		dashApi.sessions(function(ret, err) {
 			if (ret) {
-				$('#sessions_count').text(ret.length);
+				$('#sessions_count_all').text(ret.length);
 				var tby = $('#sessions tbody').empty();
 				if (ret.length > 0) {
 					for (var i = 0; i < ret.length; i++) {
@@ -433,7 +509,7 @@ function showSessions() {
 
 function showTopics() {
 	// 标题导航条
-	$('#title_bar .description').text("Topics List");
+	//$('#title_bar .description').text("Topics List");
 	$('#title_bar .title').text("Topics");
 	$('#title_bar .breadcrumb-env').html(
 			'<ol class="breadcrumb bc-1">' +
@@ -470,7 +546,7 @@ function showTopics() {
 
 function showSubscriptions() {
 	// 标题导航条
-	$('#title_bar .description').text("Subscriptions List");
+	//$('#title_bar .description').text("Subscriptions List");
 	$('#title_bar .title').text("Subscriptions");
 	$('#title_bar .breadcrumb-env').html(
 			'<ol class="breadcrumb bc-1">' +
@@ -507,7 +583,7 @@ function showSubscriptions() {
 
 function showWebsocket() {
 	// 标题导航条
-	$('#title_bar .description').text("MQTT Over Websocket");
+	//$('#title_bar .description').text("MQTT Over Websocket");
 	$('#title_bar .title').text("Websocket");
 	$('#title_bar .breadcrumb-env').html(
 			'<ol class="breadcrumb bc-1">' +
@@ -637,7 +713,7 @@ function showWebsocket() {
 
 function showUsers() {
 	// 标题导航条
-	$('#title_bar .description').text("Users List");
+	//$('#title_bar .description').text("Users List");
 	$('#title_bar .title').text("Users");
 	$('#title_bar .breadcrumb-env').html(
 			'<ol class="breadcrumb bc-1">' +
@@ -819,7 +895,7 @@ var User = {
 
 function showHttpApi() {
 	// 标题导航条
-	$('#title_bar .description').text("HTTP API List");
+	//$('#title_bar .description').text("HTTP API List");
 	$('#title_bar .title').text("HTTP API");
 	$('#title_bar .breadcrumb-env').html(
 			'<ol class="breadcrumb bc-1">' +
