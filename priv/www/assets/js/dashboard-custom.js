@@ -432,13 +432,47 @@ function showClients() {
 	
 	// 加载Clients信息
 	loading('clients.html', function() {
-		dashApi.clients(function(ret, err) {
+		clients.loadTable();
+	});
+};
+
+(function(w) {
+	var cs = {};
+	cs.curr_page = 1;
+	cs.page_size = 10;
+	cs.user_key = null;
+	
+	cs.setPageSize = function(pageSize) {
+		this.page_size = pageSize;
+		this.loadTable();
+	};
+	
+	cs.search = function(userKey) {
+		this.user_key = userKey;
+		this.loadTable();
+	};
+	
+	cs.setCurrPage = function(currPage) {
+		this.curr_page = currPage;
+		this.loadTable();
+	};
+	
+	cs.loadTable = function() {
+		// 加载分页信息
+		$('#page_size').text(this.page_size);
+		$('#user_key').val(this.user_key);
+		var params = {page_size : this.page_size,
+				curr_page : this.curr_page,
+				user_key : this.user_key};
+		
+		// Table List
+		dashApi.clients(params, function(ret, err) {
 			if (ret) {
-				$('#clients_count').text(ret.length);
+				$('#clients_count').text(ret.totalNum);
 				var tby = $('#clients tbody').empty();
-				if (ret.length > 0) {
-					for (var i = 0; i < ret.length; i++) {
-						var obj = ret[i];
+				if (ret.result.length > 0) {
+					for (var i = 0; i < ret.result.length; i++) {
+						var obj = ret.result[i];
 						tby.append('<tr>' +
 								'<td>' + obj['clientId'] + '</td>' +
 								'<td>' + obj['username'] + '</td>' +
@@ -460,8 +494,10 @@ function showClients() {
 				console.log(err);
 			}
 		});
-	});
-};
+	};
+	
+	w.clients = cs;
+})(window);
 
 function showSessions() {
 	// 标题导航条
@@ -558,7 +594,7 @@ function showSubscriptions() {
 	loading('subscriptions.html', function() {
 		dashApi.subscriptions(function(ret, err) {
 			if (ret) {
-				$('#subscriptions_count').text(ret.length);
+				$('#subscriptions_count_all').text(ret.length);
 				var tby = $('#subscriptions tbody').empty();
 				if (ret.length > 0) {
 					for (var i = 0; i < ret.length; i++) {

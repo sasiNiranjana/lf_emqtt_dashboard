@@ -87,8 +87,8 @@
 		},
 
 		// clients
-		clients : function(callback) {
-			this._ajax("clients", null, callback);
+		clients : function(params, callback) {
+			this._ajax("clients", params, callback);
 		},
 
 		// sessions
