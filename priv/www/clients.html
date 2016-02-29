@@ -1,7 +1,7 @@
 <div class="panel panel-default">
 	<div class="panel-heading">
 		<h3 class="panel-title">
-			All Clients (<em id="clients_count">0</em>)
+			All Clients (<em id="clients_count_all">0</em>)
 		</h3>
 
 		<div class="panel-options">
@@ -66,19 +66,15 @@
 
 		<div class="row">
 			<div class="col-sm-6">
-				<!-- <div>Showing 1 to 10 of 57 entries</div> -->
+				<!-- <div>Showing 1 to 10 of 60 entries</div> -->
 			</div>
 			<div class="col-sm-6">
-				<ul class="pagination pull-right" style="margin: 0 0;">
-					<li class="paginate_button previous disabled"><a
-						href="javascript:;">Previous</a></li>
+				<ul class="pagination pull-right" style="margin: 0 0;" id="pagination">
+					<li class="paginate_button previous disabled"><a href="javascript:;">Previous</a></li>
 					<li class="paginate_button active"><a href="javascript:;" onclick="clients.setCurrPage(1);">1</a></li>
 					<li class="paginate_button "><a href="javascript:;" onclick="clients.setCurrPage(2);">2</a></li>
 					<li class="paginate_button "><a href="javascript:;" onclick="clients.setCurrPage(3);">3</a></li>
-					<li class="paginate_button "><a href="javascript:;" onclick="clients.setCurrPage(4);">4</a></li>
-					<li class="paginate_button "><a href="javascript:;" onclick="clients.setCurrPage(5);">5</a></li>
-					<li class="paginate_button "><a href="javascript:;" onclick="clients.setCurrPage(6);">6</a></li>
-					<li class="paginate_button next"><a href="javascript:;">Next</a></li>
+					<li class="paginate_button next disabled"><a href="javascript:;">Next</a></li>
 				</ul>
 			</div>
 		</div>

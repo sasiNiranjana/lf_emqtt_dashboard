@@ -1,3 +1,40 @@
+jQuery.fn.pagination = function(currPage, pageSize, totalNum, totalPage, callback) {
+	var p = $(this).empty();
+	if (totalNum == 0) {
+		p.append('<li class="paginate_button previous disabled"><a href="javascript:;">Previous</a></li>');
+		p.append('<li class="paginate_button next disabled"><a href="javascript:;">Next</a></li>');
+	}
+	
+	if (currPage <= 1) {
+		p.append('<li class="paginate_button previous disabled"><a href="javascript:;">Previous</a></li>');
+	} else {
+		p.append('<li class="paginate_button previous"><a href="javascript:;" onclick="clients.setCurrPage('+(currPage-1)+');">Previous</a></li>');
+	}
+	if (currPage >= totalPage) {
+		p.append('<li class="paginate_button next disabled"><a href="javascript:;">Next</a></li>');
+	} else {
+		p.append('<li class="paginate_button next"><a href="javascript:;" onclick="clients.setCurrPage('+(currPage+1)+');">Next</a></li>');
+	}
+	
+	// 起始按钮
+	var start = 1;
+	// 结束按钮
+	var end = totalPage;
+	if ((currPage - 2) > 1) {
+		start = currPage - 2;
+	}
+	if ((currPage + 3) < totalPage) {
+		end = currPage + 3;
+	}
+	for (var i = start; i <= end; i++) {
+		if (i == currPage) {
+			p.append('<li class="paginate_button active"><a href="javascript:;" onclick="clients.setCurrPage('+i+');">'+i+'</a></li>');
+		} else {
+			p.append('<li class="paginate_button "><a href="javascript:;" onclick="clients.setCurrPage('+i+');">'+i+'</a></li>');
+		}
+	}
+}
+
 // checks whether the content is in RTL mode
 function rtl() {
 	if (typeof window.isRTL == 'boolean')
@@ -440,15 +477,19 @@ function showClients() {
 	var cs = {};
 	cs.curr_page = 1;
 	cs.page_size = 10;
+	cs.total_num = 0;
+	cs.total_page = 0;
 	cs.user_key = null;
 	
 	cs.setPageSize = function(pageSize) {
 		this.page_size = pageSize;
+		this.curr_page = 1;
 		this.loadTable();
 	};
 	
 	cs.search = function(userKey) {
 		this.user_key = userKey;
+		this.curr_page = 1;
 		this.loadTable();
 	};
 	
@@ -464,11 +505,23 @@ function showClients() {
 		var params = {page_size : this.page_size,
 				curr_page : this.curr_page,
 				user_key : this.user_key};
+		var _this = this;
 		
 		// Table List
 		dashApi.clients(params, function(ret, err) {
 			if (ret) {
-				$('#clients_count').text(ret.totalNum);
+				// 分页按钮
+				_this.total_num = ret.totalNum;
+				_this.total_page = ret.totalPage;
+				$('#pagination').pagination(_this.curr_page,
+						_this.page_size,
+						_this.total_num,
+						_this.total_page,
+						function(page) {
+							_this.setCurrPage(page);
+						});
+				
+				$('#clients_count_all').text(ret.totalNum);
 				var tby = $('#clients tbody').empty();
 				if (ret.result.length > 0) {
 					for (var i = 0; i < ret.result.length; i++) {
@@ -557,7 +610,7 @@ function showTopics() {
 	loading('topics.html', function() {
 		dashApi.topics(function(ret, err) {
 			if (ret) {
-				$('#topics_count').text(ret.length);
+				$('#topics_count_all').text(ret.length);
 				var tby = $('#topics tbody').empty();
 				if (ret.length > 0) {
 					for (var i = 0; i < ret.length; i++) {
@@ -785,7 +838,7 @@ var User = {
 		showTable : function() {
 			dashApi.users(function(ret, err) {
 				if (ret) {
-					$('#users_count').text(ret.length);
+					$('#users_count_all').text(ret.length);
 					var tby = $('#users tbody').empty();
 					if (ret.length > 0) {
 						for (var i = 0; i < ret.length; i++) {
