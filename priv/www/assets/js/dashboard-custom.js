@@ -3,17 +3,13 @@ jQuery.fn.pagination = function(currPage, pageSize, totalNum, totalPage, callbac
 	if (totalNum == 0) {
 		p.append('<li class="paginate_button previous disabled"><a href="javascript:;">Previous</a></li>');
 		p.append('<li class="paginate_button next disabled"><a href="javascript:;">Next</a></li>');
+		return;
 	}
 	
 	if (currPage <= 1) {
 		p.append('<li class="paginate_button previous disabled"><a href="javascript:;">Previous</a></li>');
 	} else {
 		p.append('<li class="paginate_button previous"><a href="javascript:;" onclick="clients.setCurrPage('+(currPage-1)+');">Previous</a></li>');
-	}
-	if (currPage >= totalPage) {
-		p.append('<li class="paginate_button next disabled"><a href="javascript:;">Next</a></li>');
-	} else {
-		p.append('<li class="paginate_button next"><a href="javascript:;" onclick="clients.setCurrPage('+(currPage+1)+');">Next</a></li>');
 	}
 	
 	// 起始按钮
@@ -32,6 +28,12 @@ jQuery.fn.pagination = function(currPage, pageSize, totalNum, totalPage, callbac
 		} else {
 			p.append('<li class="paginate_button "><a href="javascript:;" onclick="clients.setCurrPage('+i+');">'+i+'</a></li>');
 		}
+	}
+
+	if (currPage >= totalPage) {
+		p.append('<li class="paginate_button next disabled"><a href="javascript:;">Next</a></li>');
+	} else {
+		p.append('<li class="paginate_button next"><a href="javascript:;" onclick="clients.setCurrPage('+(currPage+1)+');">Next</a></li>');
 	}
 }
 
