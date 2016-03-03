@@ -471,61 +471,55 @@ function showClients() {
 	
 	// 加载Clients信息
 	loading('clients.html', function() {
+		clients.clearInfo();
 		clients.loadTable();
 	});
 };
 
 (function(w) {
 	var cs = {};
-	cs.curr_page = 1;
-	cs.page_size = 10;
 	cs.total_num = 0;
-	cs.total_page = 0;
-	cs.user_key = null;
+	cs.client_key = null;
+	cs.c_flag = null;
 	
-	cs.setPageSize = function(pageSize) {
-		this.page_size = pageSize;
-		this.curr_page = 1;
-		this.loadTable();
+	cs.clearInfo = function() {
+		this.total_num = 0;
+		this.client_key = null;
+		this.c_flag = null;
 	};
 	
-	cs.search = function(userKey) {
-		this.user_key = userKey;
-		this.curr_page = 1;
-		this.loadTable();
-	};
-	
-	cs.setCurrPage = function(currPage) {
-		this.curr_page = currPage;
+	cs.search = function(clientKey) {
+		this.c_flag = null;
+		this.client_key = clientKey;
 		this.loadTable();
 	};
 	
 	cs.loadTable = function() {
-		// 加载分页信息
-		$('#page_size').text(this.page_size);
-		$('#user_key').val(this.user_key);
-		var params = {page_size : this.page_size,
-				curr_page : this.curr_page,
-				user_key : this.user_key};
 		var _this = this;
+		var params = {c_flag : _this.c_flag,
+				client_key : _this.client_key};
+		
+		if (params.c_flag == 'end') {
+			alert('No Data.');
+			return;
+		}
 		
 		// Table List
 		dashApi.clients(params, function(ret, err) {
 			if (ret) {
-				// 分页按钮
-				_this.total_num = ret.totalNum;
-				_this.total_page = ret.totalPage;
-				$('#pagination').pagination(_this.curr_page,
-						_this.page_size,
-						_this.total_num,
-						_this.total_page,
-						function(page) {
-							_this.setCurrPage(page);
-						});
-				
-				$('#clients_count_all').text(ret.totalNum);
-				var tby = $('#clients tbody').empty();
-				if (ret.result.length > 0) {
+				var tby = $('#clients tbody');
+				if (params.c_flag == null) {
+					_this.total_num = ret.totalNum;
+					$('#clients_count_all').text(_this.total_num);
+					tby.empty();
+				}
+				if (_this.total_num <= 0) {
+					tby.empty();
+					tby.append(
+							'<tr><td colspan="8">' +
+							'<p style="padding: 12px;">... no clients ...</p>' +
+							'</td></tr>');
+				} else {
 					for (var i = 0; i < ret.result.length; i++) {
 						var obj = ret.result[i];
 						tby.append('<tr>' +
@@ -539,11 +533,6 @@ function showClients() {
 								'<td>' + obj['connected_at'] + '</td>' +
 								'</tr>');
 					}
-				} else {
-					tby.append(
-							'<tr><td colspan="8">' +
-							'<p style="padding: 12px;">... no clients ...</p>' +
-							'</td></tr>');
 				}
 			} else {
 				console.log(err);
