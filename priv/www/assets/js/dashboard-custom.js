@@ -510,6 +510,9 @@ function showClients() {
 				var tby = $('#clients tbody');
 				if (params.c_flag == null) {
 					_this.total_num = ret.totalNum;
+					if (ret.c_flag) {
+						_this.c_flag = ret.c_flag;
+					}
 					$('#clients_count_all').text(_this.total_num);
 					tby.empty();
 				}
