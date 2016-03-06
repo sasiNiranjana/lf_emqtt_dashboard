@@ -21,6 +21,7 @@
 
 -include("../../../include/emqttd.hrl").
 
+-import(proplists, [get_value/2, get_value/3]).
 -export([handle_request/1]).
 
 -define(SEPARTOR, $\/).
@@ -31,7 +32,6 @@
 -include_lib("stdlib/include/qlc.hrl").
 -include_lib("stdlib/include/ms_transform.hrl").
 
--import(proplists, [get_value/2, get_value/3]).
 
 handle_request(Req) ->
     case authorized(Req) of
@@ -102,13 +102,16 @@ api(listeners, Req) ->
 %%clients api
 api(clients, Req) ->
     ClientQry = Req:parse_post(),
-    io:format("arg~p~n",[ClientQry]),
-    CFlag = get_value("c_flag", ClientQry, ""),
+    CurrentPage = int(get_value("curr_page", ClientQry, "1")),
+    PageSize = int(get_value("page_size", ClientQry, "10")),
+    %Username = get_value("user_key", ClientQry, ""),
     TotalNum = clientcount(mqtt_client), 
-    io:format("count:~p~n",[TotalNum]),
-    {M, C} = queryclient(mqtt_client, CFlag), 
-    io:format("Result:~p~n",[M]),
-    api_respond(Req, [{totalNum, TotalNum}, {result, M}, {c_flag, C}]);
+    TotalPage = case TotalNum rem PageSize of
+		0 -> TotalNum div PageSize;
+		_ -> (TotalNum div PageSize) + 1
+		    end,
+    Result = queryclient(mqtt_client, CurrentPage, TotalPage, PageSize), 
+    api_respond(Req, [{currentPage, CurrentPage},{pageSize, PageSize},{totalNum, TotalNum}, {totalPage, TotalPage},{result, Result}]);
     
 %%-----------------------------------session--------------------------------------
 %%sessin check api
@@ -376,13 +379,13 @@ bin(B) when is_binary(B) -> B.
 %query_cond(_, _) ->
 %	{error, badarg}.
 
-match(_DbContent, []) ->
-    true;
-match(DbContent, WContent) ->
-    case string:str(DbContent, WContent) of
-	1 -> true;
-	_ -> false
-    end.
+%match(_DbContent, []) ->
+%    true;
+%match(DbContent, WContent) ->
+%    case string:str(DbContent, WContent) of
+%	1 -> true;
+%	_ -> false
+%    end.
 
 clientcount(Tab) ->
     MScount = ets:fun2ms(fun(#mqtt_client{client_id = ClientId, peername = {IpAddr, Port},
@@ -392,21 +395,34 @@ clientcount(Tab) ->
     ets:select_count(Tab, MScount).
 
 
-queryclient(Tab, 'end')->
-    {[],[]};
-queryclient(Tab, [])->
-    result_match(ets:match_object(Tab, #mqtt_client{_='_'}, 3));
+queryclient(Tab, CurrentPage, TotalPage, PageSize) ->
+	if CurrentPage > TotalPage ->
+		[];
+	true ->
+		Obj = ets:match_object(Tab, #mqtt_client{_='_'}, PageSize),
+		parser_obj(CurrentPage, Obj)
+	end.
 
-queryclient(_Tab, Continue)->
-    result_match(ets:match_object(Continue)).
+parser_obj(_, Obj) when is_atom(Obj), Obj =:= '$end_of_table'->
+    [];
+parser_obj(1, {Matchs, _C}) ->
+    [formatclient(Match)|| Match <- Matchs];
+parser_obj(2, {_Matchs, C}) ->
+    parser_obj(1, ets:match_object(C));
+parser_obj(Times, {_Matchs, C}=Obj) ->
+    if is_atom(C), C =:= '$end_of_table' ->
+	parser_obj(1, Obj);
+    true->
+	parser_obj(Times-1, ets:match_object(C))
+    end.
 
 int(S) ->
     list_to_integer(S).
 
-str(A) when is_atom(A) -> atom_to_list(A);
-str(B) when is_binary(B) -> binary_to_list(B);
-str(L) when is_list(L) -> L.
-
+%str(A) when is_atom(A) -> atom_to_list(A);
+%str(B) when is_binary(B) -> binary_to_list(B);
+%str(L) when is_list(L) -> L.
+%
 formatclient(#mqtt_client{client_id = ClientId, peername = {IpAddr, Port},
                          username = Username, clean_sess = CleanSess,
                          proto_ver = ProtoVer, keepalive = KeepAlvie,
@@ -420,14 +436,4 @@ formatclient(#mqtt_client{client_id = ClientId, peername = {IpAddr, Port},
          {keepalive, KeepAlvie},
          {connected_at, list_to_binary(connected_at_format(ConnectedAt))}].
 
-result_match(Result)->
-     case Result of
-	'$end_of_table' ->
-		{[], 'end'};
-	{Matchs, '$end_of_table'}	->
-		Matchlist = [formatclient(Match)|| Match <- Matchs],
-		{Matchlist, 'end'};
-	{Matchs, Continuation}	->
-		Matchlist = [formatclient(Match)|| Match <- Matchs],
-		{Matchlist, Continuation}
-    end.
+
