@@ -501,18 +501,18 @@ function showClients() {
 	};
 	
 	cs.loadTable = function() {
+		var _this = this;
 		// 加载分页信息
 		$('#page_size').text(this.page_size);
 		$('#user_key').val(this.client_key);
+		
 		var params = {page_size : this.page_size,
 				curr_page : this.curr_page,
 				client_key : this.client_key};
-		var _this = this;
-		
 		// Table List
 		dashApi.clients(params, function(ret, err) {
 			if (ret) {
-				// 分页按钮
+				// 加载分页按钮
 				_this.curr_page = ret.currentPage;
 				_this.page_size = ret.pageSize;
 				_this.total_num = ret.totalNum;
