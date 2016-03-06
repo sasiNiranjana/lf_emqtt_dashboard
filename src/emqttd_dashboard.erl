@@ -407,8 +407,6 @@ parser_obj(_, Obj) when is_atom(Obj), Obj =:= '$end_of_table'->
     [];
 parser_obj(1, {Matchs, _C}) ->
     [formatclient(Match)|| Match <- Matchs];
-parser_obj(2, {_Matchs, C}) ->
-    parser_obj(1, ets:match_object(C));
 parser_obj(Times, {_Matchs, C}=Obj) ->
     if is_atom(C), C =:= '$end_of_table' ->
 	parser_obj(1, Obj);
