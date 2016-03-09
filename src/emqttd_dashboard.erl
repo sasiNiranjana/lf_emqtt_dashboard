@@ -32,6 +32,17 @@
 -include_lib("stdlib/include/qlc.hrl").
 -include_lib("stdlib/include/ms_transform.hrl").
 
+-record(session, {
+        clean_sess,
+        max_inflight,
+	inflight_queue,
+        message_queue,
+	message_dropped,
+        awaiting_rel, 
+        awaiting_ack,
+        awaiting_comp,
+        created_at}).
+
 
 handle_request(Req) ->
     case authorized(Req) of
@@ -116,22 +127,19 @@ api(clients, Req) ->
 %%-----------------------------------session--------------------------------------
 %%sessin check api
 api(sessions, Req) ->
-    Records = [emqttd_vm:get_ets_object(Tab) || Tab <- [mqtt_transient_session, mqtt_persistent_session]],
-    InfoKeys = [clean_sess, 
-                max_inflight,
-                inflight_queue,
-                message_queue,
-                message_dropped,
-                awaiting_rel,
-                awaiting_ack,
-                awaiting_comp,
-                created_at],
-
-    Sessions = [ [{clientId, ClientId} | session_table(Session, InfoKeys)]
-                    || {{ClientId, _Pid}, Session} <- lists:append(Records)],
-
-    api_respond(Req, Sessions);
-   
+    Qry = Req:parse_post(),
+    CurrentPage = int(get_value("curr_page", Qry, "1")),
+    PageSize = int(get_value("page_size", Qry, "10")),
+    Transient = count(mqtt_transient_session),
+    Persistent = count(mqtt_persistent_session),
+    TotalNum = Transient + Persistent,
+    TotalPage = case TotalNum rem PageSize of
+		0 -> TotalNum div PageSize;
+		_ -> (TotalNum div PageSize) + 1
+		    end,
+	Result = [querysession(Tab, CurrentPage, TotalPage, PageSize)|| Tab <- [mqtt_transient_session, mqtt_persistent_session]],
+    api_respond(Req, [{currentPage, CurrentPage},{pageSize, PageSize},{totalNum, TotalNum}, {totalPage, TotalPage},{result, Result}]);
+    
 %%-----------------------------------topic--------------------------------------
 %%topic api
 api(topics, Req) ->
@@ -253,11 +261,6 @@ user_passwd(BasicAuth) ->
 
 code(ok) -> 1;
 code(ignore) -> 2.
-
-session_table(Session, InfoKeys) ->
-    CreatedAt = list_to_binary(connected_at_format(proplists:get_value(created_at, Session))),
-    NewSession = lists:keyreplace(created_at, 1, Session, {created_at, CreatedAt}),
-    [{Key, proplists:get_value(Key, NewSession)} || Key <- InfoKeys].
 
 rpc(Node, M, F, A) ->
    rpc:call(Node, M, F, A).
@@ -399,7 +402,7 @@ queryclient(Tab, CurrentPage, TotalPage, PageSize) ->
 	if CurrentPage > TotalPage ->
 		[];
 	true ->
-		Obj = ets:match_object(Tab, #mqtt_client{_='_'}, PageSize),
+		Obj = ets:match_object(Tab, '$1', PageSize),
 		parser_obj(CurrentPage, Obj)
 	end.
 
@@ -433,5 +436,50 @@ formatclient(#mqtt_client{client_id = ClientId, peername = {IpAddr, Port},
          {proto_ver, ProtoVer},
          {keepalive, KeepAlvie},
          {connected_at, list_to_binary(connected_at_format(ConnectedAt))}].
+
+session_table({{ClientId, _Pid}, #session{clean_sess = CleanSess,
+                   			max_inflight    = MaxInflight,
+                   			 inflight_queue  = InflightQueue,
+                   message_queue   = MessageQueue,
+                   message_dropped= MessageDropped,
+                   awaiting_rel    = AwaitingRel,
+                   awaiting_ack    = AwaitingAck,
+                   awaiting_comp   = AwaitingComp,
+		   created_at= CreatedAt}}) ->
+   [{clientId, ClientId},
+    {clean_sess, CleanSess},
+    {max_inflight, MaxInflight},
+    {inflight_queue, InflightQueue},
+    {message_queue, MessageQueue},
+    {message_dropped, MessageDropped},
+    {awaiting_rel, AwaitingRel},
+    {awaiting_ack, AwaitingAck},
+    {awaiting_comp, AwaitingComp},
+    {created_at, connected_at_format(CreatedAt)}].
+
+
+count(Tab) ->
+    MScount = ets:fun2ms(fun({{'_', '_'}, #session{_='_'}} )->true end),
+    ets:select_count(Tab, MScount).
+
+
+querysession(Tab, CurrentPage, TotalPage, PageSize) ->
+	if CurrentPage > TotalPage ->
+		[];
+	true ->
+		Obj = ets:match_object(Tab, '$1', PageSize),
+		parser_session(CurrentPage, Obj)
+	end.
+
+parser_session(_, Obj) when is_atom(Obj), Obj =:= '$end_of_table'->
+    [];
+parser_session(1, {Matchs, _C}) ->
+    [session_table(Match)|| Match <- Matchs];
+parser_session(Times, {_Matchs, C}=Obj) ->
+    if is_atom(C), C =:= '$end_of_table' ->
+	parser_session(1, Obj);
+    true->
+	parser_session(Times-1, ets:match_object(C))
+    end.
 
 
