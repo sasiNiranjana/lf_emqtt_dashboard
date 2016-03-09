@@ -1,39 +1,57 @@
-jQuery.fn.pagination = function(currPage, pageSize, totalNum, totalPage) {
+var PageInfo = function(currPage, pageSize, totalNum) {
+	this.currPage = currPage;
+	this.pageSize = pageSize;
+	this.totalNum = totalNum;
+	this.totalPage = 0;
+};
+PageInfo.prototype.countTotalPage = function(totalPage) {
+	if (totalPage) {
+		this.totalPage = totalPage;
+		return;
+	}
+	if (this.totalNum % this.pageSize == 0) {
+		this.totalPage = this.totalNum / this.pageSize;
+	} else {
+		this.totalPage = this.totalNum / this.pageSize + 1;
+	}
+};
+
+jQuery.fn.pagination = function(pageInfo) {
 	var p = $(this).empty();
-	if (totalNum == 0) {
+	if (pageInfo.totalNum == 0) {
 		p.append('<li class="paginate_button previous disabled"><a href="javascript:;">Previous</a></li>');
 		p.append('<li class="paginate_button next disabled"><a href="javascript:;">Next</a></li>');
 		return;
 	}
 	
-	if (currPage <= 1) {
+	if (pageInfo.currPage <= 1) {
 		p.append('<li class="paginate_button previous disabled"><a href="javascript:;">Previous</a></li>');
 	} else {
-		p.append('<li class="paginate_button previous"><a href="javascript:;" onclick="clients.setCurrPage('+(currPage-1)+');">Previous</a></li>');
+		p.append('<li class="paginate_button previous"><a href="javascript:;" onclick="clients.setCurrPage('+(pageInfo.currPage-1)+');">Previous</a></li>');
 	}
 	
 	// 起始按钮
 	var start = 1;
 	// 结束按钮
-	var end = totalPage;
-	if ((currPage - 2) > 1) {
-		start = currPage - 2;
+	var end = pageInfo.totalPage;
+	if ((pageInfo.currPage - 2) > 1) {
+		start = pageInfo.currPage - 2;
 	}
-	if ((currPage + 3) < totalPage) {
-		end = currPage + 3;
+	if ((pageInfo.currPage + 3) < pageInfo.totalPage) {
+		end = pageInfo.currPage + 3;
 	}
 	for (var i = start; i <= end; i++) {
-		if (i == currPage) {
+		if (i == pageInfo.currPage) {
 			p.append('<li class="paginate_button active"><a href="javascript:;" onclick="clients.setCurrPage('+i+');">'+i+'</a></li>');
 		} else {
 			p.append('<li class="paginate_button "><a href="javascript:;" onclick="clients.setCurrPage('+i+');">'+i+'</a></li>');
 		}
 	}
 
-	if (currPage >= totalPage) {
+	if (pageInfo.currPage >= pageInfo.totalPage) {
 		p.append('<li class="paginate_button next disabled"><a href="javascript:;">Next</a></li>');
 	} else {
-		p.append('<li class="paginate_button next"><a href="javascript:;" onclick="clients.setCurrPage('+(currPage+1)+');">Next</a></li>');
+		p.append('<li class="paginate_button next"><a href="javascript:;" onclick="clients.setCurrPage('+(pageInfo.currPage+1)+');">Next</a></li>');
 	}
 }
 
@@ -477,56 +495,60 @@ function showClients() {
 
 (function(w) {
 	var cs = {};
-	cs.curr_page = 1;
-	cs.page_size = 10;
-	cs.total_num = 0;
-	cs.total_page = 0;
+	cs.pInfo = new PageInfo(1, 10, 0);
 	cs.client_key = null;
 	
 	cs.setPageSize = function(pageSize) {
-		this.page_size = pageSize;
-		this.curr_page = 1;
+		this.pInfo.pageSize = pageSize;
+		this.pInfo.currPage = 1;
 		this.loadTable();
 	};
 	
 	cs.search = function(clientKey) {
 		this.client_key = clientKey;
-		this.curr_page = 1;
+		this.pInfo.currPage = 1;
 		this.loadTable();
 	};
 	
 	cs.setCurrPage = function(currPage) {
-		this.curr_page = currPage;
+		this.pInfo.currPage = currPage;
 		this.loadTable();
 	};
 	
 	cs.loadTable = function() {
 		var _this = this;
 		// 加载分页信息
-		$('#page_size').text(this.page_size);
+		$('#page_size').text(this.pInfo.pageSize);
 		$('#user_key').val(this.client_key);
 		
-		var params = {page_size : this.page_size,
-				curr_page : this.curr_page,
+		var params = {page_size : this.pInfo.pageSize,
+				curr_page : this.pInfo.currPage,
 				client_key : this.client_key};
 		// Table List
 		dashApi.clients(params, function(ret, err) {
 			if (ret) {
+				var result = [];
+				if (ret instanceof Array) {
+					result = ret;
+					_this.pInfo.currPage = 1;
+					_this.pInfo.pageSize = ret.length;
+					_this.pInfo.totalNum = ret.length;
+					_this.pInfo.totalPage = 1;
+				} else {
+					result = ret.result;
+					_this.pInfo.currPage = ret.currentPage;
+					_this.pInfo.pageSize = ret.pageSize;
+					_this.pInfo.totalNum = ret.totalNum;
+					_this.pInfo.totalPage = ret.totalPage;
+				}
 				// 加载分页按钮
-				_this.curr_page = ret.currentPage;
-				_this.page_size = ret.pageSize;
-				_this.total_num = ret.totalNum;
-				_this.total_page = ret.totalPage;
-				$('#pagination').pagination(_this.curr_page,
-						_this.page_size,
-						_this.total_num,
-						_this.total_page);
+				$('#pagination').pagination(_this.pInfo);
 				
-				$('#clients_count_all').text(_this.total_num);
+				$('#clients_count_all').text(_this.pInfo.totalNum);
 				var tby = $('#clients tbody').empty();
-				if (_this.total_num > 0) {
-					for (var i = 0; i < ret.result.length; i++) {
-						var obj = ret.result[i];
+				if (_this.pInfo.totalNum > 0) {
+					for (var i = 0; i < result.length; i++) {
+						var obj = result[i];
 						tby.append('<tr>' +
 								'<td>' + obj['clientId'] + '</td>' +
 								'<td>' + obj['username'] + '</td>' +
