@@ -637,7 +637,7 @@ function showSessions() {
 				var tby = $('#sessions tbody').empty();
 				if (_this.pInfo.totalNum > 0) {
 					for (var i = 0; i < result.length; i++) {
-						var obj = ret[i];
+						var obj = result[i];
 						tby.append('<tr>' +
 								'<td>' + obj['clientId'] + '</td>' +
 								'<td>' + obj['clean_sess'] + '</td>' +
