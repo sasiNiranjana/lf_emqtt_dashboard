@@ -686,7 +686,7 @@ function showTopics() {
 						var obj = ret[i];
 						tby.append('<tr>' +
 								'<td>' + obj['topic'] + '</td>' +
-								'<td>' + obj['node'] + '</td>' +
+								'<td>' + obj['flag'] + '</td>' +
 								'</tr>');
 					}
 				} else {
