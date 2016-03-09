@@ -125,9 +125,10 @@ dispatcher() ->
      {"clients",        emqttd_dashboard_client,    execute,  [{"curr_page", intFun(), "1"}, {"page_size", intFun(), "10"}, {"client_key", stringFun(), ""}]},
      {"sessions",       emqttd_dashboard_session,    execute, [{"curr_page", intFun(), "1"}, {"page_size", intFun(), "10"}, {"client_key", stringFun(), ""}]},
      {"topics",         emqttd_dashboard_topic,    execute,  []},
+     {"routers",         emqttd_dashboard_route,    execute,  []},
      {"subscriptions",  emqttd_dashboard_subscription, execute, []},
      {"users",          emqttd_dashboard_user,     users,  []},
-     {"update_user",    emqttd_dashboard_user,     update,      [{"user_name", bin(), "admin"}, {"password", bin(), "public"}, {"tags", bin(), ""}]},
-     {"remove_user",    emqttd_dashboard_user,     remover,      [{"user_name", bin(), "admin"}]},
-     {"add_user",       emqttd_dashboard_user,     add,    [{"user_name", bin(), "admin"}, {"password", bin(), "public"}, {"tags", bin(), ""}]}
+     {"update_user",    emqttd_dashboard_user,     update,      [{"user_name", bin(), ""}, {"password", bin(), ""}, {"tags", bin(), ""}]},
+     {"remove_user",    emqttd_dashboard_user,     remover,      [{"user_name", bin(), ""}]},
+     {"add_user",       emqttd_dashboard_user,     add,    [{"user_name", bin(), ""}, {"password", bin(), ""}, {"tags", bin(), ""}]}
     ].

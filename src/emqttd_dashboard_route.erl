@@ -14,8 +14,8 @@
 %% limitations under the License.
 %%--------------------------------------------------------------------
 
-%% @doc Action for topic api.
--module(emqttd_dashboard_topic).
+%% @doc Action for route api.
+-module(emqttd_dashboard_route).
 
 -include("emqttd_dashboard.hrl").
 -include("../../../include/emqttd.hrl").
@@ -25,8 +25,7 @@
 -export([execute/0]).
 
 execute() ->
-    %% Count total number.
-    F = fun() -> qlc:e(qlc:q([E || E <- mnesia:table(topic)])) end,
+    F = fun() -> qlc:e(qlc:q([E || E <- mnesia:table(route)])) end,
     {atomic, Topics} =  mnesia:transaction(F),
-    [[{topic, Topic}, {flags, Flags}] || #mqtt_topic{topic = Topic,flags= Flags} <- Topics].
+    [[{topic, Topic}, {node, Node}] || #mqtt_route{topic = Topic, node= Node} <- Topics].
 

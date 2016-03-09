@@ -40,7 +40,7 @@ execute(CurrPage, PageSize, _ClientKey) ->
      {pageSize, PageSize},
      {totalNum, TotalNum},
      {totalPage, TotalPage},
-     {result, Result}].
+     {result, lists:append(Result)}].
 
 count() ->
     lists:sum([length(ets:match_object(Tab, '$1')) || Tab <-[mqtt_transient_session, mqtt_persistent_session]]).
@@ -78,6 +78,6 @@ session_table({{ClientId, _Pid}, Session}) ->
      CreatedAt = list_to_binary(connected_at_format(get_value(created_at, Session))),
      NewSession = lists:keyreplace(created_at, 1, Session, {created_at, CreatedAt}),
      L = [{Key,get_value(Key, NewSession)} || Key <- InfoKeys],
-     [[{clientId, ClientId}|L]].
+     [{clientId, ClientId}|L].
 
 
