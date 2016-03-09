@@ -16,7 +16,7 @@ PageInfo.prototype.countTotalPage = function(totalPage) {
 	}
 };
 
-jQuery.fn.pagination = function(pageInfo) {
+jQuery.fn.pagination = function(pageInfo, module) {
 	var p = $(this).empty();
 	if (pageInfo.totalNum == 0) {
 		p.append('<li class="paginate_button previous disabled"><a href="javascript:;">Previous</a></li>');
@@ -27,7 +27,7 @@ jQuery.fn.pagination = function(pageInfo) {
 	if (pageInfo.currPage <= 1) {
 		p.append('<li class="paginate_button previous disabled"><a href="javascript:;">Previous</a></li>');
 	} else {
-		p.append('<li class="paginate_button previous"><a href="javascript:;" onclick="clients.setCurrPage('+(pageInfo.currPage-1)+');">Previous</a></li>');
+		p.append('<li class="paginate_button previous"><a href="javascript:;" onclick="'+module+'.setCurrPage('+(pageInfo.currPage-1)+');">Previous</a></li>');
 	}
 	
 	// 起始按钮
@@ -42,16 +42,16 @@ jQuery.fn.pagination = function(pageInfo) {
 	}
 	for (var i = start; i <= end; i++) {
 		if (i == pageInfo.currPage) {
-			p.append('<li class="paginate_button active"><a href="javascript:;" onclick="clients.setCurrPage('+i+');">'+i+'</a></li>');
+			p.append('<li class="paginate_button active"><a href="javascript:;" onclick="'+module+'.setCurrPage('+i+');">'+i+'</a></li>');
 		} else {
-			p.append('<li class="paginate_button "><a href="javascript:;" onclick="clients.setCurrPage('+i+');">'+i+'</a></li>');
+			p.append('<li class="paginate_button "><a href="javascript:;" onclick="'+module+'.setCurrPage('+i+');">'+i+'</a></li>');
 		}
 	}
 
 	if (pageInfo.currPage >= pageInfo.totalPage) {
 		p.append('<li class="paginate_button next disabled"><a href="javascript:;">Next</a></li>');
 	} else {
-		p.append('<li class="paginate_button next"><a href="javascript:;" onclick="clients.setCurrPage('+(pageInfo.currPage+1)+');">Next</a></li>');
+		p.append('<li class="paginate_button next"><a href="javascript:;" onclick="'+module+'.setCurrPage('+(pageInfo.currPage+1)+');">Next</a></li>');
 	}
 }
 
@@ -542,7 +542,7 @@ function showClients() {
 					_this.pInfo.totalPage = ret.totalPage;
 				}
 				// 加载分页按钮
-				$('#pagination').pagination(_this.pInfo);
+				$('#pagination').pagination(_this.pInfo, 'clients');
 				
 				$('#clients_count_all').text(_this.pInfo.totalNum);
 				var tby = $('#clients tbody').empty();
@@ -587,12 +587,56 @@ function showSessions() {
 	
 	// 加载Sessions信息
 	loading('sessions.html', function() {
+		sessions.loadTable();
+	});
+};
+
+(function(w) {
+	var se = {};
+	se.pInfo = new PageInfo(1, 10, 0);
+	
+	se.setPageSize = function(pageSize) {
+		this.pInfo.pageSize = pageSize;
+		this.pInfo.currPage = 1;
+		this.loadTable();
+	};
+	
+	se.setCurrPage = function(currPage) {
+		this.pInfo.currPage = currPage;
+		this.loadTable();
+	};
+	
+	se.loadTable = function() {
+		var _this = this;
+		// 加载分页信息
+		$('#page_size').text(this.pInfo.pageSize);
+		
+		var params = {page_size : this.pInfo.pageSize,
+				curr_page : this.pInfo.currPage};
+		// Table List
 		dashApi.sessions(function(ret, err) {
 			if (ret) {
-				$('#sessions_count_all').text(ret.length);
+				var result = [];
+				if (ret instanceof Array) {
+					result = ret;
+					_this.pInfo.currPage = 1;
+					_this.pInfo.pageSize = ret.length;
+					_this.pInfo.totalNum = ret.length;
+					_this.pInfo.totalPage = 1;
+				} else {
+					result = ret.result;
+					_this.pInfo.currPage = ret.currentPage;
+					_this.pInfo.pageSize = ret.pageSize;
+					_this.pInfo.totalNum = ret.totalNum;
+					_this.pInfo.totalPage = ret.totalPage;
+				}
+				// 加载分页按钮
+				$('#pagination').pagination(_this.pInfo, 'sessions');
+				
+				$('#sessions_count_all').text(_this.pInfo.totalNum);
 				var tby = $('#sessions tbody').empty();
-				if (ret.length > 0) {
-					for (var i = 0; i < ret.length; i++) {
+				if (_this.pInfo.totalNum > 0) {
+					for (var i = 0; i < result.length; i++) {
 						var obj = ret[i];
 						tby.append('<tr>' +
 								'<td>' + obj['clientId'] + '</td>' +
@@ -609,15 +653,17 @@ function showSessions() {
 				} else {
 					tby.append(
 							'<tr><td colspan="9">' +
-							'<p style="padding: 12px;">... no sessions ...</p>' +
+							'<p style="padding: 12px;">... no clients ...</p>' +
 							'</td></tr>');
 				}
 			} else {
 				console.log(err);
 			}
 		});
-	});
-};
+	};
+	
+	w.sessions = se;
+})(window);
 
 function showTopics() {
 	// 标题导航条
