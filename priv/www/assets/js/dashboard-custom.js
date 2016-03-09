@@ -986,15 +986,15 @@ var User = {
 		delPage : function(username) {
 	    	var m = $('#modal_confirm_del_user');
 			m.modal('show');
-			m.find('user_del_name').val(username);
+			m.find('#user_del_name').val(username);
 		},
 	    
 	    delSubmit : function() {
 	    	var m = $('#modal_confirm_del_user');
-	    	var username= m.find('user_del_name').val();
+	    	var username= m.find('#user_del_name').val();
 	    	dashApi.user_remove(username, function(ret, err) {
 	    		if (ret) {
-	    			m.find('user_del_name').val('');
+	    			m.find('#user_del_name').val('');
 					m.modal('hide');
 					User.showTable();
 	    		} else {
