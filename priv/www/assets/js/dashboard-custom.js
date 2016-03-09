@@ -191,6 +191,9 @@ function initWebPage(url) {
 	} else if (strs[1] == '/topics') {
 		setMenuClass('topics');
 		showTopics();
+	} else if (strs[1] == '/routes') {
+		setMenuClass('routes');
+		showRoutes();
 	} else if (strs[1] == '/subscriptions') {
 		setMenuClass('subscriptions');
 		showSubscriptions();
@@ -268,6 +271,11 @@ function regEvent() {
 			$(this).click(function() {
 				setMenuClass('topics');
 				showTopics();
+			});
+		} else if (mod == 'routes') {
+			$(this).click(function() {
+				setMenuClass('routes');
+				showRoutes();
 			});
 		} else if (mod == 'subscriptions') {
 			$(this).click(function() {
@@ -686,13 +694,50 @@ function showTopics() {
 						var obj = ret[i];
 						tby.append('<tr>' +
 								'<td>' + obj['topic'] + '</td>' +
-								'<td>' + obj['flag'] + '</td>' +
+								'<td>' + obj['flags'] + '</td>' +
 								'</tr>');
 					}
 				} else {
 					tby.append(
 							'<tr><td colspan="9">' +
 							'<p style="padding: 12px;">... no topics ...</p>' +
+							'</td></tr>');
+				}
+			} else {
+				console.log(err);
+			}
+		});
+	});
+};
+
+function showRoutes() {
+	// 标题导航条
+	//$('#title_bar .description').text("Routes List");
+	$('#title_bar .title').text("Routes");
+	$('#title_bar .breadcrumb-env').html(
+			'<ol class="breadcrumb bc-1">' +
+			'<li><i class="fa-home"></i>Overview</li>' +
+			'<li class="active"><strong>Routes</strong></li>' +
+			'</ol>');
+	
+	// 加载Routes信息
+	loading('routes.html', function() {
+		dashApi.routes(function(ret, err) {
+			if (ret) {
+				$('#routes_count_all').text(ret.length);
+				var tby = $('#routes tbody').empty();
+				if (ret.length > 0) {
+					for (var i = 0; i < ret.length; i++) {
+						var obj = ret[i];
+						tby.append('<tr>' +
+								'<td>' + obj['topic'] + '</td>' +
+								'<td>' + obj['flags'] + '</td>' +
+								'</tr>');
+					}
+				} else {
+					tby.append(
+							'<tr><td colspan="9">' +
+							'<p style="padding: 12px;">... no routes ...</p>' +
 							'</td></tr>');
 				}
 			} else {
@@ -994,7 +1039,7 @@ var User = {
 			var user = {};
 			var m = $('#modal_user_edit');
 			user.user_name = m.find('#user_edit_name').val();
-			user.tag = m.find('#user_edit_remark').val();
+			user.tags = m.find('#user_edit_remark').val();
 			user.password = m.find('#user_edit_pwd').val();
 			user.pwd_1 = m.find('#user_edit_pwd_1').val();
 			if (user.user_name == '') {
@@ -1024,7 +1069,7 @@ var User = {
 			var user = {};
 			var m = $('#modal_user_add');
 			user.user_name = m.find('#user_add_name').val();
-			user.tag = m.find('#user_add_remark').val();
+			user.tags = m.find('#user_add_remark').val();
 			user.password = m.find('#user_add_pwd').val();
 			user.pwd_1 = m.find('#user_add_pwd_1').val();
 			if (user.user_name == '') {

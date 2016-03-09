@@ -129,6 +129,11 @@
 		// logout
 		logout : function(callback) {
 			this._ajax("logout", null, callback);
+		},
+		
+		// routes
+		routes : function(ret, err) {
+			this._ajax("routes", null, callback);
 		}
 	};
 
