@@ -1,0 +1,83 @@
+<div class="panel panel-default">
+	<div class="panel-heading">
+		<h3 class="panel-title">
+			All Sessions (<em id="sessions_count_all">0</em>)
+		</h3>
+
+		<div class="panel-options">
+			<a href="#" data-toggle="panel"> <span class="collapse-icon">–</span>
+				<span class="expand-icon">+</span>
+			</a>
+		</div>
+	</div>
+	<div class="panel-body">
+	
+	    <div class="row" style="margin-bottom: 5px;">
+            <div class="col-sm-6">
+                <ul class="list-inline list-unstyled">
+                    <li class="dropdown"><a href="#" class="dropdown-toggle"
+                        data-toggle="dropdown">Show Number <span id="page_size">10</span> <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="javascript:;" onclick="sessions.setPageSize(10);">10</a></li>
+                            <li><a href="javascript:;" onclick="sessions.setPageSize(25);">25</a></li>
+                            <li><a href="javascript:;" onclick="sessions.setPageSize(50);">50</a></li>
+                            <li><a href="javascript:;" onclick="sessions.setPageSize(100);">100</a></li>
+                        </ul></li>
+                </ul>
+            </div>
+            <div class="col-sm-6">
+                <!-- 
+                <form role="form" class="form-inline pull-right" onsubmit="return false;">
+
+                    <div class="form-group">
+                        <input type="text" class="form-control" size="25"
+                            placeholder="User Name" id="user_key"/>
+                    </div>
+
+                    <div class="form-group">
+                        <button class="btn btn-success btn-single" onclick="sessions.search($('#user_key').val());" type="button">Search</button>
+                    </div>
+
+                </form>
+                 -->
+            </div>
+        </div>
+
+		<div class="table-responsive" data-pattern="priority-columns"
+			data-focus-btn-icon="fa-asterisk" data-sticky-table-header="true"
+			data-add-display-all-btn="true" data-add-focus-btn="true">
+			<table class="table table-hover" id="sessions">
+				<thead>
+					<tr>
+						<th>ClientId</th>
+						<th>CleanSess</th>
+						<th>MaxInflight</th>
+						<th>MessageQueue</th>
+						<th>MessageDropped</th>
+						<th>AwaitingRel</th>
+						<th>AwaitingAck</th>
+						<th>AwaitingComp</th>
+						<th>CreatedAt</th>
+					</tr>
+				</thead>
+
+				<tbody>
+
+				</tbody>
+			</table>
+		</div>
+		
+		<div class="row">
+            <div class="col-sm-12">
+                <ul class="pagination pull-right" style="margin: 0 0;" id="pagination">
+                    <li class="paginate_button previous disabled"><a href="javascript:;">Previous</a></li>
+                    <li class="paginate_button active"><a href="javascript:;" onclick="sessions.setCurrPage(1);">1</a></li>
+                    <li class="paginate_button "><a href="javascript:;" onclick="sessions.setCurrPage(2);">2</a></li>
+                    <li class="paginate_button "><a href="javascript:;" onclick="sessions.setCurrPage(3);">3</a></li>
+                    <li class="paginate_button next disabled"><a href="javascript:;">Next</a></li>
+                </ul>
+            </div>
+        </div>
+
+	</div>
+</div>

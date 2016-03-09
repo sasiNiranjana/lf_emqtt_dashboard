@@ -1,116 +1,201 @@
-<!DOCTYPE HTML>
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>emqttd dashboard</title>
-<!-- The Fonts -->
-<!-- <link href="http://fonts.googleapis.com/css?family=Oswald|Droid+Sans:400,700" rel="stylesheet" /> -->
-<!-- The Main CSS File -->
-<link rel="shortcut icon" href="imgs/favicon.ico" type="image/x-icon">
-<link rel="stylesheet" href="css/style.css" />
-<script src="script/jQuery/jquery-1.7.2.min.js"></script>
-<script src="script/jQueryUI/jquery-ui-1.8.21.min.js"></script>
-<script src="script/mqttws31.js"></script>
-<!-- Comment Topic Tree -->
-<!--
-<script src="script/d3.js"></script>
-<script src="script/d3.layout.js"></script>
-<script src="script/topic_tree.js"></script>
--->
-<script src="script/emqttd.js"></script>
-<script type="text/javascript">
-	$(document).ready(function() {
-		var item = -1;
-		var item2 = -1;
-		var url = window.location.href;
-		var strs = url.split('#');
-		if (strs.length == 1 || strs[1] == '/overview') {
-			overview = new Overview();
-			item = 0;
-		} else if (strs[1] == '/clients') {
-			clients = new Clients();
-			item = 1;
-		} else if (strs[1] == '/session') {
-			session = new Session();
-			item = 2;
-		} else if (strs[1] == '/topic') {
-			topic = new Topic();
-			item = 3;
-		} else if (strs[1] == '/subpub') {
-			subpub = new Subpub();
-			item = 4;
-		} else if (strs[1] == '/users') {
-			user = new User();
-			item2 = 0;
-		} else if (strs[1] == '/http_api') {
-			httpApi = new HttpApi();
-			item2 = 1;
-		} else {
-			overview = new Overview();
-			item = 0;
-		}
-		$('#tab_nav>li').each(function(i, e) {
-			if (i == item) {
-				tabClass(e);
-			}
-		});
-		$('#tab_nav_2>li').each(function(i, e) {
-			if (i == item2) {
-				tabClass(e);
-			}
-		});
-		addClick();
-	});
-</script>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>eMQTT(d) Dashboard</title>
+<meta name="keywords" content="eMQTT(d) Dashboard" />
+<meta name="description" content="eMQTT(d) Dashboard" />
+<meta name="author" content="emqtt.io" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<link rel="shortcut icon" href="assets/images/favicon.ico"
+	type="image/x-icon" />
+
+<link rel="stylesheet"
+	href="http://fonts.useso.com/css?family=Arimo:400,700,400italic">
+<link rel="stylesheet" href="assets/fonts/linecons/css/linecons.css">
+<link rel="stylesheet"
+	href="assets/fonts/fontawesome/css/font-awesome.min.css">
+<link rel="stylesheet" href="assets/css/bootstrap.css">
+<link rel="stylesheet" href="assets/css/xenon-core.css">
+<link rel="stylesheet" href="assets/css/xenon-forms.css">
+<link rel="stylesheet" href="assets/css/xenon-components.css">
+<link rel="stylesheet" href="assets/css/xenon-skins.css">
+<link rel="stylesheet" href="assets/css/dashboard-custom.css">
+
+<script src="assets/js/jquery.min.js"></script>
+<script src="assets/js/jquery-validate/jquery.validate.min.js"></script>
+
+<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!--[if lt IE 9]>
+	<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+	<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+<![endif]-->
 </head>
-<body>
-	<!-- Top Panel -->
-	<header class="top-panel">
-		<div class="wrapper">
-			<div class="logo">
-				<a href="#" title="Emqtt Home"> <img src="imgs/emqtt_logo.png"
-					alt="emqtt_logo" height="60px;" />
-				</a>
+<body class="page-body">
+
+	<div class="page-container">
+		<!-- add class "sidebar-collapsed" to close sidebar by default, "chat-visible" to make chat appear always -->
+
+		<!-- Add "fixed" class to make the sidebar fixed always to the browser viewport. -->
+		<!-- Adding class "toggle-others" will keep only one menu item open at a time. -->
+		<!-- Adding class "collapsed" collapse sidebar root elements and show only icons. -->
+		<div class="sidebar-menu toggle-others fixed">
+
+			<div class="sidebar-menu-inner">
+
+				<header class="logo-env"> <!-- logo -->
+				<div class="logo">
+					<a href="/" class="logo-expanded"> <img
+						src="assets/images/logo@2x.png" width="80" alt="" />
+					</a> <a href="/" class="logo-collapsed"> <img
+						src="assets/images/logo-collapsed@2x.png" width="40" alt="" />
+					</a>
+				</div>
+
+				<!-- This will toggle the mobile menu and will be visible only on mobile devices -->
+				<div class="mobile-menu-toggle visible-xs">
+					<a href="#" data-toggle="user-info-menu"> <i class="fa-user"></i>
+					</a> <a href="#" data-toggle="mobile-menu"> <i class="fa-bars"></i>
+					</a>
+				</div>
+
+				</header>
+
+				<ul id="main-menu" class="main-menu">
+					<!-- add class "multiple-expanded" to allow multiple submenus to open -->
+					<!-- class "auto-inherit-active-class" will automatically add "active" class for parent elements who are marked already with class "active" -->
+					<li module="overview"><a href="/#/overview"> <i
+							class="linecons-note"></i> <span class="title">Overview</span>
+					</a></li>
+					<li module="clients"><a href="/#/clients">
+							<i class="linecons-desktop"></i> <span class="title">Clients</span>
+					</a></li>
+					<li module="sessions"><a href="/#/sessions"> <i
+							class="linecons-database"></i> <span class="title">Sessions</span>
+					</a></li>
+					<li module="topics"><a href="/#/topics"> <i
+							class="linecons-tag"></i> <span class="title">Topics</span>
+					</a></li>
+					<li module="subscriptions"><a href="/#/subscriptions"> <i
+							class="linecons-mail"></i> <span class="title">Subscriptions</span>
+					</a></li>
+					<li module="websocket"><a href="/#/websocket"> <i
+							class="linecons-globe"></i> <span class="title">Websocket</span>
+					</a></li>
+					<li module="users"><a href="/#/users"> <i
+							class="linecons-user"></i> <span class="title">Admins</span>
+					</a></li>
+					<li module="http_api"><a href="/#/http_api"> <i
+							class="linecons-doc"></i> <span class="title">HTTP API</span>
+					</a></li>
+				</ul>
+
 			</div>
-			<div class="items-inner">
-			<div class="column" style="width: 70%;"><b>Home</b><span>&nbsp;/&nbsp;</span><b id="model_title">Overview</b></div>
-			<div class="column" style="width: 20%;text-align: right;float: right;padding-right: 12px;"><i id='current_user'></i>&nbsp;<a href="javascript:void(0);" id="logout">logout</a></div>
-			</div>
+
 		</div>
-	</header>
 
-	<aside class="sidebar">
-		<nav>
-			<ul class="main-tab-nav" id="tab_nav">
-				<li class="active-tab"><a href="/#/overview" title="Overview">Overview</a></li>
-				<li><a href="/#/clients" title="Clients">Clients</a></li>
-				<li><a href="/#/session" title="Sessions">Sessions</a></li>
-				<li><a href="/#/topic" title="Topics">Topics</a></li>
-				<li><a href="/#/subpub" title="Subscriptions">Subscriptions</a></li>
-				<li><a href="/websocket.html" title="Websocket">Websocket</a></li>
+		<div class="main-content">
+
+			<!-- User Info, Notifications and Menu Bar -->
+			<nav class="navbar user-info-navbar" role="navigation">
+			<!-- Left links for user info navbar -->
+			<ul class="user-info-menu left-links list-inline list-unstyled">
+
+				<li class="hidden-sm hidden-xs"><a href="#"
+					data-toggle="sidebar"> <i class="fa-bars"></i>
+				</a></li>
+
 			</ul>
-		</nav>
-		<nav>
-			<ul class="main-tab-nav" id="tab_nav_2">
-				<li><a href="/#/users" title="Admins">Admins</a></li>
-				<li><a href="/#/http_api" title="HTTP API">HTTP API</a></li>
+
+
+			<!-- Right links for user info navbar -->
+			<ul class="user-info-menu right-links list-inline list-unstyled">
+
+				<li class="dropdown user-profile">
+				<a><img src="assets/images/user-4.png"
+						alt="user-image" class="img-circle img-inline userpic-32"
+						width="28" />
+				<span> <b id="current_user">Admin</b></span>
+				</a>
+				</li>
+				
+				<li>
+				<a href="javascript:;" id="logout"><span><i class="fa-lock"></i> Logout</span></a>
+				</li>
+
 			</ul>
-		</nav>
-	</aside>
 
-	<div class="wrapper contents-wrapper" id="page">
+			</nav>
+			<div class="page-title" id="title_bar">
 
-		<div class="contents" id="contents"></div>
-		<div class="clear"></div>
+                <!-- 
+				<div class="title-env">
+					<p class="description">Clients List</p>
+					<h1 class="title">Clients</h1>
+				</div>
+				 -->
+
+				<div class="breadcrumb-env">
+
+					<ol class="breadcrumb bc-1">
+						<li><a href="/#/overview"><i class="fa-home"></i>Overview</a>
+						</li>
+						<li class="active"><a href="/#/clients"><strong>Clients</strong></a>
+						</li>
+					</ol>
+
+				</div>
+
+			</div>
+
+			<!-- context -->
+			<div id="context">
+				
+			</div>
+
+			<!-- Main Footer -->
+			<footer class="main-footer sticky footer-type-1">
+			<div class="footer-inner">
+				<!-- Add your copyright text here -->
+				<div class="footer-text">
+					&copy; 2015 -
+					<script type="text/javascript">
+						document.write(new Date().getFullYear());
+					</script>
+					Powered by <strong> <a href="http://emqtt.io"
+						target="_blank" title="emqtt">EMQTT.IO</a></strong>
+				</div>
+
+				<!-- Go to Top Link, just add rel="go-top" to any link to add this functionality -->
+				<div class="go-up">
+					<a href="#" rel="go-top"> <i class="fa-angle-up"></i>
+					</a>
+				</div>
+			</div>
+			</footer>
+		</div>
 
 	</div>
 
-	<footer class="footer-panel">
-		<p>Powered by
-			<a target="_blank" href="http://emqtt.io">emqtt.io</a> 
-		</p>
-	</footer>
+	<!-- Bottom Scripts -->
+	<script src="assets/js/bootstrap.min.js"></script>
+	<script src="assets/js/TweenLite.min.js"></script>
+	<script src="assets/js/TweenMax.min.js"></script>
+	<script src="assets/js/toastr/toastr.min.js"></script>
+	<script src="assets/js/resizeable.js"></script>
+	<script src="assets/js/joinable.js"></script>
+	<script src="assets/js/xenon-toggles.js"></script>
+	<script src="assets/js/mqttws31.js"></script>
+	<script src="assets/js/dashboard-api.js"></script>
+
+	<!-- JavaScripts initializations and stuff -->
+	<script src="assets/js/xenon-custom.js"></script>
+	<script src="assets/js/dashboard-custom.js"></script>
+	<script type="text/javascript">
+		jQuery(document).ready(function($) {
+			initWebPage(window.location.href);
+		});
+	</script>
 </body>
 </html>

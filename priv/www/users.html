@@ -1,57 +1,36 @@
-<div>
-	<h1 class="h1">Admins</h1>
-	<p>&nbsp;</p>
-	<!-- col -->
-	<div class="colgroup leading full">
-		<div class="column full first">
-			<h3 class="h3">All Admin &nbsp;&nbsp;<b class="b">[<i id="users_count" style="color: #4ba575;font-size: 12px;">0</i>]</b></h3>
-			<hr />
-			<div>
-				<table class="stylized" id="users">
-					<thead>
-						<tr>
-							<th>Name</th>
-							<th>Remark</th>
-							<th>Operation</th>
-						</tr>
-					</thead>
-					<tbody>
-					</tbody>
-				</table>
-			</div>
+<div class="panel panel-default">
+	<div class="panel-heading">
+		<h3 class="panel-title">
+			All Users (<em id="users_count_all">0</em>)
+		</h3>
+
+		<div class="panel-options">
+			<a href="#" data-toggle="panel"> <span class="collapse-icon">–</span>
+				<span class="expand-icon">+</span>
+			</a>
 		</div>
 	</div>
 
-	<div class="colgroup leading full">
-		<div class="column full first">
-			<h3 class="h3" id="user_title">Add a Admin</h3>
-			<hr />
-			<div>
-			<p class="column full first" style="margin-bottom: 10px;">
-				<label for="user_name">Name:</label><br>
-				<input type="text" name="user_name" id="user_name" value="" class="width2">
-			</p>
-			<p class="column full first" style="margin-bottom: 10px;">
-				<label for="password">Password:</label><br>
-				<input type="password" name="password" id="password" value="" class="width2 leading">
-				<br/>
-				<input type="password" name="passwd_2" id="passwd_2" value="" class="width2">
-			</p>
-			<p class="column full first" style="margin-bottom: 10px;">
-				<label for="tag">Remark:</label><br>
-				<input type="text" name="tag" id="tag" value="" class="width2">
-			</p>
-			<p class="column full first box">
-				<input type="button" id="add_user_btn" name="add_user_btn" value="Add" class="btn btn-green"/>
-				<b id="add_user_span" style="display: none;"> &nbsp;&nbsp;
-				<a href="javascript:void(0);" onclick="User.add();">Cancel</a>
-				</b>
-			</p>
-			</div>
+	<div class="panel-body btn-toolbar">
+		<div class="btn-group focus-btn-group">
+			<button class="btn btn-success btn-sm" id="user_add_btn">
+				<span class="fa-upload"></span> Add User
+			</button>
 		</div>
 	</div>
 
+	<table class="table table-striped" id="users">
+		<thead>
+			<tr>
+				<th>#</th>
+				<th>Name</th>
+				<th>Remark</th>
+				<th>Operation</th>
+			</tr>
+		</thead>
 
+		<tbody>
 
-
+		</tbody>
+	</table>
 </div>

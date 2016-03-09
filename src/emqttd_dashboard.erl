@@ -21,6 +21,7 @@
 
 -include("../../../include/emqttd.hrl").
 
+-import(proplists, [get_value/2, get_value/3]).
 -export([handle_request/1]).
 
 -define(SEPARTOR, $\/).
@@ -28,8 +29,9 @@
 -define(KB, 1024).
 -define(MB, (1024*1024)).
 -define(GB, (1024*1024*1024)).
-
 -include_lib("stdlib/include/qlc.hrl").
+-include_lib("stdlib/include/ms_transform.hrl").
+
 
 handle_request(Req) ->
     case authorized(Req) of
@@ -99,20 +101,17 @@ api(listeners, Req) ->
 %%-----------------------------------clients--------------------------------------
 %%clients api
 api(clients, Req) ->
-    F = fun(#mqtt_client{client_id = ClientId, peername = {IpAddr, Port},
-                         username = Username, clean_sess = CleanSess,
-                         proto_ver = ProtoVer, keepalive = KeepAlvie,
-                         connected_at = ConnectedAt}) ->
-        [{clientId, ClientId}, 
-		 {username, Username}, 
-		 {ipaddress, list_to_binary(emqttd_net:ntoa(IpAddr))}, 
-		 {port, Port},
-         {clean_sess, CleanSess},
-         {proto_ver, ProtoVer},
-         {keepalive, KeepAlvie},
-         {connected_at, list_to_binary(connected_at_format(ConnectedAt))}]
-    end,
-    api_respond(Req, [F(Client) || Client <- emqttd_vm:get_ets_object(mqtt_client)]);
+    ClientQry = Req:parse_post(),
+    CurrentPage = int(get_value("curr_page", ClientQry, "1")),
+    PageSize = int(get_value("page_size", ClientQry, "10")),
+    %Username = get_value("user_key", ClientQry, ""),
+    TotalNum = clientcount(mqtt_client), 
+    TotalPage = case TotalNum rem PageSize of
+		0 -> TotalNum div PageSize;
+		_ -> (TotalNum div PageSize) + 1
+		    end,
+    Result = queryclient(mqtt_client, CurrentPage, TotalPage, PageSize), 
+    api_respond(Req, [{currentPage, CurrentPage},{pageSize, PageSize},{totalNum, TotalNum}, {totalPage, TotalPage},{result, Result}]);
     
 %%-----------------------------------session--------------------------------------
 %%sessin check api
@@ -283,4 +282,156 @@ format(subscriptions, Subscriptions) ->
 bin(S) when is_list(S) -> list_to_binary(S);
 bin(A) when is_atom(A) -> bin(atom_to_list(A));
 bin(B) when is_binary(B) -> B.
+
+%%%%%%% enhancement mnesia paging%%
+%count(TableName) ->
+%    case list(TableName) of
+%	{error, Msg} -> {error, Msg};
+%	{ok, []}     -> 0;
+%	{ok, L}      -> length(L)
+%    end.
+%
+%count(TableName, Where) ->
+%    case list(TableName, Where) of
+%	{error, Msg} -> {error, Msg};
+%	{ok, []}     -> 0;
+%	{ok, L}      -> length(L)
+%    end.
+%
+%list(Table) ->
+%    F = fun() ->
+%	qlc:e(qlc:q([X || X <- mnesia:table(Table)]))
+%    end,
+%    {atomic, L} = mnesia:transaction(F),
+%    {ok, L}.
+%
+%list(Table, Where) ->
+%    case query_fun(Table, Where) of 
+%	{error, Msg} -> {error, Msg};
+%	{ok, F}      -> 
+%		{atomic, L} = mnesia:transaction(F),
+%    		{ok, L}
+%    end.
+%
+%list(Table, Offset, Limit) ->
+%	if is_integer(Offset) and is_integer(Limit)
+%		and (Offset > 0) and (Limit >0) ->
+%		F = fun()-> 
+%			QH = qlc:q([X || X<- mnesia:table(Table)]),
+%			Qc = qlc:cursor(QH),
+%			case Offset of
+%				1 -> skip;
+%				_ -> qlc:next_answers(Qc, Offset-1)
+%			end,
+%			qlc:next_answers(Qc, Limit)
+%	end,
+%	{atomic, L} = mnesia:transaction(F),
+%	{ok ,L};
+%	true ->
+% 	{error, badarg}	
+%	end.
+%
+%list(Table, Offset, Limit, Where) ->
+%    if is_integer(Offset) and is_integer(Limit)
+%		and (Offset > 0) and (Limit >0) ->
+%	case query_fun(Table, Offset, Limit, Where) of
+%		{error, Msg} -> {error, Msg};
+%		{ok, F} ->
+%			{atomic, L} = mnesia:transaction(F),
+%			{ok, L}
+%
+%	end;
+%    true ->
+% 	{error, badarg}	
+%    end.
+%
+%query_fun(Table, Where) ->
+%    case query_cond(Table, Where) of
+%	    {ok, QH} ->
+%		    {ok, fun() -> qlc:e(QH) end};
+%	    {error, Msg} ->
+%		    {error, Msg}
+%    end.
+%
+%query_fun(Table, Offset, Limit, Where) ->
+%    case query_cond(Table, Where) of
+%	{ok, QH} ->
+%		{ok , fun()-> 
+%			Qc = qlc:cursor(QH),
+%			case Offset of
+%				1 -> skip;
+%				_ -> qlc:next_answers(Qc, Limit)
+%		       	end 
+%		      end};
+%	{error, Msg} ->
+%		{error, Msg}
+%    end.
+%
+%query_cond(mqtt_client, Where) ->
+%    case Where of
+%	[{username, Username}] ->
+%		QH = qlc:q([X || X <- mnesia:table(mqtt_client), match(X#mqtt_client.username, Username)]),
+%		{ok, QH};
+%	[] ->
+%		{error, badarg}
+%    end;
+%
+%query_cond(_, _) ->
+%	{error, badarg}.
+
+%match(_DbContent, []) ->
+%    true;
+%match(DbContent, WContent) ->
+%    case string:str(DbContent, WContent) of
+%	1 -> true;
+%	_ -> false
+%    end.
+
+clientcount(Tab) ->
+    MScount = ets:fun2ms(fun(#mqtt_client{client_id = ClientId, peername = {IpAddr, Port},
+                         username = Username, clean_sess = CleanSess,
+                         proto_ver = ProtoVer, keepalive = KeepAlvie,
+			 connected_at = ConnectedAt}) -> true end),
+    ets:select_count(Tab, MScount).
+
+
+queryclient(Tab, CurrentPage, TotalPage, PageSize) ->
+	if CurrentPage > TotalPage ->
+		[];
+	true ->
+		Obj = ets:match_object(Tab, #mqtt_client{_='_'}, PageSize),
+		parser_obj(CurrentPage, Obj)
+	end.
+
+parser_obj(_, Obj) when is_atom(Obj), Obj =:= '$end_of_table'->
+    [];
+parser_obj(1, {Matchs, _C}) ->
+    [formatclient(Match)|| Match <- Matchs];
+parser_obj(Times, {_Matchs, C}=Obj) ->
+    if is_atom(C), C =:= '$end_of_table' ->
+	parser_obj(1, Obj);
+    true->
+	parser_obj(Times-1, ets:match_object(C))
+    end.
+
+int(S) ->
+    list_to_integer(S).
+
+%str(A) when is_atom(A) -> atom_to_list(A);
+%str(B) when is_binary(B) -> binary_to_list(B);
+%str(L) when is_list(L) -> L.
+%
+formatclient(#mqtt_client{client_id = ClientId, peername = {IpAddr, Port},
+                         username = Username, clean_sess = CleanSess,
+                         proto_ver = ProtoVer, keepalive = KeepAlvie,
+			 connected_at = ConnectedAt})->
+	[{clientId, ClientId}, 
+       	 {username, Username}, 
+ 	 {ipaddress, list_to_binary(emqttd_net:ntoa(IpAddr))}, 
+	 {port, Port},
+         {clean_sess, CleanSess},
+         {proto_ver, ProtoVer},
+         {keepalive, KeepAlvie},
+         {connected_at, list_to_binary(connected_at_format(ConnectedAt))}].
+
 
