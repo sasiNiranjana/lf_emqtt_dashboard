@@ -622,7 +622,7 @@ function showSessions() {
 		var params = {page_size : this.pInfo.pageSize,
 				curr_page : this.pInfo.currPage};
 		// Table List
-		dashApi.sessions(function(ret, err) {
+		dashApi.sessions(params, function(ret, err) {
 			if (ret) {
 				var result = [];
 				if (ret instanceof Array) {
