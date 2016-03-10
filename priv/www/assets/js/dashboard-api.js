@@ -138,7 +138,7 @@
 		},
 		
 		// routes
-		routes : function(ret, err) {
+		routes : function(callback) {
 			this._ajax("routes", null, callback);
 		}
 	};
