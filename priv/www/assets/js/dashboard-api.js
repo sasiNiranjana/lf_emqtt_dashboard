@@ -49,7 +49,8 @@
 				success : function(ret) {
 					if ((apiEnd == 'remove_user'
 						|| apiEnd == 'add_user')
-						&& ret != 1) {
+						&& typeof ret == "object"
+						&& ret.stauts == "failure") {
 						callback(undefined, ret);
 					} else {
 						callback(ret, undefined);

@@ -731,7 +731,7 @@ function showRoutes() {
 						var obj = ret[i];
 						tby.append('<tr>' +
 								'<td>' + obj['topic'] + '</td>' +
-								'<td>' + obj['flags'] + '</td>' +
+								'<td>' + obj['node'] + '</td>' +
 								'</tr>');
 					}
 				} else {
@@ -978,7 +978,8 @@ var User = {
 								'</td></tr>');
 					}
 				} else {
-					console.log(err);
+					//console.log(err);
+					alert("failure");
 				}
 			});
 		},
@@ -998,7 +999,8 @@ var User = {
 					m.modal('hide');
 					User.showTable();
 	    		} else {
-					console.log(err);
+					//console.log(err);
+	    			alert("Delete failure.");
 				}
 			});
 		},
@@ -1060,7 +1062,8 @@ var User = {
 					m.modal('hide');
 					User.showTable();
 	    		} else {
-					console.log(err);
+					//console.log(err);
+	    			alert("Edit failure.");
 				}
 			});
 	    },
@@ -1090,7 +1093,8 @@ var User = {
 					m.modal('hide');
 					User.showTable();
 	    		} else {
-					console.log(err);
+					//console.log(err);
+	    			alert("Add failure.");
 				}
 			});
 		}
