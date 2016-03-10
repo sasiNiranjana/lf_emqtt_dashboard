@@ -50,7 +50,7 @@
 					if ((apiEnd == 'remove_user'
 						|| apiEnd == 'add_user')
 						&& typeof ret == "object"
-						&& ret.stauts == "failure") {
+						&& ret.status == "failure") {
 						callback(undefined, ret);
 					} else {
 						callback(ret, undefined);
