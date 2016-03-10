@@ -75,9 +75,10 @@ session_table({{ClientId, _Pid}, Session}) ->
              awaiting_ack,
              awaiting_comp,
              created_at],
-     CreatedAt = list_to_binary(connected_at_format(get_value(created_at, Session))),
-     NewSession = lists:keyreplace(created_at, 1, Session, {created_at, CreatedAt}),
-     L = [{Key,get_value(Key, NewSession)} || Key <- InfoKeys],
-     [{clientId, ClientId}|L].
+     [{clientId, ClientId} | [{Key, format(Key, get_value(Key, Session))} || Key <- InfoKeys]].
 
+format(created_at, Val) ->
+    list_to_binary(connected_at_format(Val));
+format(_, Val) ->
+    Val.
 

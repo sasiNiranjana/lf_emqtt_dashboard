@@ -30,18 +30,17 @@ users() ->
  
 update(Username, Password, Tag) ->
     Status = emqttd_dashboard_admin:update_user(Username, Password, Tag),
-    io:format("~p",[Status]),
-    code(Status).
+    [{status, code(Status)}].
  
 remover(Username) ->
     Status = emqttd_dashboard_admin:remove_user(Username),
-    code(Status).
+    [{status, code(Status)}].
  
 add(Username, Password, Tag) ->
     Status = emqttd_dashboard_admin:add_user(Username, Password, Tag),
-    code(Status).
+    [{status, code(Status)}].
  
-code(ok) -> 1;
-code(ignore) -> 2.
+code(ok) -> success;
+code(ignore) -> failure.
 
 

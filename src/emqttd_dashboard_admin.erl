@@ -41,7 +41,18 @@ start_link() ->
 %%%=============================================================================
 add_user(Username, Password, Tags) ->
     Admin = #mqtt_admin{username = Username, password = hash(Password), tags = Tags},
-    ensure_ok(mnesia:transaction(fun mnesia:write/1, [Admin])).
+    case catch mnesia:dirty_read(mqtt_admin, Username) of
+     [] ->
+        ensure_ok(mnesia:transaction(fun mnesia:write/1, [Admin]));
+    {'EXIT',{aborted, Reason}} ->
+        lager:error("remove_user: ~s fail, reason:~s", [Username, Reason]), 
+        ignore;
+    [_User] ->
+        lager:error("~s exist", [Username]), 
+        ignore
+    end.
+
+
 
 remove_user(Username) ->
     case catch mnesia:dirty_read(mqtt_admin, Username) of
@@ -97,7 +108,8 @@ check(_, undefined) ->
 check(Username, Password) ->
     case catch mnesia:dirty_read(mqtt_admin, Username) of
     {'EXIT',{aborted, Reason}} ->
-        lager:error("Cannot find all users reason:~s", [Reason]);
+        lager:error("Cannot find all users reason:~s", [Reason]),
+        {error, "Username Not Found"};
     [] -> 
         lager:error("~s Not Found", [Username]),
         {error, "Username Not Found"};
@@ -154,32 +166,6 @@ init([]) ->
 
 handle_call(_Req, _From, State) ->
     {reply, error,  State}.
-
-handle_cast({update_user, #mqtt_admin{username = Username, password = Password, tags = Tags}}, State) ->
-    case catch mnesia:dirty_read(mqtt_admin, Username) of
-        [] ->
-            lager:error("cannot find Username: ~s", [Username]),
-            ignore;
-        {'EXIT',{aborted, Reason}} ->
-            lager:error("update_user: ~s fail, reason:~s", [Username, Reason]), 
-            ignore;
-        [_OldUser] ->
-            User1 = #mqtt_admin{username = Username, password = Password, tags = Tags},
-            mnesia:transaction(fun() -> mnesia:write(User1) end)
-        end,
-    {noreply, State};
-
-handle_cast({remove_user, Username}, State) ->
-    case catch mnesia:dirty_read(mqtt_admin, Username) of
-        [] ->
-            lager:error("Cannot find Username: ~s", [Username]);
-        {'EXIT',{aborted, Reason}} ->
-            lager:error("remove_user: ~s fail, reason:~s", [Username, Reason]), 
-            ignore;
-        [_User] ->
-            mnesia:transaction(fun() -> mnesia:delete({mqtt_admin, Username}) end)
-    end,
-    {noreply, State};
 
 handle_cast(_Msg, State) ->
     {noreply, State}.

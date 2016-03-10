@@ -39,7 +39,7 @@ handle_request(Req) ->
 handle_request("/api/current_user", Req)  ->
     "Basic " ++ BasicAuth =  Req:get_header_value("Authorization"),
     {Username, _Password} = user_passwd(BasicAuth),
-    to_json([{username, Username}]);
+    Req:respond({200, [{"Content-Type", "application/json"}], to_json([{username, bin(Username)}])});
 
 handle_request("/api/logout", Req)  ->
     Req:respond({401, [{"WWW-Authenticate", "Basic Realm=\"emqttd dashboad\""}], []});
@@ -125,7 +125,7 @@ dispatcher() ->
      {"clients",        emqttd_dashboard_client,    execute,  [{"curr_page", intFun(), "1"}, {"page_size", intFun(), "10"}, {"client_key", stringFun(), ""}]},
      {"sessions",       emqttd_dashboard_session,    execute, [{"curr_page", intFun(), "1"}, {"page_size", intFun(), "10"}, {"client_key", stringFun(), ""}]},
      {"topics",         emqttd_dashboard_topic,    execute,  []},
-     {"routers",         emqttd_dashboard_route,    execute,  []},
+     {"routes",         emqttd_dashboard_route,    execute,  []},
      {"subscriptions",  emqttd_dashboard_subscription, execute, []},
      {"users",          emqttd_dashboard_user,     users,  []},
      {"update_user",    emqttd_dashboard_user,     update,      [{"user_name", bin(), ""}, {"password", bin(), ""}, {"tags", bin(), ""}]},
