@@ -1056,7 +1056,7 @@ var User = {
 				alert("Passwords do not match.");
 				return;
 			}
-			dashApi.user_add(user, function(ret, err) {
+			dashApi.user_update(user, function(ret, err) {
 				if (ret) {
 					User.setEditDate(m);
 					m.modal('hide');

@@ -126,6 +126,11 @@
 		user_current : function(callback) {
 			this._ajax("current_user", null, callback);
 		},
+		
+		// user_update
+		user_update : function(callback) {
+			this._ajax("update_user", null, callback);
+		},
 
 		// logout
 		logout : function(callback) {
