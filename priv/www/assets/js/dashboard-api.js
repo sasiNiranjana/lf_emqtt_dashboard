@@ -94,7 +94,7 @@
 
 		// sessions
 		sessions : function(params, callback) {
-			this._ajax("sessions", null, callback);
+			this._ajax("sessions", params, callback);
 		},
 
 		// topics
