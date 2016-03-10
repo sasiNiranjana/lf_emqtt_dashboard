@@ -93,7 +93,7 @@
 		},
 
 		// sessions
-		sessions : function(callback) {
+		sessions : function(params, callback) {
 			this._ajax("sessions", null, callback);
 		},
 
