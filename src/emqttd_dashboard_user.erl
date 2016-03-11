@@ -18,6 +18,9 @@
 
 -include("emqttd_dashboard.hrl").
 -include("../../../include/emqttd.hrl").
+
+-import(emqttd_dashboard_admin, [add_user/3, remove_user/1, update_user/3]).
+
 -export([users/0, update/3, remover/1, add/3]).
 
 %%-----------------------------------Users--------------------------------------
@@ -29,18 +32,21 @@ users() ->
     [F(Admin) || Admin <- emqttd_vm:get_ets_object(mqtt_admin)].
  
 update(Username, Password, Tag) ->
-    Status = emqttd_dashboard_admin:update_user(Username, Password, Tag),
-    [{status, code(Status)}].
- 
+    Status = update_user(Username, Password, Tag),
+    code(Status).
+
+remover(<<"admin">>) ->
+        [{status, failure},{reason, list_to_binary("admin cannot be deleted")}];
+
 remover(Username) ->
-    Status = emqttd_dashboard_admin:remove_user(Username),
-    [{status, code(Status)}].
+    Status = remove_user(Username),
+    code(Status).
  
 add(Username, Password, Tag) ->
-    Status = emqttd_dashboard_admin:add_user(Username, Password, Tag),
-    [{status, code(Status)}].
+    Status = add_user(Username, Password, Tag),
+    code(Status).
  
-code(ok) -> success;
-code(ignore) -> failure.
+code(ok) -> [{status,success}];
+code({error, Reason}) -> [{status, failure},{reason, list_to_binary(Reason)}].
 
 

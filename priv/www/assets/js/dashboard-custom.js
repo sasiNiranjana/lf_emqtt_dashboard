@@ -1094,7 +1094,7 @@ var User = {
 					User.showTable();
 	    		} else {
 					//console.log(err);
-	    			alert("Add failure.");
+	    			alert(err.reason);
 				}
 			});
 		}

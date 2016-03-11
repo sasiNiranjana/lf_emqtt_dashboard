@@ -46,10 +46,10 @@ add_user(Username, Password, Tags) ->
         ensure_ok(mnesia:transaction(fun mnesia:write/1, [Admin]));
     {'EXIT',{aborted, Reason}} ->
         lager:error("remove_user: ~s fail, reason:~s", [Username, Reason]), 
-        ignore;
+        {error, Reason};
     [_User] ->
         lager:error("~s exist", [Username]), 
-        ignore
+        {error, "username already exist"}
     end.
 
 
@@ -58,10 +58,10 @@ remove_user(Username) ->
     case catch mnesia:dirty_read(mqtt_admin, Username) of
     [] ->
         lager:error("Cannot find Username: ~s", [Username]), 
-        ignore;
+        {error, "Username Not Found"};
     {'EXIT',{aborted, Reason}} ->
         lager:error("remove_user: ~s fail, reason:~s", [Username, Reason]), 
-        ignore;
+        {error, Reason};
     [_User] ->
         ensure_ok(mnesia:transaction(fun mnesia:delete/1, [{mqtt_admin, Username}]))
     end.
@@ -71,10 +71,10 @@ update_user(Username, Password, Tags) ->
     case catch mnesia:dirty_read(mqtt_admin, Username) of
     {'EXIT',{aborted, Reason}} ->
         lager:error("update_user: ~s fail, reason:~s", [Username, Reason]),
-        ignore;
+        {error, Reason};
     [] ->
         lager:error("Cannot find admin: ~s", [Username]), 
-        ignore;
+        {error, "Username Not Found"};
     [_] ->
         ensure_ok(mnesia:transaction(fun mnesia:write/1, [Admin]))
     end.
@@ -83,10 +83,10 @@ lookup_user(Username) ->
     case catch mnesia:dirty_read(mqtt_admin, Username) of
     {'EXIT',{aborted, Reason}} ->
         lager:error("Cannot find admin: ~s,reason:~s", [Username, Reason]), 
-        ignore;
+        {error, Reason};
     [] ->
         lager:error("Cannot find admin: ~s", [Username]), 
-        ignore;
+        {error, "Username Not Found"};
     Admin  ->
         Admin
     end.
@@ -95,7 +95,7 @@ all_users() ->
     case catch mnesia:dirty_all_keys(mqtt_admin) of
     {'EXIT',{aborted, Reason}} ->
         lager:error("Cannot find all users reason:~s", [Reason]),
-        ignore;
+        {error, Reason};
      KeyList ->
         KeyList
     end.
