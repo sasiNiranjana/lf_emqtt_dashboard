@@ -41,38 +41,77 @@ start_link() ->
 %%%=============================================================================
 add_user(Username, Password, Tags) ->
     Admin = #mqtt_admin{username = Username, password = hash(Password), tags = Tags},
-    ensure_ok(mnesia:transaction(fun mnesia:write/1, [Admin])).
+    case catch mnesia:dirty_read(mqtt_admin, Username) of
+     [] ->
+        ensure_ok(mnesia:transaction(fun mnesia:write/1, [Admin]));
+    {'EXIT',{aborted, Reason}} ->
+        lager:error("remove_user: ~s fail, reason:~s", [Username, Reason]), 
+        {error, Reason};
+    [_User] ->
+        lager:error("~s exist", [Username]), 
+        {error, "username already exist"}
+    end.
+
+
 
 remove_user(Username) ->
-    case mnesia:dirty_read(mqtt_admin, Username) of
-    [_User] ->
-        ensure_ok(mnesia:transaction(fun mnesia:delete/1, [{mqtt_admin, Username}]));
+    case catch mnesia:dirty_read(mqtt_admin, Username) of
     [] ->
-        lager:error("Cannot find Username: ~s", [Username]), {error, not_found}
+        lager:error("Cannot find Username: ~s", [Username]), 
+        {error, "Username Not Found"};
+    {'EXIT',{aborted, Reason}} ->
+        lager:error("remove_user: ~s fail, reason:~s", [Username, Reason]), 
+        {error, Reason};
+    [_User] ->
+        ensure_ok(mnesia:transaction(fun mnesia:delete/1, [{mqtt_admin, Username}]))
     end.
 
 update_user(Username, Password, Tags) ->
     Admin = #mqtt_admin{username = Username, password = hash(Password), tags = Tags},
-    case mnesia:dirty_read(mqtt_admin, Username) of
-    [_] ->
-        ensure_ok(mnesia:transaction(fun mnesia:write/1, [Admin]));
+    case catch mnesia:dirty_read(mqtt_admin, Username) of
+    {'EXIT',{aborted, Reason}} ->
+        lager:error("update_user: ~s fail, reason:~s", [Username, Reason]),
+        {error, Reason};
     [] ->
-        lager:error("Cannot find admin: ~s", [Username]), ignore
+        lager:error("Cannot find admin: ~s", [Username]), 
+        {error, "Username Not Found"};
+    [_] ->
+        ensure_ok(mnesia:transaction(fun mnesia:write/1, [Admin]))
     end.
 
 lookup_user(Username) ->
-    mnesia:dirty_read(mqtt_admin, bin(Username)).
+    case catch mnesia:dirty_read(mqtt_admin, Username) of
+    {'EXIT',{aborted, Reason}} ->
+        lager:error("Cannot find admin: ~s,reason:~s", [Username, Reason]), 
+        {error, Reason};
+    [] ->
+        lager:error("Cannot find admin: ~s", [Username]), 
+        {error, "Username Not Found"};
+    Admin  ->
+        Admin
+    end.
 
 all_users() ->
-    mnesia:dirty_all_keys(mqtt_admin).
+    case catch mnesia:dirty_all_keys(mqtt_admin) of
+    {'EXIT',{aborted, Reason}} ->
+        lager:error("Cannot find all users reason:~s", [Reason]),
+        {error, Reason};
+     KeyList ->
+        KeyList
+    end.
+
 
 check(undefined, _) ->
     {error, "Username undefined"};
 check(_, undefined) ->
     {error, "Password undefined"};
 check(Username, Password) ->
-    case mnesia:dirty_read(mqtt_admin, Username) of
+    case catch mnesia:dirty_read(mqtt_admin, Username) of
+    {'EXIT',{aborted, Reason}} ->
+        lager:error("Cannot find all users reason:~s", [Reason]),
+        {error, "Username Not Found"};
     [] -> 
+        lager:error("~s Not Found", [Username]),
         {error, "Username Not Found"};
     [#mqtt_admin{password = <<Salt:4/binary, Hash/binary>>}] ->
         case Hash =:= md5_hash(Salt, Password) of
@@ -104,7 +143,7 @@ init([]) ->
                                 tags = <<"administrator">>};
                 undefined -> %% 
                     #mqtt_admin{username = <<"admin">>,
-                                password = hash(<<"admin">>),
+                                password = hash(<<"public">>),
                                 tags = <<"administrator">>}
             end,
             mnesia:transaction(fun mnesia:write/1, [Admin]);
@@ -128,27 +167,6 @@ init([]) ->
 handle_call(_Req, _From, State) ->
     {reply, error,  State}.
 
-handle_cast({update_user, #mqtt_admin{username = Username, password = Password, tags = Tags}}, State) ->
-    case mnesia:dirty_read(mqtt_admin, Username) of
-        [_OldUser] ->
-            User1 = #mqtt_admin{username = Username, password = Password, tags = Tags},
-            mnesia:transaction(fun() -> mnesia:write(User1) end),
-            ok;
-        [] ->
-            lager:error("cannot find Username: ~s", [Username]),
-            ignore
-    end,
-    {noreply, State};
-
-handle_cast({remove_user, Username}, State) ->
-    case mnesia:dirty_read(mqtt_admin, Username) of
-        [_User] ->
-            mnesia:transaction(fun() -> mnesia:delete({mqtt_admin, Username}) end);
-        [] ->
-            lager:error("Cannot find Username: ~s", [Username])
-    end,
-    {noreply, State};
-
 handle_cast(_Msg, State) ->
     {noreply, State}.
 
@@ -164,7 +182,8 @@ code_change(_OldVsn, State, _Extra) ->
 %%%=============================================================================
 %%% Internal functions
 %%%=============================================================================
-
+ensure_ok({aborted, _}) ->
+    ignore;
 ensure_ok({atomic, Ok}) ->
     Ok.
 

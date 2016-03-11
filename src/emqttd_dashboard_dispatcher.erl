@@ -14,60 +14,121 @@
 %% limitations under the License.
 %%--------------------------------------------------------------------
 
-%% @doc emqttd web dashboard dispatcher.
+%% @doc Web emqttd dashboard dispatcher.
 -module(emqttd_dashboard_dispatcher).
 
--export([modules/1, build_dispatcher/1]).
+-import(proplists, [get_value/2, get_value/3]).
 
--export([dispatcher/0, web_ui/0]).
+-import(emqttd_dashboard_util, [intFun/0, stringFun/0, bin/0]).
+-import(emqttd_dashboard_util, [to_json/1]).
 
--behaviour(emqttd_dashboard_extension).
+-export([handle_request/1]).
 
-build_dispatcher(Ignore) ->
-    [{["api" | Path], Mod, Args} ||
-        {Path, Mod, Args} <-
-            lists:append([Module:dispatcher() || Module <- modules(Ignore)])].
-
-modules(IgnoreApps) ->
-    [Module || {App, Module, Behaviours} <-
-                   all_module_attributes(behaviour),
-               not lists:member(App, IgnoreApps),
-               lists:member(emqttd_dashboard_extension, Behaviours)].
-
-all_module_attributes(Name) ->
-    Targets =
-        lists:usort(
-          lists:append(
-            [[{App, Module} || Module <- Modules] ||
-                {App, _, _}   <- application:loaded_applications(),
-                {ok, Modules} <- [application:get_key(App, modules)]])),
-    lists:foldl(
-      fun ({App, Module}, Acc) ->
-              case lists:append([Atts || {N, Atts} <- module_attributes(Module),
-                                         N =:= Name]) of
-                  []   -> Acc;
-                  Atts -> [{App, Module, Atts} | Acc]
-              end
-      end, [], Targets).
-
-module_attributes(Module) ->
-    case catch Module:module_info(attributes) of
-        {'EXIT', {undef, [{Module, module_info, _} | _]}} ->
-			lager:warning("Module ~p not found, so not scanned for boot steps. ~n", [Module]),
-            %io:format("WARNING: module ~p not found, so not scanned for boot steps.~n", [Module]),
-            [];
-        {'EXIT', Reason} ->
-            exit(Reason);
-        V -> V
+handle_request(Req) ->
+    case authorized(Req) of
+        true  ->
+            Path = Req:get(path),
+            handle_request(Path, Req);
+        false ->
+            Req:respond({401,
+                         [{"WWW-Authenticate",
+                           "Basic Realm=\"emqttd dashboad\""}],
+                         []})
     end.
 
+handle_request("/api/current_user", Req)  ->
+    "Basic " ++ BasicAuth =  Req:get_header_value("Authorization"),
+    {Username, _Password} = user_passwd(BasicAuth),
+    Req:respond({200, [{"Content-Type", "application/json"}], to_json([{username, bin(Username)}])});
+
+handle_request("/api/logout", Req)  ->
+    Req:respond({401, [{"WWW-Authenticate", "Basic Realm=\"emqttd dashboad\""}], []});
+
+handle_request("/api/" ++ Path, Req) when length(Path) > 0 ->
+    execude(Path, Req);
+
+handle_request("/" ++ Rest, Req) ->
+    mochiweb_request:serve_file(Rest, docroot(), Req).
+
+docroot() ->
+    {file, Here} = code:is_loaded(?MODULE),
+    Dir = filename:dirname(filename:dirname(Here)),
+    filename:join([Dir, "priv", "www"]).
+
+%%------------------------------------------------------------------------------
+%% basic authorization
+%%------------------------------------------------------------------------------
+authorized(Req) ->
+    case Req:get_header_value("Authorization") of
+        undefined             ->
+            false;
+        "Basic " ++ BasicAuth ->
+            {Username, Password} = user_passwd(BasicAuth),
+            case emqttd_dashboard_admin:check(bin(Username), bin(Password)) of
+                ok              ->
+                    true;
+                {error, Reason} ->
+                    lager:error("HTTP Auth failure: username=~s, reason=~p",
+                                [Username, Reason]),
+                    false
+            end
+    end.
+
+user_passwd(BasicAuth) ->
+    list_to_tuple(binary:split(base64:decode(BasicAuth), <<":">>)).
+
+bin(S) when is_list(S) -> list_to_binary(S);
+bin(A) when is_atom(A) -> bin(atom_to_list(A));
+bin(B) when is_binary(B) -> B.
+
+execude(Path, Req) ->
+    WebArgs = Req:parse_post(),
+    MFA =[{Module, Fun, Args} || {LocalPath, Module, Fun, Args}<-dispatcher(), LocalPath==Path],
+    case MFA of
+    [{Module, Function, Args}] ->
+        LocalArgs =
+        case Args of
+            [] ->
+                [];
+            ListArgs ->
+               lists:map(fun({ArgKey, ArgTyepFun, ArgDefault})->
+                        case get_value(ArgKey, WebArgs)of
+                               undefined ->
+                                        ArgTyepFun(ArgDefault);
+                                Value ->
+                                        ArgTyepFun(Value)
+                        end
+                       end, ListArgs)
+        end, 
+        case catch apply(Module, Function, LocalArgs) of
+                    {'EXIT', Reason} ->
+                            io:format("~p~n",[Reason]),
+                            Req:respond({404, [{"Content-Type", "application/json"}],[]});
+                    JsonData ->
+                        Req:respond({200, [{"Content-Type", "application/json"}], to_json(JsonData)})
+            end;
+       []->
+            Req:respond({404, [{"Content-Type", "application/json"}], []})
+    end.
+       
 %%----------------------------------------------------------------------------
 
-web_ui() -> [{javascript, <<"dispatcher.js">>}].
-
 dispatcher() ->
-    [{["overview"],                                                mqttd_dashboard_wm_overview, []},
-     {["users"],                                                   mqttd_dashboard_wm_users, []},
-     {["users", user],                                             mqttd_dashboard_wm_user, []},
-     {["users", user, "permissions"],                              mqttd_dashboard_wm_permissions_user, []}
+    [{"stats",          emqttd_dashboard_overview, stats, []},
+     {"ptype",          emqttd_dashboard_overview, ptype, []},
+     {"memory",         emqttd_dashboard_overview, memory, []},
+     {"cpu",            emqttd_dashboard_overview, cpu, []},
+     {"node",           emqttd_dashboard_overview, nodesinfo, []},
+     {"metrics",        emqttd_dashboard_overview,   metrics, []},
+     {"listeners",      emqttd_dashboard_overview,   listeners,     []},
+     {"bnode",          emqttd_dashboard_overview,    bnode,     []},
+     {"clients",        emqttd_dashboard_client,    execute,  [{"curr_page", intFun(), "1"}, {"page_size", intFun(), "10"}, {"client_key", stringFun(), ""}]},
+     {"sessions",       emqttd_dashboard_session,    execute, [{"curr_page", intFun(), "1"}, {"page_size", intFun(), "10"}, {"client_key", stringFun(), ""}]},
+     {"topics",         emqttd_dashboard_topic,    execute,  []},
+     {"routes",         emqttd_dashboard_route,    execute,  []},
+     {"subscriptions",  emqttd_dashboard_subscription, execute, []},
+     {"users",          emqttd_dashboard_user,     users,  []},
+     {"update_user",    emqttd_dashboard_user,     update,      [{"user_name", bin(), ""}, {"password", bin(), ""}, {"tags", bin(), ""}]},
+     {"remove_user",    emqttd_dashboard_user,     remover,      [{"user_name", bin(), ""}]},
+     {"add_user",       emqttd_dashboard_user,     add,    [{"user_name", bin(), ""}, {"password", bin(), ""}, {"tags", bin(), ""}]}
     ].

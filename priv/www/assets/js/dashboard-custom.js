@@ -191,6 +191,9 @@ function initWebPage(url) {
 	} else if (strs[1] == '/topics') {
 		setMenuClass('topics');
 		showTopics();
+	} else if (strs[1] == '/routes') {
+		setMenuClass('routes');
+		showRoutes();
 	} else if (strs[1] == '/subscriptions') {
 		setMenuClass('subscriptions');
 		showSubscriptions();
@@ -268,6 +271,11 @@ function regEvent() {
 			$(this).click(function() {
 				setMenuClass('topics');
 				showTopics();
+			});
+		} else if (mod == 'routes') {
+			$(this).click(function() {
+				setMenuClass('routes');
+				showRoutes();
 			});
 		} else if (mod == 'subscriptions') {
 			$(this).click(function() {
@@ -614,7 +622,7 @@ function showSessions() {
 		var params = {page_size : this.pInfo.pageSize,
 				curr_page : this.pInfo.currPage};
 		// Table List
-		dashApi.sessions(function(ret, err) {
+		dashApi.sessions(params, function(ret, err) {
 			if (ret) {
 				var result = [];
 				if (ret instanceof Array) {
@@ -637,7 +645,7 @@ function showSessions() {
 				var tby = $('#sessions tbody').empty();
 				if (_this.pInfo.totalNum > 0) {
 					for (var i = 0; i < result.length; i++) {
-						var obj = ret[i];
+						var obj = result[i];
 						tby.append('<tr>' +
 								'<td>' + obj['clientId'] + '</td>' +
 								'<td>' + obj['clean_sess'] + '</td>' +
@@ -686,13 +694,50 @@ function showTopics() {
 						var obj = ret[i];
 						tby.append('<tr>' +
 								'<td>' + obj['topic'] + '</td>' +
-								'<td>' + obj['node'] + '</td>' +
+								'<td>' + obj['flags'] + '</td>' +
 								'</tr>');
 					}
 				} else {
 					tby.append(
 							'<tr><td colspan="9">' +
 							'<p style="padding: 12px;">... no topics ...</p>' +
+							'</td></tr>');
+				}
+			} else {
+				console.log(err);
+			}
+		});
+	});
+};
+
+function showRoutes() {
+	// 标题导航条
+	//$('#title_bar .description').text("Routes List");
+	$('#title_bar .title').text("Routes");
+	$('#title_bar .breadcrumb-env').html(
+			'<ol class="breadcrumb bc-1">' +
+			'<li><i class="fa-home"></i>Overview</li>' +
+			'<li class="active"><strong>Routes</strong></li>' +
+			'</ol>');
+	
+	// 加载Routes信息
+	loading('routes.html', function() {
+		dashApi.routes(function(ret, err) {
+			if (ret) {
+				$('#routes_count_all').text(ret.length);
+				var tby = $('#routes tbody').empty();
+				if (ret.length > 0) {
+					for (var i = 0; i < ret.length; i++) {
+						var obj = ret[i];
+						tby.append('<tr>' +
+								'<td>' + obj['topic'] + '</td>' +
+								'<td>' + obj['node'] + '</td>' +
+								'</tr>');
+					}
+				} else {
+					tby.append(
+							'<tr><td colspan="9">' +
+							'<p style="padding: 12px;">... no routes ...</p>' +
 							'</td></tr>');
 				}
 			} else {
@@ -933,7 +978,8 @@ var User = {
 								'</td></tr>');
 					}
 				} else {
-					console.log(err);
+					//console.log(err);
+					alert("failure");
 				}
 			});
 		},
@@ -941,19 +987,20 @@ var User = {
 		delPage : function(username) {
 	    	var m = $('#modal_confirm_del_user');
 			m.modal('show');
-			m.find('user_del_name').val(username);
+			m.find('#user_del_name').val(username);
 		},
 	    
 	    delSubmit : function() {
 	    	var m = $('#modal_confirm_del_user');
-	    	var username= m.find('user_del_name').val();
+	    	var username= m.find('#user_del_name').val();
 	    	dashApi.user_remove(username, function(ret, err) {
 	    		if (ret) {
-	    			m.find('user_del_name').val('');
+	    			m.find('#user_del_name').val('');
 					m.modal('hide');
 					User.showTable();
 	    		} else {
-					console.log(err);
+					//console.log(err);
+	    			alert("Delete failure.");
 				}
 			});
 		},
@@ -994,7 +1041,7 @@ var User = {
 			var user = {};
 			var m = $('#modal_user_edit');
 			user.user_name = m.find('#user_edit_name').val();
-			user.tag = m.find('#user_edit_remark').val();
+			user.tags = m.find('#user_edit_remark').val();
 			user.password = m.find('#user_edit_pwd').val();
 			user.pwd_1 = m.find('#user_edit_pwd_1').val();
 			if (user.user_name == '') {
@@ -1009,13 +1056,14 @@ var User = {
 				alert("Passwords do not match.");
 				return;
 			}
-			dashApi.user_add(user, function(ret, err) {
+			dashApi.user_update(user, function(ret, err) {
 				if (ret) {
 					User.setEditDate(m);
 					m.modal('hide');
 					User.showTable();
 	    		} else {
-					console.log(err);
+					//console.log(err);
+	    			alert("Edit failure.");
 				}
 			});
 	    },
@@ -1024,7 +1072,7 @@ var User = {
 			var user = {};
 			var m = $('#modal_user_add');
 			user.user_name = m.find('#user_add_name').val();
-			user.tag = m.find('#user_add_remark').val();
+			user.tags = m.find('#user_add_remark').val();
 			user.password = m.find('#user_add_pwd').val();
 			user.pwd_1 = m.find('#user_add_pwd_1').val();
 			if (user.user_name == '') {
@@ -1045,7 +1093,8 @@ var User = {
 					m.modal('hide');
 					User.showTable();
 	    		} else {
-					console.log(err);
+					//console.log(err);
+	    			alert(err.reason);
 				}
 			});
 		}

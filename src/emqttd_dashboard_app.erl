@@ -38,7 +38,7 @@ stop(_State) ->
 
 %% open http port
 open_listener({_Http, Port, Options}) ->
-    MFArgs = {emqttd_dashboard, handle_request, []},
+    MFArgs = {emqttd_dashboard_dispatcher, handle_request, []},
 	mochiweb:start_http(Port, Options, MFArgs).
 
 worker_spec(Name) ->

@@ -49,7 +49,8 @@
 				success : function(ret) {
 					if ((apiEnd == 'remove_user'
 						|| apiEnd == 'add_user')
-						&& ret != 1) {
+						&& typeof ret == "object"
+						&& ret.status == "failure") {
 						callback(undefined, ret);
 					} else {
 						callback(ret, undefined);
@@ -92,8 +93,8 @@
 		},
 
 		// sessions
-		sessions : function(callback) {
-			this._ajax("sessions", null, callback);
+		sessions : function(params, callback) {
+			this._ajax("sessions", params, callback);
 		},
 
 		// topics
@@ -125,10 +126,20 @@
 		user_current : function(callback) {
 			this._ajax("current_user", null, callback);
 		},
+		
+		// user_update
+		user_update : function(callback) {
+			this._ajax("update_user", null, callback);
+		},
 
 		// logout
 		logout : function(callback) {
 			this._ajax("logout", null, callback);
+		},
+		
+		// routes
+		routes : function(callback) {
+			this._ajax("routes", null, callback);
 		}
 	};
 
