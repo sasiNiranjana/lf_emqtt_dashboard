@@ -791,12 +791,12 @@ body {
 .sidebar-menu {
   display: table-cell;
   position: relative;
-  width: 180px;
+  width: 190px;
   background: #2c2e2f;
   z-index: 1;
 }
 .sidebar-menu .logo-env {
-  padding: 28px 18px;
+  padding: 29px 18px;
   border-bottom: 1px solid #313437;
 }
 .sidebar-menu .logo-env .logo {
