@@ -134,12 +134,56 @@
 
 		// logout
 		logout : function(callback) {
-			this._ajax("logout", null, callback);
+			//this._ajax("logout", null, callback);
+			clearAuthenticate();
 		},
 		
 		// routes
 		routes : function(callback) {
 			this._ajax("routes", null, callback);
+		}
+	};
+	
+	var xmlHttp = false;
+    //创建HttpRequest对象
+    function createXmlHttpRequest() {
+        try {
+            xmlHttp = new ActiveXObject("Msxml2.XMLHTTP");
+        } catch (e) {
+            try {
+                xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
+            } catch (e2) {
+                xmlHttp = false;
+            }
+        }
+        if (!xmlHttp && typeof XMLHttpRequest != "udefined") {
+            xmlHttp = new XMLHttpRequest();
+        }
+    };
+
+	function clearAuthenticate() {
+		//先创建XMLHttpRequest的对象
+		createXmlHttpRequest();
+		try {
+			// IE浏览器实现注销功能
+			if (navigator.userAgent.indexOf("MSIE") > 0) {
+				document.execCommand("ClearAuthenticationCache");
+			}
+			// Firefox实现注销功能  
+			else if (navigator.userAgent.indexOf("Firefox") > 0) {
+				xmlHttp.open("GET", "/", true,
+						"logout", "logout");
+				xmlHttp.send("");
+				xmlHttp.abort();
+			}
+			// Google Chrome等浏览器实现注销功能
+			else {
+				xmlHttp.open("GET", "/", false, "logout", "logout");
+				xmlHttp.send(null);
+				xmlHttp.abort();
+			}
+		} catch (e) {
+			alert("There was an error");
 		}
 	};
 
