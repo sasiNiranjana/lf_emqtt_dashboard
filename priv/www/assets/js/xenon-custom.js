@@ -1,7 +1,6 @@
 /**
  *	Xenon Main
  *
- *	Theme by: www.laborator.co
  **/
 
 var public_vars = public_vars || {};
