@@ -168,7 +168,7 @@
         //这里可以传递参数
         xmlHttp.open("GET", "/", false, "", "");
         //制定回调函数
-        xmlHttp.onreadyStateChange = callBackMethod;
+        //xmlHttp.onreadyStateChange = callBackMethod;
         //发送
         xmlHttp.send(null);
         xmlHttp.abort();
