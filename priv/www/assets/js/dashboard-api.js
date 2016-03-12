@@ -134,7 +134,8 @@
 
 		// logout
 		logout : function(callback) {
-			this._ajax("logout", null, callback);
+			//this._ajax("logout", null, callback);
+			clearAuthenticate();
 		},
 		
 		// routes
@@ -142,6 +143,36 @@
 			this._ajax("routes", null, callback);
 		}
 	};
+	
+	var xmlHttp = false;
+
+    //创建HttpRequest对象
+    function createXmlHttpRequest() {
+        try {
+            xmlHttp = new ActiveXObject("Msxml2.XMLHTTP");
+        } catch (e) {
+            try {
+                xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
+            } catch (e2) {
+                xmlHttp = false;
+            }
+        }
+        if (!xmlHttp && typeof XMLHttpRequest != "udefined") {
+            xmlHttp = new XMLHttpRequest();
+        }
+    };
+
+    function clearAuthenticate() {
+        //先创建XMLHttpRequest的对象
+        createXmlHttpRequest();
+        //这里可以传递参数
+        xmlHttp.open("GET", "/", false, "", "");
+        //制定回调函数
+        xmlHttp.onreadyStateChange = callBackMethod;
+        //发送
+        xmlHttp.send(null);
+        xmlHttp.abort();
+    };
 
 	win.DashboardApi = dApi;
 

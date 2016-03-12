@@ -303,12 +303,9 @@ function regEvent() {
 
 function clearAuth() {
 	dashApi.logout(function(ret, err) {
-		if (ret) {
-			
-		} else {
-			console.log(err);
-		}
+		
 	});
+	
 	window.location.href = '/';
 }
 
