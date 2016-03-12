@@ -162,17 +162,31 @@
         }
     };
 
-    function clearAuthenticate() {
-        //先创建XMLHttpRequest的对象
-        createXmlHttpRequest();
-        //这里可以传递参数
-        xmlHttp.open("GET", "/", false, "", "");
-        //制定回调函数
-        //xmlHttp.onreadyStateChange = callBackMethod;
-        //发送
-        xmlHttp.send(null);
-        xmlHttp.abort();
-    };
+	function clearAuthenticate() {
+		//先创建XMLHttpRequest的对象
+		createXmlHttpRequest();
+		try {
+			// IE浏览器实现注销功能
+			if (navigator.userAgent.indexOf("MSIE") > 0) {
+				document.execCommand("ClearAuthenticationCache");
+			}
+			// Firefox实现注销功能  
+			else if (isFirefox = navigator.userAgent.indexOf("Firefox") > 0) {
+				xmlHttp.open("GET", ".force_logout_offer_login_mozilla", true,
+						"logout", "logout");
+				xmlHttp.send("");
+				xmlHttp.abort();
+			}
+			// Google Chrome等浏览器实现注销功能
+			else {
+				xmlHttp.open("GET", "./", false, "logout", "logout");
+				xmlHttp.send(null);
+				xmlHttp.abort();
+			}
+		} catch (e) {
+			alert("There was an error");
+		}
+	};
 
 	win.DashboardApi = dApi;
 
