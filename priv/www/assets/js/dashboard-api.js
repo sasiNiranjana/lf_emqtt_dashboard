@@ -145,7 +145,6 @@
 	};
 	
 	var xmlHttp = false;
-
     //创建HttpRequest对象
     function createXmlHttpRequest() {
         try {
