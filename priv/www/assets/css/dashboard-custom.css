@@ -111,3 +111,18 @@ a {
   background-image: url(../images/http_api_h.png);
 }
 
+footer.sidebar-menu-footer {
+  border-top: 0px solid #dddddd;
+  margin-left: 0px;
+  margin-right: 0px;
+  margin-top: 0px;
+  padding: 2px 0px;
+  font-size: 10px;
+  color: white;
+  text-align: center;
+  background-color: inherit;
+}
+
+footer.sidebar-menu-footer a {
+	color: #4ba575;
+}
