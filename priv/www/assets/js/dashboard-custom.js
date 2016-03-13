@@ -999,7 +999,7 @@ var User = {
 					User.showTable();
 	    		} else {
 					//console.log(err);
-	    			alert("Delete failure.");
+	    			alert(err.reason);
 				}
 			});
 		},

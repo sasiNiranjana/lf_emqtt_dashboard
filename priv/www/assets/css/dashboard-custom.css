@@ -21,8 +21,8 @@ a {
   font-weight: normal;
   line-height: 1;
   background-repeat: no-repeat;
-  background-position: bottom;
-  background-size: 100%;
+  background-position: center;
+  background-size: 80%;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -109,4 +109,20 @@ a {
 }
 .sidebar-menu .main-menu li.active > a .dash-icon-http-api {
   background-image: url(../images/http_api_h.png);
+}
+
+footer.sidebar-menu-footer {
+  border-top: 0px solid #dddddd;
+  margin-left: 0px;
+  margin-right: 0px;
+  margin-top: 0px;
+  padding: 2px 0px;
+  font-size: 10px;
+  color: white;
+  text-align: center;
+  background-color: inherit;
+}
+
+footer.sidebar-menu-footer a {
+	color: #4ba575;
 }

@@ -838,8 +838,8 @@ body {
   color: #979898;
   text-decoration: none;
   display: block;
-  padding: 10px 20px;
-  height: 55px;
+  padding: 5px 20px;
+  height: 45px;
   border-bottom: 1px solid #313437;
 }
 .sidebar-menu .main-menu a > i {
