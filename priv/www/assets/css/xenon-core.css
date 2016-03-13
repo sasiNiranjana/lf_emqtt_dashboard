@@ -791,12 +791,12 @@ body {
 .sidebar-menu {
   display: table-cell;
   position: relative;
-  width: 180px;
+  width: 190px;
   background: #2c2e2f;
   z-index: 1;
 }
 .sidebar-menu .logo-env {
-  padding: 28px 18px;
+  padding: 29px 18px;
   border-bottom: 1px solid #313437;
 }
 .sidebar-menu .logo-env .logo {
@@ -838,7 +838,8 @@ body {
   color: #979898;
   text-decoration: none;
   display: block;
-  padding: 12px 10px;
+  padding: 10px 20px;
+  height: 55px;
   border-bottom: 1px solid #313437;
 }
 .sidebar-menu .main-menu a > i {
@@ -1036,7 +1037,7 @@ body {
 }
 @media screen and (min-width: 768px) {
   .sidebar-menu.collapsed {
-    width: 52px;
+    width: 64px;
     z-index: 10;
     overflow: visible;
   }
