@@ -149,7 +149,7 @@
 		logout : function(callback) {
 			this._config.userName = "logout";
 			this._config.password = "logout";
-			this._ajax("current_user", null, callback, true);
+			this._ajax("logout", null, callback, true);
 			// clearAuthenticate();
 		},
 		
