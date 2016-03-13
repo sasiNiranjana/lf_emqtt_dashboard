@@ -24,7 +24,12 @@
 
 		// 配置项参数
 		_config : {
-			apiUri : "/"
+			apiUri : "/",
+			protocol : "http",
+			hostname : "",
+			port : "18083",
+			userName : null,
+			password : null
 		},
 
 		// API初始化
@@ -39,11 +44,19 @@
 		},
 
 		// var callback = function(ret, err) {};
-		_ajax : function(apiEnd, data, callback) {
+		_ajax : function(apiEnd, data, callback, isAddAuth) {
 			this._checkException();
+			var isAuth = (typeof isAddAuth == "boolean") ? isAddAuth : false;
+			var url = this._config.apiUri + "api/" + apiEnd;
+			if (isAuth) {
+				url = this._config.protocol + "://" + this._config.userName +
+						":" + this._config.password + "@" +
+						this._config.hostname + ":" + this._config.port + "/" +
+						"api/" + apiEnd;
+			}
 			$.ajax({
 				type : "POST",
-				url : this._config.apiUri + "api/" + apiEnd,
+				url : url,
 				dataType : "json",
 				data : data,
 				success : function(ret) {
@@ -134,8 +147,10 @@
 
 		// logout
 		logout : function(callback) {
-			//this._ajax("logout", null, callback);
-			clearAuthenticate();
+			this._config.userName = "logout";
+			this._config.password = "logout";
+			this._ajax("logout", null, callback, true);
+			// clearAuthenticate();
 		},
 		
 		// routes
@@ -174,14 +189,14 @@
 				xmlHttp.open("GET", "/", true,
 						"logout", "logout");
 				xmlHttp.send("");
-				xmlHttp.abort();
 			}
 			// Google Chrome等浏览器实现注销功能
 			else {
-				xmlHttp.open("GET", "/", false, "logout", "logout");
+				xmlHttp.open("GET", "/", false,
+						"logout", "logout");
 				xmlHttp.send(null);
-				xmlHttp.abort();
 			}
+			//xmlHttp.abort();
 		} catch (e) {
 			alert("There was an error");
 		}

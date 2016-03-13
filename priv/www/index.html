@@ -44,7 +44,7 @@
 					<a href="/" class="logo-expanded"> <img
 						src="assets/images/logo@2x.png" height="18" alt="" />
 					</a> <a href="/" class="logo-collapsed"> <img
-						src="assets/images/3062055.jpg" height="40" width="40" alt="" />
+						src="assets/images/logo32_32.png" height="40" width="40" alt="" />
 					</a>
 				</div>
 
@@ -182,7 +182,18 @@
 	<script src="assets/js/dashboard-custom.js"></script>
 	<script type="text/javascript">
 		jQuery(document).ready(function($) {
-			initWebPage(window.location.href);
+			// 完整网址
+			//alert(document.URL);
+			//alert(document.location.href);
+			//alert(self.location.href);
+			//alert(parent.document.location);
+			// 当前域名
+			//alert(top.location.href);
+		    //alert(top.location.hostname);
+		    //alert(top.location.port);
+		    var config = {hostname : top.location.hostname,
+		    		port : top.location.port};
+			initWebPage(document.location.href, config);
 		});
 	</script>
 </body>

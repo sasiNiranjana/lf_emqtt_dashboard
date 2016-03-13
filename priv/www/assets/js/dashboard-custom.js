@@ -171,9 +171,9 @@ function loading(module, fun) {
 }
 
 var dashApi = null;
-function initWebPage(url) {
+function initWebPage(url, config) {
 	dashApi = new DashboardApi();
-	dashApi.init();
+	dashApi.init(config);
 
 	// 注册事件
 	regEvent();
@@ -303,10 +303,12 @@ function regEvent() {
 
 function clearAuth() {
 	dashApi.logout(function(ret, err) {
-		
+		if (ret) {
+			window.location.href = '/';
+		} else {
+			window.location.href = '/';
+		}
 	});
-	
-	window.location.href = '/';
 }
 
 function showCurrentUser() {
