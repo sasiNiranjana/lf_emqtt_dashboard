@@ -13,21 +13,7 @@
 	<div class="panel-body">
 	
 	    <div class="row" style="margin-bottom: 5px;">
-            <div class="col-sm-6">
-                <ul class="list-inline list-unstyled">
-                    <li class="dropdown"><a href="#" class="dropdown-toggle"
-                        data-toggle="dropdown">Show Number <span id="page_size">10</span> <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="javascript:;" onclick="sessions.setPageSize(10);">10</a></li>
-                            <li><a href="javascript:;" onclick="sessions.setPageSize(25);">25</a></li>
-                            <li><a href="javascript:;" onclick="sessions.setPageSize(50);">50</a></li>
-                            <li><a href="javascript:;" onclick="sessions.setPageSize(100);">100</a></li>
-                            <li><a href="javascript:;" onclick="sessions.setPageSize(200);">200</a></li>
-                            <li><a href="javascript:;" onclick="sessions.setPageSize(500);">500</a></li>
-                        </ul></li>
-                </ul>
-            </div>
-            <div class="col-sm-6">
+            <div class="col-sm-12">
                 <!-- 
                 <form role="form" class="form-inline pull-right" onsubmit="return false;">
 
@@ -70,7 +56,31 @@
 		</div>
 		
 		<div class="row">
-            <div class="col-sm-12">
+            <div class="col-sm-6">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-white dropdown-toggle" data-toggle="dropdown">
+                        Show <strong id="page_size">10</strong> Number <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-white" role="menu">
+                        <li>
+                            <a href="javascript:;" onclick="sessions.setPageSize(10);">10</a>
+                        </li>
+                        <li>
+                            <a href="javascript:;" onclick="sessions.setPageSize(25);">25</a>
+                        </li>
+                        <li>
+                            <a href="javascript:;" onclick="sessions.setPageSize(100);">100</a>
+                        </li>
+                        <li>
+                            <a href="javascript:;" onclick="sessions.setPageSize(200);">200</a>
+                        </li>
+                        <li>
+                            <a href="javascript:;" onclick="sessions.setPageSize(500);">500</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-sm-6">
                 <ul class="pagination pull-right" style="margin: 0 0;" id="pagination">
                     <li class="paginate_button previous disabled"><a href="javascript:;">Previous</a></li>
                     <li class="paginate_button active"><a href="javascript:;" onclick="sessions.setCurrPage(1);">1</a></li>
