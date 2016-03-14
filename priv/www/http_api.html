@@ -1,6 +1,6 @@
 <div class="row">
 	<div class="col-md-12">
-	<h2>eMQTTd Dashboard HTTP API</h2>
+	<h2>HTTP API</h2>
 	<div class="vspacer v3"></div>
 	</div>
 
@@ -17,11 +17,9 @@
 				<p class="ta-left leading">Apart from this help page, all URIs
 					will serve only resources of type application/json, and will
 					require HTTP basic authentication. The default user is admin/admin.</p>
-				<p class="ta-left leading">The emqttd_dashboard plugin provide
-					eMQTTd web management interface.The Dashboard include eMQTT broker
-					monitor, clients management, sessions management, topics management
-					and so on. The eMQTTd Dashboard Plugin Main Interface.</p>
-
+				<p class="ta-left leading">The emqttd_dashboard plugin provides
+                a web management console. The Dashboard helps monitor broker's running status, 
+                statistics and metrics of MQTT packets.</p>
 			</div>
 		</div>
 
@@ -46,54 +44,53 @@
 					<tr>
 						<td>X</td>
 						<td><a href="/api/stats">/api/stats </a></td>
-						<td>The eMQTT broker statistics of clients, topics,
-							subscriptions</td>
+						<td>The Statistics of Clients, Sessions, Topics and Subscriptions</td>
 					</tr>
 					<tr>
 						<td>X</td>
 						<td><a href="/api/node">/api/node</a></td>
-						<td>A list of nodes in the eMQTT broker cluster</td>
+						<td>List of clustered nodes</td>
 					</tr>
 					<tr>
 						<td>X</td>
 						<td><a href="/api/metrics">/api/metrics</a></td>
-						<td>The eMQTT broker metrics</td>
+						<td>The broker metrics</td>
 					</tr>
 					<tr>
 						<td>X</td>
 						<td><a href="/api/listeners">/api/listeners</a></td>
-						<td>A list of all listeners in the eMQTT broker</td>
+						<td>List of all TCP listeners</td>
 					</tr>
 					<tr>
 						<td>X</td>
 						<td><a href="/api/clients">/api/clients</a></td>
-						<td>A list of all connected clients</td>
+						<td>List of all connected clients</td>
 					</tr>
 					<tr>
 						<td>X</td>
 						<td><a href="/api/sessions">/api/sessions</a></td>
-						<td>A list of all sessions the eMQTT broker</td>
+						<td>List of all sessions</td>
 					</tr>
 					<tr>
 						<td>X</td>
 						<td><a href="/api/topics">/api/topics</a></td>
-						<td>A list of all topic in the eMQTT broker</td>
+						<td>List of all Topics</td>
                     </tr>
 	            	<tr>
 						<td>X</td>
 						<td><a href="/api/routes">/api/routes</a></td>
-						<td>A list of all route in the eMQTT broker</td>
+						<td>List of all routes</td>
 					</tr>
 					<tr>
 						<td>X</td>
 						<td><a href="/api/subscriptions">/api/subscriptions</a></td>
-						<td>A list of all subscriber in the eMQTT broker</td>
+						<td>List of all Subscriptions</td>
 					</tr>
 
 					<tr>
 						<td>X</td>
 						<td><a href="/api/users">/api/users</a></td>
-						<td>A list of all emqttd_dashboard management user</td>
+						<td>List of all admins</td>
 					</tr>
 
 				</tbody>

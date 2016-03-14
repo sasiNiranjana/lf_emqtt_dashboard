@@ -1,7 +1,7 @@
 /**
  * dashboard-api.js V0.1
  * 
- * Copyright 2016, eMQTT
+ * Copyright 2016, Feng Lee <feng@emqtt.io>
  * 
  */
 ;
