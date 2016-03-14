@@ -31,6 +31,10 @@ a {
   -moz-osx-font-smoothing: grayscale;
 }
 
+.dash-icon-logo {
+  background-image: url(../images/logo32_32.png);
+}
+
 .dash-icon-overview {
   background-image: url(../images/overview_d.png);
 }
