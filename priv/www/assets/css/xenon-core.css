@@ -4048,7 +4048,6 @@ label.cbr-inline + .cbr-inline {
 .btn {
   outline: none;
   border: 1px solid transparent;
-  margin-bottom: 10px;
 }
 .btn.text-left {
   text-align: left;
