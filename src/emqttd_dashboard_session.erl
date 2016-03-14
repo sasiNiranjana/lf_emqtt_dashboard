@@ -22,7 +22,7 @@
 
 -include_lib("stdlib/include/ms_transform.hrl").
 
--import(emqttd_dashboard_util, [connected_at_format/1]).
+-import(emqttd_dashboard_util, [connected_at_format/1, currentpage/1, currentpage/2]).
 -import(proplists, [get_value/2, get_value/3]).
 
 -export([execute/3]).
@@ -35,8 +35,9 @@ execute(CurrPage, PageSize, _ClientKey) ->
             0 -> TotalNum div PageSize;
             _ -> (TotalNum div PageSize) + 1
         end,
-	Result = [querysession(Tab, CurrPage, TotalPage, PageSize)|| Tab <- [mqtt_transient_session, mqtt_persistent_session]],
-    [{currentPage, CurrPage},
+    CurrPage2 = currentpage(CurrPage, TotalPage),
+	Result = [querysession(Tab, CurrPage2, TotalPage, PageSize)|| Tab <- [mqtt_transient_session, mqtt_persistent_session]],
+    [{currentPage, CurrPage2},
      {pageSize, PageSize},
      {totalNum, TotalNum},
      {totalPage, TotalPage},

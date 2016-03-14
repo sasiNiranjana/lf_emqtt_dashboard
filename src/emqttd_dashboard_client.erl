@@ -21,7 +21,7 @@
 -include("../../../include/emqttd.hrl").
 -include_lib("stdlib/include/ms_transform.hrl").
 
--import(emqttd_dashboard_util, [connected_at_format/1]).
+-import(emqttd_dashboard_util, [connected_at_format/1, currentpage/1, currentpage/2]).
 -export([execute/3]).
 
 execute(CurrPage, PageSize, _ClientKey) ->
@@ -32,8 +32,9 @@ execute(CurrPage, PageSize, _ClientKey) ->
             0 -> TotalNum div PageSize;
             _ -> (TotalNum div PageSize) + 1
         end,
-    Result = query(mqtt_client, CurrPage, PageSize, TotalPage),
-    [{currentPage, CurrPage},
+    CurrPage2 = currentpage(CurrPage, TotalPage), 
+    Result = query(mqtt_client, CurrPage2, PageSize, TotalPage),
+    [{currentPage, CurrPage2},
      {pageSize, PageSize},
      {totalNum, TotalNum},
      {totalPage, TotalPage},

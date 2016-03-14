@@ -84,9 +84,20 @@ bin() ->
         if is_list(A) -> 
             list_to_binary(A);
         is_atom(A) -> 
-                list_to_binary((atom_to_list(A)));
+            list_to_binary((atom_to_list(A)));
         true ->
                 A
         end
     end.
 
+currentpage(1) ->
+        1;
+currentpage(CurrPage) ->
+        CurrPage.
+currentpage(CurrPage, TotalPage)->
+    if CurrPage > TotalPage ->
+       currentpage(TotalPage);
+    true ->
+       currentpage(CurrPage)
+    end.
+ 
