@@ -49,12 +49,24 @@ jQuery.fn.pagination = function(pageInfo, module) {
 			start = end - len + 1;
 		}
 	}
+	if (start > 1) {
+		p.append('<li class="paginate_button active"><a href="javascript:;" onclick="'+module+'.setCurrPage(1);">1</a></li>');
+		if (start > 2) {
+			p.append('<li class="paginate_button ">...</li>');
+		}
+	}
 	for (var i = start; i <= end; i++) {
 		if (i == pageInfo.currPage) {
 			p.append('<li class="paginate_button active"><a href="javascript:;" onclick="'+module+'.setCurrPage('+i+');">'+i+'</a></li>');
 		} else {
 			p.append('<li class="paginate_button "><a href="javascript:;" onclick="'+module+'.setCurrPage('+i+');">'+i+'</a></li>');
 		}
+	}
+	if (end < pageInfo.totalPage) {
+		if (end < pageInfo.totalPage-1) {
+			p.append('<li class="paginate_button ">...</li>');
+		}
+		p.append('<li class="paginate_button "><a href="javascript:;" onclick="'+module+'.setCurrPage('+pageInfo.totalPage+');">'+pageInfo.totalPage+'</a></li>');
 	}
 
 	if (pageInfo.currPage >= pageInfo.totalPage) {
