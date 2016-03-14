@@ -10,6 +10,10 @@ a {
 	
 }
 
+.table > thead > tr > td, .table > thead > tr > th {
+	border-bottom: 0px;
+}
+
 .dash-icon {
   position: relative;
   width: 24px;
