@@ -30,6 +30,7 @@ jQuery.fn.pagination = function(pageInfo, module) {
 		p.append('<li class="paginate_button previous"><a href="javascript:;" onclick="'+module+'.setCurrPage('+(pageInfo.currPage-1)+');">Previous</a></li>');
 	}
 	
+	var len = 6;
 	// 起始按钮
 	var start = 1;
 	// 结束按钮
@@ -39,6 +40,14 @@ jQuery.fn.pagination = function(pageInfo, module) {
 	}
 	if ((pageInfo.currPage + 3) < pageInfo.totalPage) {
 		end = pageInfo.currPage + 3;
+	}
+	if (pageInfo.totalPage >= len) {
+		if (end < len) {
+			end = len;
+		}
+		if ((end - start) < (len - 1)) {
+			start = end - len + 1;
+		}
 	}
 	for (var i = start; i <= end; i++) {
 		if (i == pageInfo.currPage) {
