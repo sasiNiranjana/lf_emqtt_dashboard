@@ -527,7 +527,7 @@ function showClients() {
 
 (function(w) {
 	var cs = {};
-	cs.pInfo = new PageInfo(1, 10, 0);
+	cs.pInfo = new PageInfo(1, 100, 0);
 	cs.client_key = null;
 	
 	cs.setPageSize = function(pageSize) {
@@ -625,7 +625,7 @@ function showSessions() {
 
 (function(w) {
 	var se = {};
-	se.pInfo = new PageInfo(1, 10, 0);
+	se.pInfo = new PageInfo(1, 100, 0);
 	
 	se.setPageSize = function(pageSize) {
 		this.pInfo.pageSize = pageSize;
