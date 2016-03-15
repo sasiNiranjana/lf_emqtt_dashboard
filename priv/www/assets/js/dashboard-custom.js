@@ -358,7 +358,8 @@ function showOverview() {
 		
 		// 加载listeners
 		overview.listeners();
-		
+	
+        clearInterval(overview.timetask);
 		overview.timetask = setInterval(function() {
 			overview.nodes();
 			overview.stats();
