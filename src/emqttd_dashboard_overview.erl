@@ -46,10 +46,10 @@ nodesinfo() ->
 			    CpuInfo = [{K, list_to_binary(V)} || {K, V} <- rpc:call(Node, emqttd_vm, loads, [])],
 			    Memory = rpc(Node, emqttd_vm, get_memory, []),
 			    [{name, Node},
-		             {total_memory, kmg(proplists:get_value(allocated, Memory))},
+		         {total_memory, kmg(proplists:get_value(allocated, Memory))},
 			     {used_memory, kmg(proplists:get_value(used, Memory))},
-			     {process_available, rpc(Node, emqttd_vm, get_process_limit, [])},
-			     {process_used, length(rpc(Node, emqttd_vm, get_process_list, []))},
+			     {process_available, rpc(Node, emqttd_vm, get_system_info, [process_limit])},
+			     {process_used, rpc(Node, emqttd_vm, get_system_info, [process_count])},
 			     {max_fds, proplists:get_value(max_fds,rpc(Node, emqttd_vm, get_system_info, [check_io]))}|CpuInfo]
      			 end, Nodes).
     
