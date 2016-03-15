@@ -186,7 +186,10 @@ function loading(module, fun) {
 			//loadingAjax.empty().append(
 			//	'<div class="page-loading-overlay">'
 			//	+ '<div class="loader-2"></div></div>');
-			loadingAjax.load(module, fun);
+			loadingAjax.load(module, function(){
+            fun();
+            stickFooterToBottom();
+            });
 		}
 	});
 }
