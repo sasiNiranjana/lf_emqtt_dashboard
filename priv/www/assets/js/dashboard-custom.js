@@ -186,7 +186,7 @@ function loading(module, fun) {
 			//loadingAjax.empty().append(
 			//	'<div class="page-loading-overlay">'
 			//	+ '<div class="loader-2"></div></div>');
-			loadingAjax.load(module, function(){
+			loadingAjax.load(module, function() {
             fun();
             stickFooterToBottom();
             });
@@ -197,7 +197,9 @@ function loading(module, fun) {
 var dashApi = null;
 function initWebPage(url, config) {
 	dashApi = new DashboardApi();
-	dashApi.init(config);
+	dashApi.init(config, function() {
+		stickFooterToBottom();
+	});
 
 	// 注册事件
 	regEvent();
