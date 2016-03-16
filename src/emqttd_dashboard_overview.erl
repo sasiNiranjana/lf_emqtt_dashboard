@@ -57,12 +57,12 @@ nodes_info() ->
 node_info() ->
     CpuInfo = [{K, list_to_binary(V)} || {K, V} <- emqttd_vm:loads()],
     Memory  = emqttd_vm:get_memory(),
-    {ok, [{name, node()},
-          {total_memory, kmg(get_value(allocated, Memory))},
-          {used_memory,  kmg(get_value(used, Memory))},
-          {process_available, erlang:system_info(process_limit)},
-          {process_used, erlang:system_info(process_count)},
-          {max_fds, get_value(max_fds, erlang:system_info(check_io))} | CpuInfo]}.
+    [{name, node()},
+     {total_memory, kmg(get_value(allocated, Memory))},
+     {used_memory,  kmg(get_value(used, Memory))},
+     {process_available, erlang:system_info(process_limit)},
+     {process_used, erlang:system_info(process_count)},
+     {max_fds, get_value(max_fds, erlang:system_info(check_io))} | CpuInfo].
 
 metrics() ->
     {ok, emqttd_metrics:all()}.
