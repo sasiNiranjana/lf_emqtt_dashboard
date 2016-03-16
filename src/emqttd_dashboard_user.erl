@@ -23,6 +23,17 @@
 
 -export([users/0, update/3, remover/1, add/3]).
 
+-http_api({"users", users, []}).
+
+-http_api({"update_user", update,  [{"user_name", binary, ""},
+                                    {"password", binary, ""},
+                                    {"tags", binary, ""}]}).
+-http_api({"remove_user", remover, [{"user_name", binary, ""}]}).
+
+-http_api({"add_user",    add,     [{"user_name", binary, ""},
+                                    {"password", binary, ""},
+                                    {"tags", binary, ""}]}).
+
 %%-----------------------------------Users--------------------------------------
 %%users api
 users() ->

@@ -25,6 +25,15 @@
          nodesinfo/0, metrics/0, listeners/0,
          bnode/0]).
 
+-http_api({"stats",    stats,     []}).
+-http_api({"ptype",    ptype,     []}).
+-http_api({"memory",   memory,    []}).
+-http_api({"cpu",      cpu,       []}).
+-http_api({"node",     nodesinfo, []}).
+-http_api({"metrics",  metrics,   []}).
+-http_api({"listeners",listeners, []}).
+-http_api({"bnode",    bnode,     []}).
+
 %%-----------------------------------overview--------------------------------------
 
 %% broker info

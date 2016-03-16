@@ -24,6 +24,8 @@
 
 -export([execute/0]).
 
+-http_api({"subscriptions", execute, []}).
+
 execute() ->
     case catch mnesia:dirty_all_keys(subscription) of
         {'EXIT', _Error} ->

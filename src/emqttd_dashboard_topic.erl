@@ -24,6 +24,8 @@
 
 -export([execute/0]).
 
+-http_api({"topics", execute, []}).
+
 execute() ->
     %% Count total number.
     F = fun() -> qlc:e(qlc:q([E || E <- mnesia:table(topic)])) end,

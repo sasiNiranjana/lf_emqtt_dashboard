@@ -21,6 +21,10 @@
 -include("../../../include/emqttd.hrl").
 -include_lib("stdlib/include/ms_transform.hrl").
 
+-http_api({"clients", execute, [{"curr_page", int, "1"},
+                                {"page_size", int, "100"},
+                                {"client_key", string, ""}]}).
+
 -import(emqttd_dashboard_util, [connected_at_format/1, currentpage/1, currentpage/2]).
 -export([execute/3]).
 

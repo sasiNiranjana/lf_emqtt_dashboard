@@ -17,6 +17,7 @@
 -module(emqttd_dashboard_util).
 
 -include("emqttd_dashboard.hrl").
+
 -include("../../../include/emqttd.hrl").
 
 -compile(export_all).
@@ -40,55 +41,18 @@ kmg(Byte) ->
 float(F, S) ->
     iolist_to_binary(io_lib:format("~.2f~s", [F, S])).
 
-intFun()->
-   fun(S)-> list_to_integer(S) end.
-
-stringFun()->
-   fun(A) ->
-      if is_list(A) ->
-          A;
-      is_binary(A) ->
-          erlang:binary_to_list(A); 
-      true ->
-          A
-      end
-   end.
-
-to_json(Body) ->
-    if
-        length(Body) == 0 -> <<"\[\]">>;
-    true -> 
-        list_to_binary(mochijson2:encode(Body) ++ <<10>>)
-    end.
-
 connected_at_format(Timestamp) ->
     strftime(datetime(emqttd_time:now_to_secs(Timestamp))).
 
 strftime({{Y,M,D}, {H,MM,S}}) ->
-    Date = string:join([zeropad(I) || I <- [Y,M,D]], "-"),
-    Time = string:join([zeropad(I) || I <- [H, MM, S]], ":"),
-    lists:concat([Date, " ", Time]).
+    lists:flatten(
+        io_lib:format(
+            "~4..0w-~2..0w-~2..0w ~2..0w:~2..0w:~2..0w", [Y, M, D, H, MM, S])).
 
 datetime(Timestamp) when is_integer(Timestamp) ->
     Universal = calendar:gregorian_seconds_to_datetime(Timestamp +
     calendar:datetime_to_gregorian_seconds({{1970,1,1}, {0,0,0}})),
     calendar:universal_time_to_local_time(Universal).
-
-zeropad(I) when I < 10 ->
-    lists:concat(["0", I]);
-zeropad(I) ->
-    integer_to_list(I).
-
-bin() ->
-    fun(A) ->
-        if is_list(A) -> 
-            list_to_binary(A);
-        is_atom(A) -> 
-            list_to_binary((atom_to_list(A)));
-        true ->
-                A
-        end
-    end.
 
 currentpage(1) ->
         1;

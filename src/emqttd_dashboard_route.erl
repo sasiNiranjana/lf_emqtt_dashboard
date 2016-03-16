@@ -14,13 +14,16 @@
 %% limitations under the License.
 %%--------------------------------------------------------------------
 
-%% @doc Action for route api.
+%% @doc Route API.
 -module(emqttd_dashboard_route).
 
 -include("emqttd_dashboard.hrl").
+
 -include("../../../include/emqttd.hrl").
 
 -include_lib("stdlib/include/qlc.hrl").
+
+-http_api({"routes", execute, []}).
 
 -export([execute/0]).
 

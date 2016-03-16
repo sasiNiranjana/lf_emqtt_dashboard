@@ -32,97 +32,72 @@
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
          terminate/2, code_change/3]).
 
--spec start_link() -> {ok, pid()} | ignore | {error, any()}.
+-spec(start_link() -> {ok, pid()} | ignore | {error, any()}).
 start_link() ->
     gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
 
-%%%=============================================================================
-%%% API 
-%%%=============================================================================
-add_user(Username, Password, Tags) ->
+%%--------------------------------------------------------------------
+%% API
+%%--------------------------------------------------------------------
+
+-spec(add_user(binary(), binary(), binary()) -> ok | {error, any()}).
+add_user(Username, Password, Tags) when is_binary(Username), is_binary(Password) ->
     Admin = #mqtt_admin{username = Username, password = hash(Password), tags = Tags},
-    case catch mnesia:dirty_read(mqtt_admin, Username) of
-     [] ->
-        ensure_ok(mnesia:transaction(fun mnesia:write/1, [Admin]));
-    {'EXIT',{aborted, Reason}} ->
-        lager:error("remove_user: ~s fail, reason:~s", [Username, Reason]), 
-        {error, Reason};
-    [_User] ->
-        lager:error("~s exist", [Username]), 
-        {error, "username already exist"}
+    return(mnesia:transaction(fun add_user_/1, [Admin])).
+
+%% @private
+add_user_(Admin = #mqtt_admin{username = Username}) ->
+    case mnesia:wread({mqtt_admin, Username}) of
+        []  -> mnesia:write(Admin);
+        [_] -> mnesia:abort("username already exist")
     end.
 
+-spec(remove_user(binary()) -> ok | {error, any()}).
+remove_user(Username) when is_binary(Username) ->
+    return(mnesia:transaction(fun mnesia:delete/1, [{mqtt_admin, Username}])).
 
-
-remove_user(Username) ->
-    case catch mnesia:dirty_read(mqtt_admin, Username) of
-    [] ->
-        lager:error("Cannot find Username: ~s", [Username]), 
-        {error, "Username Not Found"};
-    {'EXIT',{aborted, Reason}} ->
-        lager:error("remove_user: ~s fail, reason:~s", [Username, Reason]), 
-        {error, Reason};
-    [_User] ->
-        ensure_ok(mnesia:transaction(fun mnesia:delete/1, [{mqtt_admin, Username}]))
-    end.
-
-update_user(Username, Password, Tags) ->
+-spec(update_user(binary(), binary(), binary()) -> ok | {error, any()}).
+update_user(Username, Password, Tags) when is_binary(Username), is_binary(Password) ->
     Admin = #mqtt_admin{username = Username, password = hash(Password), tags = Tags},
-    case catch mnesia:dirty_read(mqtt_admin, Username) of
-    {'EXIT',{aborted, Reason}} ->
-        lager:error("update_user: ~s fail, reason:~s", [Username, Reason]),
-        {error, Reason};
-    [] ->
-        lager:error("Cannot find admin: ~s", [Username]), 
-        {error, "Username Not Found"};
-    [_] ->
-        ensure_ok(mnesia:transaction(fun mnesia:write/1, [Admin]))
+    return(mnesia:transaction(fun update_user_/1, [Admin])).
+
+%% @private
+update_user_(Admin = #mqtt_admin{username = Username}) ->
+    case mnesia:wread({mqtt_admin, Username}) of
+        []  -> mnesia:abort("username not found");
+        [_] -> mnesia:write(Admin)
     end.
 
-lookup_user(Username) ->
-    case catch mnesia:dirty_read(mqtt_admin, Username) of
-    {'EXIT',{aborted, Reason}} ->
-        lager:error("Cannot find admin: ~s,reason:~s", [Username, Reason]), 
-        {error, Reason};
-    [] ->
-        lager:error("Cannot find admin: ~s", [Username]), 
-        {error, "Username Not Found"};
-    Admin  ->
-        Admin
-    end.
+-spec(lookup_user(binary()) -> [mqtt_admin()]).
+lookup_user(Username) when is_binary(Username) -> mnesia:dirty_read(mqtt_admin, Username).
 
-all_users() ->
-    case catch mnesia:dirty_all_keys(mqtt_admin) of
-    {'EXIT',{aborted, Reason}} ->
-        lager:error("Cannot find all users reason:~s", [Reason]),
-        {error, Reason};
-     KeyList ->
-        KeyList
-    end.
+-spec(all_users() -> [binary()]).
+all_users() -> mnesia:dirty_all_keys(mqtt_admin).
 
+return({atomic, _}) ->
+    ok;
+return({aborted, Reason}) ->
+    {error, Reason}.
 
 check(undefined, _) ->
     {error, "Username undefined"};
 check(_, undefined) ->
     {error, "Password undefined"};
 check(Username, Password) ->
-    case catch mnesia:dirty_read(mqtt_admin, Username) of
-    {'EXIT',{aborted, Reason}} ->
-        lager:error("Cannot find all users reason:~s", [Reason]),
-        {error, "Username Not Found"};
-    [] -> 
-        lager:error("~s Not Found", [Username]),
-        {error, "Username Not Found"};
-    [#mqtt_admin{password = <<Salt:4/binary, Hash/binary>>}] ->
-        case Hash =:= md5_hash(Salt, Password) of
-            true  -> ok;
-            false -> {error, "Password Error"}
-        end
+    case lookup_user(Username) of
+        [#mqtt_admin{password = <<Salt:4/binary, Hash/binary>>}] ->
+            case Hash =:= md5_hash(Salt, Password) of
+                true  -> ok;
+                false -> {error, "Password Error"}
+            end;
+        [] ->
+            {error, "Username Not Found"}
     end.
 
-%%%=============================================================================
-%%% gen_server callbacks
-%%%=============================================================================
+%%--------------------------------------------------------------------
+%% gen_server callbacks
+%%--------------------------------------------------------------------
+
 init([]) ->
     % Create mqtt_admin table
     ok = emqttd_mnesia:create_table(mqtt_admin, [
@@ -179,13 +154,9 @@ terminate(_Reason, _State) ->
 code_change(_OldVsn, State, _Extra) ->
     {ok, State}.
 
-%%%=============================================================================
-%%% Internal functions
-%%%=============================================================================
-ensure_ok({aborted, _}) ->
-    ignore;
-ensure_ok({atomic, Ok}) ->
-    Ok.
+%%--------------------------------------------------------------------
+%% Internal functions
+%%--------------------------------------------------------------------
 
 hash(Password) ->
     SaltBin = salt(),

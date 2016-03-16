@@ -27,6 +27,11 @@
 
 -export([execute/3]).
 
+-http_api({"sessions", execute, [{"curr_page", int, "1"},
+                                 {"page_size", int, "100"},
+                                 {"client_key", string, ""}]}).
+
+
 execute(CurrPage, PageSize, _ClientKey) ->
     %% Count total number.
     TotalNum = count(),
