@@ -28,7 +28,8 @@
 -export([execute/0]).
 
 execute() ->
-    F = fun() -> qlc:e(qlc:q([E || E <- mnesia:table(route)])) end,
-    {atomic, Topics} =  mnesia:transaction(F),
-    [[{topic, Topic}, {node, Node}] || #mqtt_route{topic = Topic, node= Node} <- Topics].
+    %%TODO: ...
+    Q = qlc:q([E || E <- mnesia:table(route)]),
+    {atomic, Topics} =  mnesia:transaction(fun qlc:e/1, [Q]),
+    {ok, [[{topic, Topic}, {node, Node}] || #mqtt_route{topic = Topic, node= Node} <- Topics]}.
 

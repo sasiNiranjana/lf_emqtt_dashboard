@@ -14,10 +14,11 @@
 %% limitations under the License.
 %%--------------------------------------------------------------------
 
-%% @doc Action for session api.
+%% @doc Subscriptions API.
 -module(emqttd_dashboard_subscription).
 
 -include("emqttd_dashboard.hrl").
+
 -include("../../../include/emqttd.hrl").
 
 -include_lib("stdlib/include/qlc.hrl").
@@ -27,20 +28,15 @@
 -http_api({"subscriptions", execute, []}).
 
 execute() ->
-    case catch mnesia:dirty_all_keys(subscription) of
-        {'EXIT', _Error} ->
-            [];
-        Keys ->
-            RowFun = fun(Key) ->
-                       Records = ets:lookup(subscription, Key),
-                       [{clientId, Key}, {subscriptions, format(subscriptions, Records)}]
-                     end,
-            [RowFun(Key) || Key <- Keys]
-    end.
+    %%TODO: protect...
+    RowFun = fun(Key) ->
+               Records = ets:lookup(subscription, Key),
+               [{clientId, Key}, {subscriptions, format(subscriptions, Records)}]
+             end,
+    {ok, [RowFun(Key) || Key <- mnesia:dirty_all_keys(subscription)]}.
 
 format(subscriptions, Subscriptions) ->
     list_to_binary(
         string:join([io_lib:format("~s:~w", [Topic, Qos]) ||
                 #mqtt_subscription{topic = Topic, qos = Qos} <- Subscriptions], ",")).
-
 

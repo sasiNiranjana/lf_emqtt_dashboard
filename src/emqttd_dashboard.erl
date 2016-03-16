@@ -20,6 +20,8 @@
 
 -export([http_handler/0, handle_request/2]).
 
+-export([paginate/3, strftime/1]).
+
 -define(APP, ?MODULE).
 
 -define(AUTH_HEADER, {"WWW-Authenticate", "Basic Realm=\"emqttd dashboard\""}).
@@ -73,11 +75,11 @@ handle_request("/api/" ++ Name, Req, Env) ->
                                 end
                              end, InitArgs),
             case catch apply(Mod, Fun, Args) of
+                {ok, JsonData} ->
+                    json_respond(Req, JsonData);
                 {'EXIT', Reason} ->
                     lager:error("Execute API '~s' Error: ~p", [Name, Reason]),
-                    Req:respond({404, [{"Content-Type", "application/json"}], []});
-                JsonData ->
-                    json_respond(Req, JsonData)
+                    Req:respond({404, [{"Content-Type", "application/json"}], []})
             end;
         false ->
             Req:respond({404, [{"Content-Type", "application/json"}], []})
@@ -85,6 +87,33 @@ handle_request("/api/" ++ Name, Req, Env) ->
        
 handle_request("/" ++ Rest, Req, Env) ->
     mochiweb_request:serve_file(Rest, get_value(docroot, Env), Req).
+
+%%--------------------------------------------------------------------
+%% Paging
+%%--------------------------------------------------------------------
+
+paginate(TotalNum, PageNum, PageSize) ->
+    TotalPage = case TotalNum rem PageSize of
+                    0 -> TotalNum div PageSize;
+                    _ -> (TotalNum div PageSize) + 1
+                end,
+    if
+        PageNum > TotalPage -> {TotalPage, TotalPage};
+        true                -> {PageNum, TotalPage}
+    end.
+
+strftime({MegaSecs, Secs, _MicroSecs}) ->
+    strftime(datetime(MegaSecs * 1000000 + Secs));
+
+strftime({{Y,M,D}, {H,MM,S}}) ->
+    lists:flatten(
+        io_lib:format(
+            "~4..0w-~2..0w-~2..0w ~2..0w:~2..0w:~2..0w", [Y, M, D, H, MM, S])).
+
+datetime(Timestamp) when is_integer(Timestamp) ->
+    Universal = calendar:gregorian_seconds_to_datetime(Timestamp +
+    calendar:datetime_to_gregorian_seconds({{1970,1,1}, {0,0,0}})),
+    calendar:universal_time_to_local_time(Universal).
 
 %%--------------------------------------------------------------------
 %% Basic Authorization

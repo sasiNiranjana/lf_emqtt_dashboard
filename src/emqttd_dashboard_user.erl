@@ -1,4 +1,5 @@
 %%--------------------------------------------------------------------
+%% Copyright (c) 2015-2016 Feng Lee <feng@emqtt.io>.
 %%
 %% Licensed under the Apache License, Version 2.0 (the "License");
 %% you may not use this file except in compliance with the License.
@@ -13,10 +14,11 @@
 %% limitations under the License.
 %%--------------------------------------------------------------------
 
-%% @doc Action for user api.
+%% @doc User API.
 -module(emqttd_dashboard_user).
 
 -include("emqttd_dashboard.hrl").
+
 -include("../../../include/emqttd.hrl").
 
 -import(emqttd_dashboard_admin, [add_user/3, remove_user/1, update_user/3]).
@@ -34,30 +36,25 @@
                                     {"password", binary, ""},
                                     {"tags", binary, ""}]}).
 
-%%-----------------------------------Users--------------------------------------
-%%users api
 users() ->
     F = fun(#mqtt_admin{username = Username, tags = Tags}) ->
             [{name, Username}, {tag, Tags}]
         end,
-    [F(Admin) || Admin <- emqttd_vm:get_ets_object(mqtt_admin)].
+    {ok, [F(Admin) || Admin <- ets:tab2list(mqtt_admin)]}.
  
 update(Username, Password, Tag) ->
     Status = update_user(Username, Password, Tag),
-    code(Status).
+    {ok, code(Status)}.
 
 remover(<<"admin">>) ->
-        [{status, failure},{reason, list_to_binary("admin cannot be deleted")}];
+    {ok, [{status, failure},{reason, list_to_binary("admin cannot be deleted")}]};
 
 remover(Username) ->
-    Status = remove_user(Username),
-    code(Status).
+    {ok, code(remove_user(Username))}.
  
 add(Username, Password, Tag) ->
-    Status = add_user(Username, Password, Tag),
-    code(Status).
+    {ok, code(add_user(Username, Password, Tag))}.
  
-code(ok) -> [{status,success}];
-code({error, Reason}) -> [{status, failure},{reason, list_to_binary(Reason)}].
-
+code(ok)              -> [{status, success}];
+code({error, Reason}) -> [{status, failure}, {reason, list_to_binary(Reason)}].
 

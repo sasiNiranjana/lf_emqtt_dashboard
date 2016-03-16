@@ -14,47 +14,36 @@
 %% limitations under the License.
 %%--------------------------------------------------------------------
 
-%% @doc Action for client api.
+%% @doc Clients API.
 -module(emqttd_dashboard_client).
 
 -include("emqttd_dashboard.hrl").
+
 -include("../../../include/emqttd.hrl").
+
 -include_lib("stdlib/include/ms_transform.hrl").
 
 -http_api({"clients", execute, [{"curr_page", int, "1"},
                                 {"page_size", int, "100"},
                                 {"client_key", string, ""}]}).
 
--import(emqttd_dashboard_util, [connected_at_format/1, currentpage/1, currentpage/2]).
 -export([execute/3]).
 
-execute(CurrPage, PageSize, _ClientKey) ->
-    %% Count total number.
-    TotalNum = count(mqtt_client),
-    TotalPage = 
-        case TotalNum rem PageSize of
-            0 -> TotalNum div PageSize;
-            _ -> (TotalNum div PageSize) + 1
-        end,
-    CurrPage2 = currentpage(CurrPage, TotalPage), 
-    Result = query(mqtt_client, CurrPage2, PageSize, TotalPage),
-    [{currentPage, CurrPage2},
-     {pageSize, PageSize},
-     {totalNum, TotalNum},
-     {totalPage, TotalPage},
-     {result, Result}].
+execute(PageNum, PageSize, _ClientKey) ->
+    TotalNum = ets:info(mqtt_client, size),
+    {CurrPage, TotalPage} = emqttd_dashboard:paginate(TotalNum, PageNum, PageSize),
+    Result = query(mqtt_client, CurrPage, PageSize, TotalPage),
+    {ok, [{currentPage, CurrPage},
+          {pageSize,    PageSize},
+          {totalNum,    TotalNum},
+          {totalPage,   TotalPage},
+          {result,      Result}]}.
 
-count(Tab) ->
-    MScount = ets:fun2ms(fun(#mqtt_client{_='_'})-> true end),
-    ets:select_count(Tab, MScount).
-
-query(Tab, CurrPage, PageSize, TotalPage) ->
-    if CurrPage > TotalPage ->
-        [];
-    true                    ->
-        Obj = ets:match_object(Tab, #mqtt_client{_='_'}, PageSize),
-        parser_obj(CurrPage, Obj)
-    end.
+query(_Tab, CurrPage, _PageSize, TotalPage) when CurrPage > TotalPage ->
+    [];
+query(Tab, CurrPage, PageSize, _TotalPage) ->
+    Obj = ets:match_object(Tab, #mqtt_client{_='_'}, PageSize),
+    parser_obj(CurrPage, Obj).
 
 parser_obj(_, Obj) when is_atom(Obj),Obj =:= '$end_of_table'->
     [];
@@ -81,6 +70,5 @@ format_data(#mqtt_client{client_id = ClientId,
      {clean_sess, CleanSess},
      {proto_ver, ProtoVer},
      {keepalive, KeepAlvie},
-     {connected_at, list_to_binary(connected_at_format(ConnectedAt))}].
-
+     {connected_at, list_to_binary(emqttd_dashboard:strftime(ConnectedAt))}].
 
