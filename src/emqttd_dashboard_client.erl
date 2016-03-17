@@ -57,12 +57,12 @@ parser_obj(Times, {_Matchs, C}=Obj) ->
     end.
 
 format_data(#mqtt_client{client_id = ClientId,
-                          peername = {IpAddr, Port},
-                          username = Username,
-                          clean_sess = CleanSess,
-                          proto_ver = ProtoVer,
-                          keepalive = KeepAlvie,
-                          connected_at = ConnectedAt}) ->
+                         peername = {IpAddr, Port},
+                         username = Username,
+                         clean_sess = CleanSess,
+                         proto_ver = ProtoVer,
+                         keepalive = KeepAlvie,
+                         connected_at = ConnectedAt}) ->
     [{clientId, ClientId},
      {username, Username},
      {ipaddress, list_to_binary(emqttd_net:ntoa(IpAddr))},
