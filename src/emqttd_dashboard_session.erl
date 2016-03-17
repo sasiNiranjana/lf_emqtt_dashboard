@@ -14,38 +14,37 @@
 %% limitations under the License.
 %%--------------------------------------------------------------------
 
-%% @doc Action for session api.
+%% @doc Session API.
 -module(emqttd_dashboard_session).
 
 -include("emqttd_dashboard.hrl").
+
 -include("../../../include/emqttd.hrl").
 
 -include_lib("stdlib/include/ms_transform.hrl").
 
--import(emqttd_dashboard_util, [connected_at_format/1, currentpage/1, currentpage/2]).
--import(proplists, [get_value/2, get_value/3]).
+-import(proplists, [get_value/2]).
 
 -export([execute/3]).
 
-execute(CurrPage, PageSize, _ClientKey) ->
+-http_api({"sessions", execute, [{"curr_page", int, "1"},
+                                 {"page_size", int, "100"},
+                                 {"client_key", string, ""}]}).
+
+execute(PageNum, PageSize, _ClientKey) ->
     %% Count total number.
     TotalNum = count(),
-    TotalPage = 
-        case TotalNum rem PageSize of
-            0 -> TotalNum div PageSize;
-            _ -> (TotalNum div PageSize) + 1
-        end,
-    CurrPage2 = currentpage(CurrPage, TotalPage),
-	Result = [querysession(Tab, CurrPage2, TotalPage, PageSize)|| Tab <- [mqtt_transient_session, mqtt_persistent_session]],
-    [{currentPage, CurrPage2},
-     {pageSize, PageSize},
-     {totalNum, TotalNum},
-     {totalPage, TotalPage},
-     {result, lists:append(Result)}].
+    {CurrPage, TotalPage} = emqttd_dashboard:paginate(TotalNum, PageNum, PageSize),
+	Result = [querysession(Tab, CurrPage, TotalPage, PageSize) ||
+                Tab <- [mqtt_transient_session, mqtt_persistent_session]],
+    {ok, [{currentPage, CurrPage},
+          {pageSize, PageSize},
+          {totalNum, TotalNum},
+          {totalPage, TotalPage},
+          {result, lists:append(Result)}]}.
 
 count() ->
-    lists:sum([length(ets:match_object(Tab, '$1')) || Tab <-[mqtt_transient_session, mqtt_persistent_session]]).
-
+    ets:info(mqtt_transient_session, size) + ets:info(mqtt_persistent_session, size).
 
 querysession(Tab, CurrentPage, TotalPage, PageSize) ->
 	if CurrentPage > TotalPage ->
@@ -67,19 +66,12 @@ parser_session(Times, {_Matchs, C}=Obj) ->
     end.
 
 session_table({{ClientId, _Pid}, Session}) ->
-    InfoKeys = [clean_sess, 
-             max_inflight,
-             inflight_queue,
-             message_queue,
-             message_dropped,
-             awaiting_rel,
-             awaiting_ack,
-             awaiting_comp,
-             created_at],
+    InfoKeys = [clean_sess, max_inflight, inflight_queue, message_queue,
+                message_dropped, awaiting_rel, awaiting_ack, awaiting_comp, created_at],
      [{clientId, ClientId} | [{Key, format(Key, get_value(Key, Session))} || Key <- InfoKeys]].
 
 format(created_at, Val) ->
-    list_to_binary(connected_at_format(Val));
+    list_to_binary(emqttd_dashboard:strftime(Val));
 format(_, Val) ->
     Val.
 

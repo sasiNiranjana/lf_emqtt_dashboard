@@ -1,4 +1,5 @@
 %%--------------------------------------------------------------------
+%% Copyright (c) 2015-2016 Feng Lee <feng@emqtt.io>.
 %%
 %% Licensed under the Apache License, Version 2.0 (the "License");
 %% you may not use this file except in compliance with the License.
@@ -13,57 +14,79 @@
 %% limitations under the License.
 %%--------------------------------------------------------------------
 
-%% @doc Action for overview api.
+%% @doc Overview API.
 -module(emqttd_dashboard_overview).
 
 -include("emqttd_dashboard.hrl").
+
 -include("../../../include/emqttd.hrl").
 
--import(emqttd_dashboard_util, [rpc/4, kmg/1]).
+-import(proplists, [get_value/2]).
 
--export([stats/0, ptype/0, memory/0, cpu/0, 
-         nodesinfo/0, metrics/0, listeners/0,
-         bnode/0]).
+-export([stats/0, ptype/0, memory/0, cpu/0, nodes_info/0, node_info/0,
+         metrics/0, listeners/0, bnode/0]).
 
-%%-----------------------------------overview--------------------------------------
+-http_api({"stats",    stats,     []}).
+-http_api({"ptype",    ptype,     []}).
+-http_api({"memory",   memory,    []}).
+-http_api({"cpu",      cpu,       []}).
+-http_api({"node",     nodes_info,[]}).
+-http_api({"metrics",  metrics,   []}).
+-http_api({"listeners",listeners, []}).
+-http_api({"bnode",    bnode,     []}).
 
-%% broker info
+-define(KB, 1024).
+-define(MB, (1024*1024)).
+-define(GB, (1024*1024*1024)).
+
 stats() ->
-    [{Stat, Val} || {Stat, Val} <- emqttd_stats:getstats()].
-   
-ptype() ->
-    emqttd_vm:get_port_types().
-   
-memory() ->
-    emqttd_vm:get_memory().
-    
-cpu() ->
-    emqttd_vm:loads().
+    {ok, emqttd_stats:getstats()}.
 
-nodesinfo() ->
-    Nodes = [node()|nodes()],
-    lists:map(fun(Node)-> 
-			    CpuInfo = [{K, list_to_binary(V)} || {K, V} <- rpc:call(Node, emqttd_vm, loads, [])],
-			    Memory = rpc(Node, emqttd_vm, get_memory, []),
-			    [{name, Node},
-		         {total_memory, kmg(proplists:get_value(allocated, Memory))},
-			     {used_memory, kmg(proplists:get_value(used, Memory))},
-			     {process_available, rpc(Node, emqttd_vm, get_system_info, [process_limit])},
-			     {process_used, rpc(Node, emqttd_vm, get_system_info, [process_count])},
-			     {max_fds, proplists:get_value(max_fds,rpc(Node, emqttd_vm, get_system_info, [check_io]))}|CpuInfo]
-     			 end, Nodes).
-    
+ptype() ->
+    {ok, emqttd_vm:get_port_types()}.
+
+memory() ->
+    {ok, emqttd_vm:get_memory()}.
+
+cpu() ->
+    {ok, emqttd_vm:loads()}.
+
+nodes_info() ->
+    {ok, [rpc:call(Node, ?MODULE, node_info, []) || Node <- [node() | nodes()]]}.
+
+node_info() ->
+    CpuInfo = [{K, list_to_binary(V)} || {K, V} <- emqttd_vm:loads()],
+    Memory  = emqttd_vm:get_memory(),
+    [{name, node()},
+     {total_memory, kmg(get_value(allocated, Memory))},
+     {used_memory,  kmg(get_value(used, Memory))},
+     {process_available, erlang:system_info(process_limit)},
+     {process_used, erlang:system_info(process_count)},
+     {max_fds, get_value(max_fds, erlang:system_info(check_io))} | CpuInfo].
+
 metrics() ->
-    [{Metric, Val} || {Metric, Val} <- emqttd_metrics:all()].
+    {ok, emqttd_metrics:all()}.
    
 listeners() ->
-    lists:map(fun({{Protocol, Port}, Pid})-> 
-		MaxClients = esockd:get_max_clients(Pid),	
-	 	CurrentClients = esockd:get_current_clients(Pid),
-	 	[{protocol, Protocol},{port, Port},{max_clients, MaxClients},{current_clients, CurrentClients}] 
-	      end, esockd:listeners()).
+    {ok, lists:map(fun listener/1, esockd:listeners())}.
+
+listener({{Protocol, Port}, Pid}) ->
+    [{protocol, Protocol}, {port, Port},
+     {max_clients, esockd:get_max_clients(Pid)},
+     {current_clients, esockd:get_current_clients(Pid)}].
 
 bnode() ->
-    [{node, node()}].
+    {ok, [{node, node()}]}.
 
+kmg(Byte) when Byte > ?GB ->
+    float(Byte / ?GB, "G");
+kmg(Byte) when Byte > ?MB ->
+    float(Byte / ?MB, "M");
+kmg(Byte) when Byte > ?KB ->
+    float(Byte / ?MB, "K");
+kmg(Byte) ->
+    Byte.
+
+float(F, S) ->
+    iolist_to_binary(io_lib:format("~.2f~s", [F, S])).
 

@@ -14,18 +14,22 @@
 %% limitations under the License.
 %%--------------------------------------------------------------------
 
-%% @doc Action for route api.
+%% @doc Route API.
 -module(emqttd_dashboard_route).
 
 -include("emqttd_dashboard.hrl").
+
 -include("../../../include/emqttd.hrl").
 
 -include_lib("stdlib/include/qlc.hrl").
 
+-http_api({"routes", execute, []}).
+
 -export([execute/0]).
 
 execute() ->
-    F = fun() -> qlc:e(qlc:q([E || E <- mnesia:table(route)])) end,
-    {atomic, Topics} =  mnesia:transaction(F),
-    [[{topic, Topic}, {node, Node}] || #mqtt_route{topic = Topic, node= Node} <- Topics].
+    %%TODO: ...
+    Q = qlc:q([E || E <- mnesia:table(route)]),
+    {atomic, Topics} =  mnesia:transaction(fun qlc:e/1, [Q]),
+    {ok, [[{topic, Topic}, {node, Node}] || #mqtt_route{topic = Topic, node= Node} <- Topics]}.
 
