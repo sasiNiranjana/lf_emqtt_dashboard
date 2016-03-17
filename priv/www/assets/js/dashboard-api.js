@@ -150,8 +150,8 @@
 		},
 		
 		// user_update
-		user_update : function(callback) {
-			this._ajax("update_user", null, callback);
+		user_update : function(user, callback) {
+			this._ajax("update_user", user, callback);
 		},
 
 		// logout
