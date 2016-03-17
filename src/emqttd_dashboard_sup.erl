@@ -14,7 +14,7 @@
 %% limitations under the License.
 %%--------------------------------------------------------------------
 
-%% @doc emqttd web dashboard supervisor.
+%% @doc emqttd dashboard supervisor.
 -module(emqttd_dashboard_sup).
 
 -behaviour(supervisor).
@@ -25,9 +25,11 @@
 %% Supervisor callbacks
 -export([init/1]).
 
+-define(CHILD(I), {I, {I, start_link, []}, permanent, 5000, worker, [I]}).
+
 start_link() ->
     supervisor:start_link({local, ?MODULE}, ?MODULE, []).
 
 init([]) ->
-    {ok, { {one_for_one, 5, 10}, []} }.
+    {ok, { {one_for_all, 10, 100}, [?CHILD(emqttd_dashboard_admin)] } }.
 

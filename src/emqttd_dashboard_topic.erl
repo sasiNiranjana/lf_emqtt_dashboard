@@ -18,15 +18,18 @@
 -module(emqttd_dashboard_topic).
 
 -include("emqttd_dashboard.hrl").
+
 -include("../../../include/emqttd.hrl").
 
 -include_lib("stdlib/include/qlc.hrl").
 
 -export([execute/0]).
 
+-http_api({"topics", execute, []}).
+
 execute() ->
-    %% Count total number.
-    F = fun() -> qlc:e(qlc:q([E || E <- mnesia:table(topic)])) end,
-    {atomic, Topics} =  mnesia:transaction(F),
-    [[{topic, Topic}, {flags, Flags}] || #mqtt_topic{topic = Topic,flags= Flags} <- Topics].
+    %%TODO: protect...
+    Q = qlc:q([E || E <- mnesia:table(topic)]),
+    {atomic, Topics} =  mnesia:transaction(fun qlc:e/1, [Q]),
+    {ok, [[{topic, Topic}, {flags, Flags}] || #mqtt_topic{topic = Topic,flags= Flags} <- Topics]}.
 
