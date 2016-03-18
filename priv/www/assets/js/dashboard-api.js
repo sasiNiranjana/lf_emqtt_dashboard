@@ -26,12 +26,7 @@
 
 		// 配置项参数
 		_config : {
-			apiUri : "/",
-			protocol : "http",
-			hostname : "",
-			port : "18083",
-			userName : null,
-			password : null
+			apiUri : "/"
 		},
 
 		// API初始化
@@ -49,20 +44,12 @@
 		},
 
 		// var callback = function(ret, err) {};
-		_ajax : function(apiEnd, data, callback, isAddAuth) {
+		_ajax : function(apiEnd, data, callback, ajaxInfo) {
 			var _self = this;
 			this._checkException();
-			var isAuth = (typeof isAddAuth == "boolean") ? isAddAuth : false;
-			var url = this._config.apiUri + "api/" + apiEnd;
-			if (isAuth) {
-				url = this._config.protocol + "://" + this._config.userName +
-						":" + this._config.password + "@" +
-						this._config.hostname + ":" + this._config.port + "/" +
-						"api/" + apiEnd;
-			}
-			$.ajax({
+			$.ajax($.extend({
 				type : "POST",
-				url : url,
+				url : this._config.apiUri + "api/" + apiEnd,
 				dataType : "json",
 				data : data,
 				success : function(ret) {
@@ -81,7 +68,7 @@
 				error : function(err) {
 					callback(undefined, err);
 				}
-			});
+			}, ajaxInfo || {}));
 		},
 		
 		// bnode
@@ -156,9 +143,11 @@
 
 		// logout
 		logout : function(callback) {
-			this._config.userName = "logout";
-			this._config.password = "logout";
-			this._ajax("logout", null, callback, true);
+			this._ajax("current_user", null, callback, {
+				headers: {
+		            "Authorization": "Lougout 123456789"
+		        }
+			});
 			// clearAuthenticate();
 		},
 		

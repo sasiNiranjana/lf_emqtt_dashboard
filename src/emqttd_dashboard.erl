@@ -132,13 +132,15 @@ authorized(Req) ->
         "Basic " ++ BasicAuth ->
             {Username, Password} = user_passwd(BasicAuth),
             case emqttd_dashboard_admin:check(bin(Username), bin(Password)) of
-                ok              ->
+                ok                 ->
                     true;
-                {error, Reason} ->
+                {error, Reason}    ->
                     lager:error("HTTP Auth failure: username=~s, reason=~p",
                                 [Username, Reason]),
                     false
-            end
+            end;
+        _                     ->
+            false
     end.
 
 user_passwd(BasicAuth) ->
