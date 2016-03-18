@@ -81,7 +81,7 @@ handle_request("/api/" ++ Name, Req, Env) ->
                     lager:error("Execute API '~s' Error: ~p", [Name, Reason]),
                     Req:respond({404, [{"Content-Type", "application/json"}], []})
             end;
-        false ->
+        undefined ->
             Req:respond({404, [{"Content-Type", "application/json"}], []})
     end;
        

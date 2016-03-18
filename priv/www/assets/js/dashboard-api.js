@@ -22,6 +22,8 @@
 
 	dApi.prototype = {
 
+		_callback : EF,
+
 		// 配置项参数
 		_config : {
 			apiUri : "/",
@@ -33,8 +35,11 @@
 		},
 
 		// API初始化
-		init : function(config) {
+		init : function(config, callback) {
 			$.extend(this._config, config || {});
+			if (typeof callback == "function") {
+				this._callback = callback;
+			}
 		},
 
 		_checkException : function() {
@@ -45,6 +50,7 @@
 
 		// var callback = function(ret, err) {};
 		_ajax : function(apiEnd, data, callback, isAddAuth) {
+			var _self = this;
 			this._checkException();
 			var isAuth = (typeof isAddAuth == "boolean") ? isAddAuth : false;
 			var url = this._config.apiUri + "api/" + apiEnd;
@@ -67,6 +73,9 @@
 						callback(undefined, ret);
 					} else {
 						callback(ret, undefined);
+					}
+					if (_self._callback) {
+						_self._callback();
 					}
 				},
 				error : function(err) {
@@ -141,8 +150,8 @@
 		},
 		
 		// user_update
-		user_update : function(callback) {
-			this._ajax("update_user", null, callback);
+		user_update : function(user, callback) {
+			this._ajax("update_user", user, callback);
 		},
 
 		// logout
