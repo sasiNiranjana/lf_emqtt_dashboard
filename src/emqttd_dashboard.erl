@@ -18,9 +18,9 @@
 
 -import(proplists, [get_value/2]).
 
--export([http_handler/0, handle_request/2]).
+-export([http_handler/0, handle_request/2, query_table/5]).
 
--export([paginate/3, strftime/1]).
+-export([strftime/1]).
 
 -define(APP, ?MODULE).
 
@@ -68,8 +68,8 @@ handle_request("/api/" ++ Name, Req, Env) ->
     Params = Req:parse_post(),
     case find_api(Name, Env)  of
         {Mod, Fun, InitArgs} ->
-            Args = lists:map(fun({Arg, Type, Def})->
-                                case get_value(Arg, Params)of
+            Args = lists:map(fun({Arg, Type, Def}) ->
+                                case get_value(Arg, Params) of
                                     undefined -> format(Type, Def);
                                     Value     -> format(Type, Value)
                                 end
@@ -89,18 +89,27 @@ handle_request("/" ++ Rest, Req, Env) ->
     mochiweb_request:serve_file(Rest, get_value(docroot, Env), Req).
 
 %%--------------------------------------------------------------------
-%% Paging
+%% Table Query and Pagination
 %%--------------------------------------------------------------------
 
-paginate(TotalNum, PageNum, PageSize) ->
+query_table(Qh, CurrPage, PageSize, TotalNum, RowFun) ->
+    C = qlc:cursor(Qh),
+    case CurrPage > 1 of
+        true  -> qlc:next_answers(C, (CurrPage - 1) * PageSize);
+        false -> ok
+    end,
+    Rows = qlc:next_answers(C, PageSize),
     TotalPage = case TotalNum rem PageSize of
                     0 -> TotalNum div PageSize;
                     _ -> (TotalNum div PageSize) + 1
                 end,
-    if
-        PageNum > TotalPage -> {TotalPage, TotalPage};
-        true                -> {PageNum, TotalPage}
-    end.
+    {ok, [{currentPage, CurrPage}, {pageSize,    PageSize},
+          {totalNum,    TotalNum}, {totalPage,   TotalPage},
+          {result,      [RowFun(R) || R <- Rows]}]}.
+
+%%--------------------------------------------------------------------
+%% Strftime
+%%--------------------------------------------------------------------
 
 strftime({MegaSecs, Secs, _MicroSecs}) ->
     strftime(datetime(MegaSecs * 1000000 + Secs));
