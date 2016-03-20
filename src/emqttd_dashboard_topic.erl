@@ -25,20 +25,15 @@
 
 -export([list/3]).
 
--http_api({"topics", list, [{"topic", binary, "all"},
-                            {"curr_page", int, "1"},
-                            {"page_size", int, "100"}]}).
+-http_api({"topics", list, [{"topic",     binary},
+                            {"curr_page", int, 1},
+                            {"page_size", int, 100}]}).
 
 
-list(<<"all">>, PageNo, PageSize) ->
+list(_Topic, PageNo, PageSize) ->
     TotalNum = mnesia:table_info(topic, size),
     Qh = qlc:q([R || R <- mnesia:table(topic)]),
-    mnesia:async_dirty(fun emqttd_dashboard:query_table/3, [Qh, PageNo, PageSize, TotalNum, fun row/1]).
-
-    %% {ok, [{total,  Total},
-    %%       {limit,  Limit},
-    %%       {offset, Offset},
-    %%       {rows,   [row(Topic) || Topic <- Topics ]}]}.
+    mnesia:async_dirty(fun emqttd_dashboard:query_table/5, [Qh, PageNo, PageSize, TotalNum, fun row/1]).
 
 row(#mqtt_topic{topic = Topic,flags= Flags}) ->
     [{topic, Topic}, {flags, Flags}].

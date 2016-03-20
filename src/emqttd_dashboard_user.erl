@@ -21,39 +21,44 @@
 
 -include("../../../include/emqttd.hrl").
 
--import(emqttd_dashboard_admin, [add_user/3, remove_user/1, update_user/3]).
-
 -export([users/0, update/3, remover/1, add/3]).
 
 -http_api({"users", users, []}).
 
--http_api({"update_user", update,  [{"user_name", binary, ""},
-                                    {"password", binary, ""},
-                                    {"tags", binary, ""}]}).
--http_api({"remove_user", remover, [{"user_name", binary, ""}]}).
+-http_api({"update_user", update,  [{"user_name", binary},
+                                    {"password", binary},
+                                    {"tags", binary, <<"">>}]}).
+-http_api({"remove_user", remover, [{"user_name", binary}]}).
 
--http_api({"add_user",    add,     [{"user_name", binary, ""},
-                                    {"password", binary, ""},
-                                    {"tags", binary, ""}]}).
+-http_api({"add_user",    add,     [{"user_name", binary},
+                                    {"password", binary},
+                                    {"tags", binary, <<"">>}]}).
+
+-define(EMPTY(S), (S == <<"">> orelse S == undefined)).
 
 users() ->
-    F = fun(#mqtt_admin{username = Username, tags = Tags}) ->
-            [{name, Username}, {tag, Tags}]
-        end,
-    {ok, [F(Admin) || Admin <- ets:tab2list(mqtt_admin)]}.
+    {ok, [row(Admin) || Admin <- ets:tab2list(mqtt_admin)]}.
+
+row(#mqtt_admin{username = Username, tags = Tags}) ->
+    [{name, Username}, {tag, Tags}].
+
+add(Username, Password, _Tag) when ?EMPTY(Username) orelse ?EMPTY(Password) ->
+    code({error, "Username or password undefined"});
+ 
+add(Username, Password, Tag) ->
+    {ok, code(emqttd_dashboard_admin:add_user(Username, Password, Tag))}.
+
+update(Username, Password, _Tag) when ?EMPTY(Username) orelse ?EMPTY(Password) ->
+    code({error, "Username or password undefined"});
  
 update(Username, Password, Tag) ->
-    Status = update_user(Username, Password, Tag),
-    {ok, code(Status)}.
+    {ok, code(emqttd_dashboard_admin:update_user(Username, Password, Tag))}.
 
 remover(<<"admin">>) ->
     {ok, [{status, failure},{reason, list_to_binary("admin cannot be deleted")}]};
 
 remover(Username) ->
-    {ok, code(remove_user(Username))}.
- 
-add(Username, Password, Tag) ->
-    {ok, code(add_user(Username, Password, Tag))}.
+    {ok, code(emqttd_dashboard_admin:remove_user(Username))}.
  
 code(ok)              -> [{status, success}];
 code({error, Reason}) -> [{status, failure}, {reason, list_to_binary(Reason)}].

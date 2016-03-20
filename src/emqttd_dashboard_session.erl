@@ -27,14 +27,14 @@
 
 -export([list/3]).
 
--http_api({"sessions", list, [{"client_id", binary, "all"},
-                              {"curr_page", int,    "1"},
-                              {"page_size", int,    "100"}]}).
+-http_api({"sessions", list, [{"client_id", binary},
+                              {"curr_page", int, 1},
+                              {"page_size", int, 100}]}).
 
-list(<<"all">>, CurrPage, PageSize) ->
+list(_ClientId, PageNo, PageSize) ->
     TotalNum = lists:sum([ets:info(Tab, size) || Tab <- tables()]),
     Qh = qlc:append([qlc:q([E || E <- ets:table(Tab)]) || Tab <- tables()]),
-    emqttd_dashboard:query_table(Qh, CurrPage, PageSize, TotalNum, fun row/1).
+    emqttd_dashboard:query_table(Qh, PageNo, PageSize, TotalNum, fun row/1).
 
 tables() ->
     [mqtt_transient_session, mqtt_persistent_session].

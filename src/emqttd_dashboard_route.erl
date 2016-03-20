@@ -23,17 +23,17 @@
 
 -include_lib("stdlib/include/qlc.hrl").
 
--http_api({"routes", list, [{"topic", binary, "all"},
-                            {"curr_page", int, "1"},
-                            {"page_size", int, "100"}]}).
+-http_api({"routes", list, [{"topic",     binary},
+                            {"curr_page", int, 1},
+                            {"page_size", int, 100}]}).
 
 -export([list/3]).
 
-list(<<"all">>, CurrPage, PageSize) ->
+list(_Topic, PageNo, PageSize) ->
     TotalNum = mnesia:table_info(route, size),
     Qh = qlc:q([R || R <- mnesia:table(route)]),
-    mnesia:async_dirty(fun emqttd_dashboard:query_table/3,
-                       [Qh, CurrPage, PageSize, TotalNum, fun row/1]).
+    mnesia:async_dirty(fun emqttd_dashboard:query_table/5,
+                       [Qh, PageNo, PageSize, TotalNum, fun row/1]).
 
 row(#mqtt_route{topic = Topic, node= Node}) ->
     [{topic, Topic}, {node, Node}].
