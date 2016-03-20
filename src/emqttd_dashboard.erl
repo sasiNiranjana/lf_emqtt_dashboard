@@ -110,14 +110,17 @@ query_table(Qh, PageNo, PageSize, TotalNum, RowFun) ->
         true  -> qlc:next_answers(Cursor, (PageNo - 1) * PageSize);
         false -> ok
     end,
-    TotalPage = case TotalNum rem PageSize of
-                    0 -> TotalNum div PageSize;
-                    _ -> (TotalNum div PageSize) + 1
-                end,
     Rows = qlc:next_answers(Cursor, PageSize),
     {ok, [{currentPage, PageNo}, {pageSize, PageSize},
-          {totalNum, TotalNum}, {totalPage, TotalPage},
+          {totalNum, TotalNum},
+          {totalPage, total_page(TotalNum, PageSize)},
           {result, [RowFun(Row) || Row <- Rows]}]}.
+
+total_page(TotalNum, PageSize) ->
+    case TotalNum rem PageSize of
+        0 -> TotalNum div PageSize;
+        _ -> (TotalNum div PageSize) + 1
+    end.
 
 %%--------------------------------------------------------------------
 %% Strftime
