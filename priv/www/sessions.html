@@ -60,7 +60,11 @@
 		      showing <span id="sessions_count_start">0</span> - <span id="sessions_count_end">0</span> of <span id="sessions_count_all">0</span> records
 		    </div>
             <div class="col-sm-6">
-                <div class="btn-group pull-right">
+                <div class="pull-right" id="pagination">
+                <button type="button" class="btn btn-white disabled previous">
+                   Previous
+                </button>
+                <div class="btn-group">
                     <button type="button" class="btn btn-white dropdown-toggle" data-toggle="dropdown">
                         records per page <strong id="page_size">100</strong> <span class="caret"></span>
                     </button>
@@ -79,10 +83,10 @@
                         </li>
                     </ul>
                 </div>
-                <ul class="pagination pull-right" style="margin: 0 0;" id="pagination">
-                    <li class="paginate_button previous disabled"><a href="javascript:;">Previous</a></li>
-                    <li class="paginate_button next disabled"><a href="javascript:;">Next</a></li>
-                </ul>
+                <button type="button" class="btn btn-white disabled next">
+                   Next
+                </button>
+                </div>
             </div>
         </div>
 

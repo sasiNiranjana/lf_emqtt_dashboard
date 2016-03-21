@@ -31,6 +31,27 @@ PageInfo.prototype.endNum = function() {
 }
 
 jQuery.fn.pagination = function(pageInfo, module) {
+	var pagination = $(this);
+	var previous = pagination.find(".previous");
+	var next = pagination.find(".next");
+	
+	if (pageInfo.totalNum == 0) {
+		previous.replaceWith('<button type="button" class="btn btn-white disabled previous">Previous</button>');
+		next.replaceWith('<button type="button" class="btn btn-white disabled next">Next</button>');
+		return;
+	}
+	if (pageInfo.currPage <= 1) {
+		previous.replaceWith('<button type="button" class="btn btn-white disabled previous">Previous</button>');
+	} else {
+		previous.replaceWith('<button type="button" class="btn btn-white previous" onclick="'+module+'.setCurrPage('+(pageInfo.currPage-1)+');">Previous</button>');
+	}
+	if (pageInfo.currPage >= pageInfo.totalPage) {
+		next.replaceWith('<button type="button" class="btn btn-white disabled next">Next</button>');
+	} else {
+		next.replaceWith('<button type="button" class="btn btn-white next" onclick="'+module+'.setCurrPage('+(pageInfo.currPage+1)+');">Next</button>');
+	}
+	
+	/*
 	var p = $(this).empty();
 	if (pageInfo.totalNum == 0) {
 		p.append('<li class="paginate_button previous disabled"><a href="javascript:;">Previous</a></li>');
@@ -44,7 +65,6 @@ jQuery.fn.pagination = function(pageInfo, module) {
 		p.append('<li class="paginate_button previous"><a href="javascript:;" onclick="'+module+'.setCurrPage('+(pageInfo.currPage-1)+');">Previous</a></li>');
 	}
 	
-	/*
 	var len = 6;
 	// 起始按钮
 	var start = 1;
@@ -83,13 +103,13 @@ jQuery.fn.pagination = function(pageInfo, module) {
 		}
 		p.append('<li class="paginate_button"><a href="javascript:;" onclick="'+module+'.setCurrPage('+pageInfo.totalPage+');">'+pageInfo.totalPage+'</a></li>');
 	}
-	*/
 
 	if (pageInfo.currPage >= pageInfo.totalPage) {
 		p.append('<li class="paginate_button next disabled"><a href="javascript:;">Next</a></li>');
 	} else {
 		p.append('<li class="paginate_button next"><a href="javascript:;" onclick="'+module+'.setCurrPage('+(pageInfo.currPage+1)+');">Next</a></li>');
 	}
+	*/
 }
 
 // checks whether the content is in RTL mode
@@ -803,13 +823,58 @@ function showSubscriptions() {
 	
 	// 加载Subscriptions信息
 	loading('subscriptions.html', function() {
-		dashApi.subscriptions(function(ret, err) {
+		subscriptions.loadTable();
+	});
+};
+
+(function(w) {
+	var subscriptions = {};
+	subscriptions.pInfo = new PageInfo(1, 100, 0);
+	
+	subscriptions.setPageSize = function(pageSize) {
+		this.pInfo.pageSize = pageSize;
+		this.pInfo.currPage = 1;
+		this.loadTable();
+	};
+	
+	subscriptions.setCurrPage = function(currPage) {
+		this.pInfo.currPage = currPage;
+		this.loadTable();
+	};
+	
+	subscriptions.loadTable = function() {
+		var _this = this;
+		
+		var params = {page_size : this.pInfo.pageSize,
+				curr_page : this.pInfo.currPage};
+		// Table List
+		dashApi.subscriptions(params, function(ret, err) {
 			if (ret) {
-				$('#subscriptions_count_all').text(ret.length);
+				var result = [];
+				if (ret instanceof Array) {
+					result = ret;
+					_this.pInfo.currPage = 1;
+					_this.pInfo.pageSize = ret.length;
+					_this.pInfo.totalNum = ret.length;
+					_this.pInfo.totalPage = 1;
+				} else {
+					result = ret.result;
+					_this.pInfo.currPage = ret.currentPage;
+					_this.pInfo.pageSize = ret.pageSize;
+					_this.pInfo.totalNum = ret.totalNum;
+					_this.pInfo.totalPage = ret.totalPage;
+				}
+				// 加载分页按钮
+				$('#pagination').pagination(_this.pInfo, 'subscriptions');
+				$('#page_size').text(_this.pInfo.pageSize);
+				
+				$('#subscriptions_count_all').text(_this.pInfo.totalNum);
+				$('#subscriptions_count_start').text(_this.pInfo.offsetting());
+				$('#subscriptions_count_end').text(_this.pInfo.endNum());
 				var tby = $('#subscriptions tbody').empty();
-				if (ret.length > 0) {
-					for (var i = 0; i < ret.length; i++) {
-						var obj = ret[i];
+				if (_this.pInfo.totalNum > 0) {
+					for (var i = 0; i < result.length; i++) {
+						var obj = result[i];
 						tby.append('<tr>' +
 								'<td>' + obj['clientId'] + '</td>' +
 								'<td>' + obj['subscriptions'] + '</td>' +
@@ -818,15 +883,17 @@ function showSubscriptions() {
 				} else {
 					tby.append(
 							'<tr><td colspan="9">' +
-							'<p style="padding: 12px;">... no subscriptions ...</p>' +
+							'<p style="padding: 12px;">... no clients ...</p>' +
 							'</td></tr>');
 				}
 			} else {
 				console.log(err);
 			}
 		});
-	});
-};
+	};
+	
+	w.subscriptions = subscriptions;
+})(window);
 
 function showWebsocket() {
 	// 标题导航条

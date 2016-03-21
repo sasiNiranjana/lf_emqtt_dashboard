@@ -112,8 +112,8 @@
 		},
 
 		// subscriptions
-		subscriptions : function(callback) {
-			this._ajax("subscriptions", null, callback);
+		subscriptions : function(params, callback) {
+			this._ajax("subscriptions", params, callback);
 		},
 
 		// users
