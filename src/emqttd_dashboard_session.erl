@@ -21,51 +21,25 @@
 
 -include("../../../include/emqttd.hrl").
 
--include_lib("stdlib/include/ms_transform.hrl").
+-include_lib("stdlib/include/qlc.hrl").
 
 -import(proplists, [get_value/2]).
 
--export([execute/3]).
+-export([list/3]).
 
--http_api({"sessions", execute, [{"curr_page", int, "1"},
-                                 {"page_size", int, "100"},
-                                 {"client_key", string, ""}]}).
+-http_api({"sessions", list, [{"client_id", binary},
+                              {"curr_page", int, 1},
+                              {"page_size", int, 100}]}).
 
-execute(PageNum, PageSize, _ClientKey) ->
-    %% Count total number.
-    TotalNum = count(),
-    {CurrPage, TotalPage} = emqttd_dashboard:paginate(TotalNum, PageNum, PageSize),
-	Result = [querysession(Tab, CurrPage, TotalPage, PageSize) ||
-                Tab <- [mqtt_transient_session, mqtt_persistent_session]],
-    {ok, [{currentPage, CurrPage},
-          {pageSize, PageSize},
-          {totalNum, TotalNum},
-          {totalPage, TotalPage},
-          {result, lists:append(Result)}]}.
+list(_ClientId, PageNo, PageSize) ->
+    TotalNum = lists:sum([ets:info(Tab, size) || Tab <- tables()]),
+    Qh = qlc:append([qlc:q([E || E <- ets:table(Tab)]) || Tab <- tables()]),
+    emqttd_dashboard:query_table(Qh, PageNo, PageSize, TotalNum, fun row/1).
 
-count() ->
-    ets:info(mqtt_transient_session, size) + ets:info(mqtt_persistent_session, size).
+tables() ->
+    [mqtt_transient_session, mqtt_persistent_session].
 
-querysession(Tab, CurrentPage, TotalPage, PageSize) ->
-	if CurrentPage > TotalPage ->
-		[];
-	true ->
-		Obj = ets:match_object(Tab, '$1', PageSize),
-		parser_session(CurrentPage, Obj)
-	end.
-
-parser_session(_, Obj) when is_atom(Obj), Obj =:= '$end_of_table'->
-    [];
-parser_session(1, {Matchs, _C}) ->
-    [session_table(Match)|| Match <- Matchs];
-parser_session(Times, {_Matchs, C}=Obj) ->
-    if is_atom(C), C =:= '$end_of_table' ->
-	parser_session(1, Obj);
-    true->
-	parser_session(Times-1, ets:match_object(C))
-    end.
-
-session_table({{ClientId, _Pid}, Session}) ->
+row({{ClientId, _Pid}, Session}) ->
     InfoKeys = [clean_sess, max_inflight, inflight_queue, message_queue,
                 message_dropped, awaiting_rel, awaiting_ack, awaiting_comp, created_at],
      [{clientId, ClientId} | [{Key, format(Key, get_value(Key, Session))} || Key <- InfoKeys]].

@@ -23,20 +23,17 @@
 
 -include_lib("stdlib/include/qlc.hrl").
 
--export([execute/0]).
+-export([list/3]).
 
--http_api({"subscriptions", execute, []}).
+-http_api({"subscriptions", list, [{"client_id", binary},
+                                   {"curr_page", int, 1},
+                                   {"page_size", int, 100}]}).
 
-execute() ->
-    %%TODO: protect...
-    RowFun = fun(Key) ->
-               Records = ets:lookup(subscription, Key),
-               [{clientId, Key}, {subscriptions, format(subscriptions, Records)}]
-             end,
-    {ok, [RowFun(Key) || Key <- mnesia:dirty_all_keys(subscription)]}.
+list(_ClientId, PageNo, PageSize) ->
+    TotalNum = ets:info(subscription, size),
+    Qh = qlc:q([E || E <- ets:table(subscription)]),
+    emqttd_dashboard:query_table(Qh, PageNo, PageSize, TotalNum, fun row/1).
 
-format(subscriptions, Subscriptions) ->
-    list_to_binary(
-        string:join([io_lib:format("~s:~w", [Topic, Qos]) ||
-                #mqtt_subscription{topic = Topic, qos = Qos} <- Subscriptions], ",")).
+row(#mqtt_subscription{subid = ClientId, topic = Topic, qos = Qos}) ->
+    [{clientid, ClientId}, {topic, Topic}, {qos, Qos}].
 

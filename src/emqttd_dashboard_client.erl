@@ -21,48 +21,26 @@
 
 -include("../../../include/emqttd.hrl").
 
--include_lib("stdlib/include/ms_transform.hrl").
+-include_lib("stdlib/include/qlc.hrl").
 
--http_api({"clients", execute, [{"curr_page", int, "1"},
-                                {"page_size", int, "100"},
-                                {"client_key", string, ""}]}).
+-export([list/3]).
 
--export([execute/3]).
+-http_api({"clients", list, [{"client_id", binary},
+                             {"curr_page", int, 1},
+                             {"page_size", int, 100}]}).
 
-execute(PageNum, PageSize, _ClientKey) ->
+list(_ClientId, PageNo, PageSize) ->
     TotalNum = ets:info(mqtt_client, size),
-    {CurrPage, TotalPage} = emqttd_dashboard:paginate(TotalNum, PageNum, PageSize),
-    Result = query(mqtt_client, CurrPage, PageSize, TotalPage),
-    {ok, [{currentPage, CurrPage},
-          {pageSize,    PageSize},
-          {totalNum,    TotalNum},
-          {totalPage,   TotalPage},
-          {result,      Result}]}.
+    Qh = qlc:q([R || R <- ets:table(mqtt_client)]),
+    emqttd_dashboard:query_table(Qh, PageNo, PageSize, TotalNum, fun row/1).
 
-query(_Tab, CurrPage, _PageSize, TotalPage) when CurrPage > TotalPage ->
-    [];
-query(Tab, CurrPage, PageSize, _TotalPage) ->
-    Obj = ets:match_object(Tab, #mqtt_client{_='_'}, PageSize),
-    parser_obj(CurrPage, Obj).
-
-parser_obj(_, Obj) when is_atom(Obj),Obj =:= '$end_of_table'->
-    [];
-parser_obj(1, {Matchs, _C}) ->
-    [format_data(Match) || Match <- Matchs];
-parser_obj(Times, {_Matchs, C}=Obj) ->
-    if is_atom(C), C =:= '$end_of_table' ->
-        parser_obj(1, Obj);
-    true                              ->
-        parser_obj(Times-1, ets:match_object(C))
-    end.
-
-format_data(#mqtt_client{client_id = ClientId,
-                          peername = {IpAddr, Port},
-                          username = Username,
-                          clean_sess = CleanSess,
-                          proto_ver = ProtoVer,
-                          keepalive = KeepAlvie,
-                          connected_at = ConnectedAt}) ->
+row(#mqtt_client{client_id = ClientId,
+                 peername = {IpAddr, Port},
+                 username = Username,
+                 clean_sess = CleanSess,
+                 proto_ver = ProtoVer,
+                 keepalive = KeepAlvie,
+                 connected_at = ConnectedAt}) ->
     [{clientId, ClientId},
      {username, Username},
      {ipaddress, list_to_binary(emqttd_net:ntoa(IpAddr))},

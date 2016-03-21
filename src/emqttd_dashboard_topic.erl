@@ -14,7 +14,7 @@
 %% limitations under the License.
 %%--------------------------------------------------------------------
 
-%% @doc Action for topic api.
+%% @doc Topic API.
 -module(emqttd_dashboard_topic).
 
 -include("emqttd_dashboard.hrl").
@@ -23,13 +23,18 @@
 
 -include_lib("stdlib/include/qlc.hrl").
 
--export([execute/0]).
+-export([list/3]).
 
--http_api({"topics", execute, []}).
+-http_api({"topics", list, [{"topic",     binary},
+                            {"curr_page", int, 1},
+                            {"page_size", int, 100}]}).
 
-execute() ->
-    %%TODO: protect...
-    Q = qlc:q([E || E <- mnesia:table(topic)]),
-    {atomic, Topics} =  mnesia:transaction(fun qlc:e/1, [Q]),
-    {ok, [[{topic, Topic}, {flags, Flags}] || #mqtt_topic{topic = Topic,flags= Flags} <- Topics]}.
+
+list(_Topic, PageNo, PageSize) ->
+    TotalNum = mnesia:table_info(topic, size),
+    Qh = qlc:q([R || R <- mnesia:table(topic)]),
+    mnesia:async_dirty(fun emqttd_dashboard:query_table/5, [Qh, PageNo, PageSize, TotalNum, fun row/1]).
+
+row(#mqtt_topic{topic = Topic,flags= Flags}) ->
+    [{topic, Topic}, {flags, Flags}].
 
