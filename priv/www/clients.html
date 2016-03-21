@@ -1,7 +1,7 @@
 <div class="panel panel-default">
     <div class="panel-heading">
         <h3 class="panel-title">
-            All Clients (<em id="clients_count_all">0</em>)
+            All Clients
         </h3>
 
         <div class="panel-options">
@@ -13,7 +13,7 @@
     <div class="panel-body">
 
         <div class="row" style="margin-bottom: 5px;">
-            <div class="col-sm-6">
+            <div class="col-sm-12">
                 <!-- 
                 <form role="form" class="form-inline pull-right" onsubmit="return false;">
 
@@ -28,27 +28,6 @@
 
                 </form>
                  -->
-            </div>
-            <div class="col-sm-6">
-                <div class="btn-group pull-right">
-                    <button type="button" class="btn btn-white dropdown-toggle" data-toggle="dropdown">
-                        Show <strong id="page_size">100</strong> Number <span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu dropdown-white" role="menu">
-                        <li>
-                            <a href="javascript:;" onclick="clients.setPageSize(100);">100</a>
-                        </li>
-                        <li>
-                            <a href="javascript:;" onclick="clients.setPageSize(200);">200</a>
-                        </li>
-                        <li>
-                            <a href="javascript:;" onclick="clients.setPageSize(500);">500</a>
-                        </li>
-                        <li>
-                            <a href="javascript:;" onclick="clients.setPageSize(1000);">1000</a>
-                        </li>
-                    </ul>
-                </div>
             </div>
         </div>
 
@@ -76,12 +55,31 @@
         </div>
 
         <div class="row">
-            <div class="col-sm-12">
+            <div class="col-sm-6">
+                showing <span id="clients_count_start">0</span> - <span id="clients_count_end">0</span> of <span id="clients_count_all">0</span> records
+            </div>
+            <div class="col-sm-6">
+                <div class="btn-group pull-right">
+                    <button type="button" class="btn btn-white dropdown-toggle" data-toggle="dropdown">
+                        records per page <strong id="page_size">100</strong> <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-white" role="menu">
+                        <li>
+                            <a href="javascript:;" onclick="clients.setPageSize(100);">100</a>
+                        </li>
+                        <li>
+                            <a href="javascript:;" onclick="clients.setPageSize(200);">200</a>
+                        </li>
+                        <li>
+                            <a href="javascript:;" onclick="clients.setPageSize(500);">500</a>
+                        </li>
+                        <li>
+                            <a href="javascript:;" onclick="clients.setPageSize(1000);">1000</a>
+                        </li>
+                    </ul>
+                </div>
                 <ul class="pagination pull-right" style="margin: 0 0;" id="pagination">
                     <li class="paginate_button previous disabled"><a href="javascript:;">Previous</a></li>
-                    <li class="paginate_button active"><a href="javascript:;" onclick="clients.setCurrPage(1);">1</a></li>
-                    <li class="paginate_button "><a href="javascript:;" onclick="clients.setCurrPage(2);">2</a></li>
-                    <li class="paginate_button "><a href="javascript:;" onclick="clients.setCurrPage(3);">3</a></li>
                     <li class="paginate_button next disabled"><a href="javascript:;">Next</a></li>
                 </ul>
             </div>

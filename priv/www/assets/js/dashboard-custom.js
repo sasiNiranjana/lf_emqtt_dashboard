@@ -15,6 +15,20 @@ PageInfo.prototype.countTotalPage = function(totalPage) {
 		this.totalPage = this.totalNum / this.pageSize + 1;
 	}
 };
+PageInfo.prototype.offsetting = function() {
+	if (this.totalNum == 0) {
+		return 0;
+	} else {
+		return (this.currPage - 1) * this.pageSize + 1;
+	}
+}
+PageInfo.prototype.endNum = function() {
+	if (this.currPage == this.totalPage) {
+		return this.totalNum;
+	} else {
+		return this.offsetting() + this.pageSize - 1;
+	}
+}
 
 jQuery.fn.pagination = function(pageInfo, module) {
 	var p = $(this).empty();
@@ -30,6 +44,7 @@ jQuery.fn.pagination = function(pageInfo, module) {
 		p.append('<li class="paginate_button previous"><a href="javascript:;" onclick="'+module+'.setCurrPage('+(pageInfo.currPage-1)+');">Previous</a></li>');
 	}
 	
+	/*
 	var len = 6;
 	// 起始按钮
 	var start = 1;
@@ -68,6 +83,7 @@ jQuery.fn.pagination = function(pageInfo, module) {
 		}
 		p.append('<li class="paginate_button"><a href="javascript:;" onclick="'+module+'.setCurrPage('+pageInfo.totalPage+');">'+pageInfo.totalPage+'</a></li>');
 	}
+	*/
 
 	if (pageInfo.currPage >= pageInfo.totalPage) {
 		p.append('<li class="paginate_button next disabled"><a href="javascript:;">Next</a></li>');
@@ -551,8 +567,6 @@ function showClients() {
 	
 	cs.loadTable = function() {
 		var _this = this;
-		// 加载分页信息
-		$('#page_size').text(this.pInfo.pageSize);
 		$('#user_key').val(this.client_key);
 		
 		var params = {page_size : this.pInfo.pageSize,
@@ -577,8 +591,11 @@ function showClients() {
 				}
 				// 加载分页按钮
 				$('#pagination').pagination(_this.pInfo, 'clients');
+				$('#page_size').text(_this.pInfo.pageSize);
 				
 				$('#clients_count_all').text(_this.pInfo.totalNum);
+				$('#clients_count_start').text(_this.pInfo.offsetting());
+				$('#clients_count_end').text(_this.pInfo.endNum());
 				var tby = $('#clients tbody').empty();
 				if (_this.pInfo.totalNum > 0) {
 					for (var i = 0; i < result.length; i++) {
@@ -642,8 +659,6 @@ function showSessions() {
 	
 	se.loadTable = function() {
 		var _this = this;
-		// 加载分页信息
-		$('#page_size').text(this.pInfo.pageSize);
 		
 		var params = {page_size : this.pInfo.pageSize,
 				curr_page : this.pInfo.currPage};
@@ -666,8 +681,11 @@ function showSessions() {
 				}
 				// 加载分页按钮
 				$('#pagination').pagination(_this.pInfo, 'sessions');
+				$('#page_size').text(_this.pInfo.pageSize);
 				
 				$('#sessions_count_all').text(_this.pInfo.totalNum);
+				$('#sessions_count_start').text(_this.pInfo.offsetting());
+				$('#sessions_count_end').text(_this.pInfo.endNum());
 				var tby = $('#sessions tbody').empty();
 				if (_this.pInfo.totalNum > 0) {
 					for (var i = 0; i < result.length; i++) {
