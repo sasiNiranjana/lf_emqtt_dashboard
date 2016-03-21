@@ -749,13 +749,58 @@ function showTopics() {
 	
 	// 加载Topics信息
 	loading('topics.html', function() {
-		dashApi.topics(function(ret, err) {
+        topics.loadTable();
+    });
+};
+
+(function(w) {
+	var topics = {};
+	topics.pInfo = new PageInfo(1, 100, 0);
+	
+	topics.setPageSize = function(pageSize) {
+		this.pInfo.pageSize = pageSize;
+		this.pInfo.currPage = 1;
+		this.loadTable();
+	};
+	
+	topics.setCurrPage = function(currPage) {
+		this.pInfo.currPage = currPage;
+		this.loadTable();
+	};
+	
+	topics.loadTable = function() {
+		var _this = this;
+		
+		var params = {page_size : this.pInfo.pageSize,
+				curr_page : this.pInfo.currPage};
+		// Table List
+		dashApi.topics(params, function(ret, err) {
 			if (ret) {
-				$('#topics_count_all').text(ret.length);
+				var result = [];
+				if (ret instanceof Array) {
+					result = ret;
+					_this.pInfo.currPage = 1;
+					_this.pInfo.pageSize = ret.length;
+					_this.pInfo.totalNum = ret.length;
+					_this.pInfo.totalPage = 1;
+				} else {
+					result = ret.result;
+					_this.pInfo.currPage = ret.currentPage;
+					_this.pInfo.pageSize = ret.pageSize;
+					_this.pInfo.totalNum = ret.totalNum;
+					_this.pInfo.totalPage = ret.totalPage;
+				}
+				// 加载分页按钮
+				$('#pagination').pagination(_this.pInfo, 'topics');
+				$('#page_size').text(_this.pInfo.pageSize);
+				
+				$('#topics_count_all').text(_this.pInfo.totalNum);
+				$('#topics_count_start').text(_this.pInfo.offsetting());
+				$('#topics_count_end').text(_this.pInfo.endNum());
 				var tby = $('#topics tbody').empty();
-				if (ret.length > 0) {
-					for (var i = 0; i < ret.length; i++) {
-						var obj = ret[i];
+				if (_this.pInfo.totalNum > 0) {
+					for (var i = 0; i < result.length; i++) {
+						var obj = result[i];
 						tby.append('<tr>' +
 								'<td>' + obj['topic'] + '</td>' +
 								'<td>' + obj['flags'] + '</td>' +
@@ -771,8 +816,10 @@ function showTopics() {
 				console.log(err);
 			}
 		});
-	});
-};
+	};
+	
+	w.topics = topics;
+})(window);
 
 function showRoutes() {
 	// 标题导航条

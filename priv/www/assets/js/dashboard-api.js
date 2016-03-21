@@ -107,8 +107,8 @@
 		},
 
 		// topics
-		topics : function(callback) {
-			this._ajax("topics", null, callback);
+		topics : function(params, callback) {
+			this._ajax("topics", params, callback);
 		},
 
 		// subscriptions
