@@ -876,8 +876,9 @@ function showSubscriptions() {
 					for (var i = 0; i < result.length; i++) {
 						var obj = result[i];
 						tby.append('<tr>' +
-								'<td>' + obj['clientId'] + '</td>' +
-								'<td>' + obj['subscriptions'] + '</td>' +
+								'<td>' + obj['clientid'] + '</td>' +
+								'<td>' + obj['topic'] + '</td>' +
+								'<td>' + obj['qos'] + '</td>' +
 								'</tr>');
 					}
 				} else {
