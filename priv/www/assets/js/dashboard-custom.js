@@ -15,8 +15,43 @@ PageInfo.prototype.countTotalPage = function(totalPage) {
 		this.totalPage = this.totalNum / this.pageSize + 1;
 	}
 };
+PageInfo.prototype.offsetting = function() {
+	if (this.totalNum == 0) {
+		return 0;
+	} else {
+		return (this.currPage - 1) * this.pageSize + 1;
+	}
+}
+PageInfo.prototype.endNum = function() {
+	if (this.currPage == this.totalPage) {
+		return this.totalNum;
+	} else {
+		return this.offsetting() + this.pageSize - 1;
+	}
+}
 
 jQuery.fn.pagination = function(pageInfo, module) {
+	var pagination = $(this);
+	var previous = pagination.find(".previous");
+	var next = pagination.find(".next");
+	
+	if (pageInfo.totalNum == 0) {
+		previous.replaceWith('<button type="button" class="btn btn-white disabled previous">Previous</button>');
+		next.replaceWith('<button type="button" class="btn btn-white disabled next">Next</button>');
+		return;
+	}
+	if (pageInfo.currPage <= 1) {
+		previous.replaceWith('<button type="button" class="btn btn-white disabled previous">Previous</button>');
+	} else {
+		previous.replaceWith('<button type="button" class="btn btn-white previous" onclick="'+module+'.setCurrPage('+(pageInfo.currPage-1)+');">Previous</button>');
+	}
+	if (pageInfo.currPage >= pageInfo.totalPage) {
+		next.replaceWith('<button type="button" class="btn btn-white disabled next">Next</button>');
+	} else {
+		next.replaceWith('<button type="button" class="btn btn-white next" onclick="'+module+'.setCurrPage('+(pageInfo.currPage+1)+');">Next</button>');
+	}
+	
+	/*
 	var p = $(this).empty();
 	if (pageInfo.totalNum == 0) {
 		p.append('<li class="paginate_button previous disabled"><a href="javascript:;">Previous</a></li>');
@@ -74,6 +109,7 @@ jQuery.fn.pagination = function(pageInfo, module) {
 	} else {
 		p.append('<li class="paginate_button next"><a href="javascript:;" onclick="'+module+'.setCurrPage('+(pageInfo.currPage+1)+');">Next</a></li>');
 	}
+	*/
 }
 
 // checks whether the content is in RTL mode
@@ -551,8 +587,6 @@ function showClients() {
 	
 	cs.loadTable = function() {
 		var _this = this;
-		// 加载分页信息
-		$('#page_size').text(this.pInfo.pageSize);
 		$('#user_key').val(this.client_key);
 		
 		var params = {page_size : this.pInfo.pageSize,
@@ -577,8 +611,11 @@ function showClients() {
 				}
 				// 加载分页按钮
 				$('#pagination').pagination(_this.pInfo, 'clients');
+				$('#page_size').text(_this.pInfo.pageSize);
 				
 				$('#clients_count_all').text(_this.pInfo.totalNum);
+				$('#clients_count_start').text(_this.pInfo.offsetting());
+				$('#clients_count_end').text(_this.pInfo.endNum());
 				var tby = $('#clients tbody').empty();
 				if (_this.pInfo.totalNum > 0) {
 					for (var i = 0; i < result.length; i++) {
@@ -642,8 +679,6 @@ function showSessions() {
 	
 	se.loadTable = function() {
 		var _this = this;
-		// 加载分页信息
-		$('#page_size').text(this.pInfo.pageSize);
 		
 		var params = {page_size : this.pInfo.pageSize,
 				curr_page : this.pInfo.currPage};
@@ -666,8 +701,11 @@ function showSessions() {
 				}
 				// 加载分页按钮
 				$('#pagination').pagination(_this.pInfo, 'sessions');
+				$('#page_size').text(_this.pInfo.pageSize);
 				
 				$('#sessions_count_all').text(_this.pInfo.totalNum);
+				$('#sessions_count_start').text(_this.pInfo.offsetting());
+				$('#sessions_count_end').text(_this.pInfo.endNum());
 				var tby = $('#sessions tbody').empty();
 				if (_this.pInfo.totalNum > 0) {
 					for (var i = 0; i < result.length; i++) {
@@ -711,13 +749,58 @@ function showTopics() {
 	
 	// 加载Topics信息
 	loading('topics.html', function() {
-		dashApi.topics(function(ret, err) {
+        topics.loadTable();
+    });
+};
+
+(function(w) {
+	var topics = {};
+	topics.pInfo = new PageInfo(1, 100, 0);
+	
+	topics.setPageSize = function(pageSize) {
+		this.pInfo.pageSize = pageSize;
+		this.pInfo.currPage = 1;
+		this.loadTable();
+	};
+	
+	topics.setCurrPage = function(currPage) {
+		this.pInfo.currPage = currPage;
+		this.loadTable();
+	};
+	
+	topics.loadTable = function() {
+		var _this = this;
+		
+		var params = {page_size : this.pInfo.pageSize,
+				curr_page : this.pInfo.currPage};
+		// Table List
+		dashApi.topics(params, function(ret, err) {
 			if (ret) {
-				$('#topics_count_all').text(ret.length);
+				var result = [];
+				if (ret instanceof Array) {
+					result = ret;
+					_this.pInfo.currPage = 1;
+					_this.pInfo.pageSize = ret.length;
+					_this.pInfo.totalNum = ret.length;
+					_this.pInfo.totalPage = 1;
+				} else {
+					result = ret.result;
+					_this.pInfo.currPage = ret.currentPage;
+					_this.pInfo.pageSize = ret.pageSize;
+					_this.pInfo.totalNum = ret.totalNum;
+					_this.pInfo.totalPage = ret.totalPage;
+				}
+				// 加载分页按钮
+				$('#pagination').pagination(_this.pInfo, 'topics');
+				$('#page_size').text(_this.pInfo.pageSize);
+				
+				$('#topics_count_all').text(_this.pInfo.totalNum);
+				$('#topics_count_start').text(_this.pInfo.offsetting());
+				$('#topics_count_end').text(_this.pInfo.endNum());
 				var tby = $('#topics tbody').empty();
-				if (ret.length > 0) {
-					for (var i = 0; i < ret.length; i++) {
-						var obj = ret[i];
+				if (_this.pInfo.totalNum > 0) {
+					for (var i = 0; i < result.length; i++) {
+						var obj = result[i];
 						tby.append('<tr>' +
 								'<td>' + obj['topic'] + '</td>' +
 								'<td>' + obj['flags'] + '</td>' +
@@ -733,8 +816,10 @@ function showTopics() {
 				console.log(err);
 			}
 		});
-	});
-};
+	};
+	
+	w.topics = topics;
+})(window);
 
 function showRoutes() {
 	// 标题导航条
@@ -748,13 +833,58 @@ function showRoutes() {
 	
 	// 加载Routes信息
 	loading('routes.html', function() {
-		dashApi.routes(function(ret, err) {
+        routes.loadTable();
+    });
+};
+
+(function(w) {
+	var routes = {};
+	routes.pInfo = new PageInfo(1, 100, 0);
+	
+	routes.setPageSize = function(pageSize) {
+		this.pInfo.pageSize = pageSize;
+		this.pInfo.currPage = 1;
+		this.loadTable();
+	};
+	
+	routes.setCurrPage = function(currPage) {
+		this.pInfo.currPage = currPage;
+		this.loadTable();
+	};
+	
+	routes.loadTable = function() {
+		var _this = this;
+		
+		var params = {page_size : this.pInfo.pageSize,
+				curr_page : this.pInfo.currPage};
+		// Table List
+		dashApi.routes(params, function(ret, err) {
 			if (ret) {
-				$('#routes_count_all').text(ret.length);
+				var result = [];
+				if (ret instanceof Array) {
+					result = ret;
+					_this.pInfo.currPage = 1;
+					_this.pInfo.pageSize = ret.length;
+					_this.pInfo.totalNum = ret.length;
+					_this.pInfo.totalPage = 1;
+				} else {
+					result = ret.result;
+					_this.pInfo.currPage = ret.currentPage;
+					_this.pInfo.pageSize = ret.pageSize;
+					_this.pInfo.totalNum = ret.totalNum;
+					_this.pInfo.totalPage = ret.totalPage;
+				}
+				// 加载分页按钮
+				$('#pagination').pagination(_this.pInfo, 'routes');
+				$('#page_size').text(_this.pInfo.pageSize);
+				
+				$('#routes_count_all').text(_this.pInfo.totalNum);
+				$('#routes_count_start').text(_this.pInfo.offsetting());
+				$('#routes_count_end').text(_this.pInfo.endNum());
 				var tby = $('#routes tbody').empty();
-				if (ret.length > 0) {
-					for (var i = 0; i < ret.length; i++) {
-						var obj = ret[i];
+				if (_this.pInfo.totalNum > 0) {
+					for (var i = 0; i < result.length; i++) {
+						var obj = result[i];
 						tby.append('<tr>' +
 								'<td>' + obj['topic'] + '</td>' +
 								'<td>' + obj['node'] + '</td>' +
@@ -770,8 +900,10 @@ function showRoutes() {
 				console.log(err);
 			}
 		});
-	});
-};
+	};
+	
+	w.routes = routes;
+})(window);
 
 function showSubscriptions() {
 	// 标题导航条
@@ -785,30 +917,78 @@ function showSubscriptions() {
 	
 	// 加载Subscriptions信息
 	loading('subscriptions.html', function() {
-		dashApi.subscriptions(function(ret, err) {
+		subscriptions.loadTable();
+	});
+};
+
+(function(w) {
+	var subscriptions = {};
+	subscriptions.pInfo = new PageInfo(1, 100, 0);
+	
+	subscriptions.setPageSize = function(pageSize) {
+		this.pInfo.pageSize = pageSize;
+		this.pInfo.currPage = 1;
+		this.loadTable();
+	};
+	
+	subscriptions.setCurrPage = function(currPage) {
+		this.pInfo.currPage = currPage;
+		this.loadTable();
+	};
+	
+	subscriptions.loadTable = function() {
+		var _this = this;
+		
+		var params = {page_size : this.pInfo.pageSize,
+				curr_page : this.pInfo.currPage};
+		// Table List
+		dashApi.subscriptions(params, function(ret, err) {
 			if (ret) {
-				$('#subscriptions_count_all').text(ret.length);
+				var result = [];
+				if (ret instanceof Array) {
+					result = ret;
+					_this.pInfo.currPage = 1;
+					_this.pInfo.pageSize = ret.length;
+					_this.pInfo.totalNum = ret.length;
+					_this.pInfo.totalPage = 1;
+				} else {
+					result = ret.result;
+					_this.pInfo.currPage = ret.currentPage;
+					_this.pInfo.pageSize = ret.pageSize;
+					_this.pInfo.totalNum = ret.totalNum;
+					_this.pInfo.totalPage = ret.totalPage;
+				}
+				// 加载分页按钮
+				$('#pagination').pagination(_this.pInfo, 'subscriptions');
+				$('#page_size').text(_this.pInfo.pageSize);
+				
+				$('#subscriptions_count_all').text(_this.pInfo.totalNum);
+				$('#subscriptions_count_start').text(_this.pInfo.offsetting());
+				$('#subscriptions_count_end').text(_this.pInfo.endNum());
 				var tby = $('#subscriptions tbody').empty();
-				if (ret.length > 0) {
-					for (var i = 0; i < ret.length; i++) {
-						var obj = ret[i];
+				if (_this.pInfo.totalNum > 0) {
+					for (var i = 0; i < result.length; i++) {
+						var obj = result[i];
 						tby.append('<tr>' +
-								'<td>' + obj['clientId'] + '</td>' +
-								'<td>' + obj['subscriptions'] + '</td>' +
+								'<td>' + obj['clientid'] + '</td>' +
+								'<td>' + obj['topic'] + '</td>' +
+								'<td>' + obj['qos'] + '</td>' +
 								'</tr>');
 					}
 				} else {
 					tby.append(
 							'<tr><td colspan="9">' +
-							'<p style="padding: 12px;">... no subscriptions ...</p>' +
+							'<p style="padding: 12px;">... no clients ...</p>' +
 							'</td></tr>');
 				}
 			} else {
 				console.log(err);
 			}
 		});
-	});
-};
+	};
+	
+	w.subscriptions = subscriptions;
+})(window);
 
 function showWebsocket() {
 	// 标题导航条

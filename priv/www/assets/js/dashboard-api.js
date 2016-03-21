@@ -107,13 +107,13 @@
 		},
 
 		// topics
-		topics : function(callback) {
-			this._ajax("topics", null, callback);
+		topics : function(params, callback) {
+			this._ajax("topics", params, callback);
 		},
 
 		// subscriptions
-		subscriptions : function(callback) {
-			this._ajax("subscriptions", null, callback);
+		subscriptions : function(params, callback) {
+			this._ajax("subscriptions", params, callback);
 		},
 
 		// users
@@ -152,8 +152,8 @@
 		},
 		
 		// routes
-		routes : function(callback) {
-			this._ajax("routes", null, callback);
+		routes : function(params, callback) {
+			this._ajax("routes", params, callback);
 		}
 	};
 	

@@ -18,89 +18,113 @@
 
 -import(proplists, [get_value/2]).
 
--export([http_handler/0, handle_request/2]).
+-export([http_handler/0, handle_request/2, query_table/5]).
 
--export([paginate/3, strftime/1]).
+-export([strftime/1]).
 
 -define(APP, ?MODULE).
 
--define(AUTH_HEADER, {"WWW-Authenticate", "Basic Realm=\"emqttd dashboard\""}).
+-record(state, {docroot, dispatch}).
 
 %%--------------------------------------------------------------------
-%% HTTP Handler
+%% HTTP Handler and Dispatcher
 %%--------------------------------------------------------------------
 
 http_handler() ->
-    Env = [{docroot, docroot()}, {api, http_api()}],
-    {?MODULE, handle_request, [Env]}.
+    {ok, Modules} = application:get_key(?APP, modules),
+    APIs = lists:append(lists:map(fun http_api/1, Modules)),
+    State = #state{docroot  = docroot(), dispatch = dispatcher(APIs)},
+    {?MODULE, handle_request, [State]}.
+
+http_api(Mod) ->
+    [{Name, {Mod, Fun, Args}} || {http_api, [{Name, Fun, Args}]} <- Mod:module_info(attributes)].
 
 docroot() ->
     {file, Here} = code:is_loaded(?MODULE),
     Dir = filename:dirname(filename:dirname(Here)),
     filename:join([Dir, "priv", "www"]).
 
-http_api() ->
-    {ok, Modules} = application:get_key(?APP, modules),
-    lists:append(lists:map(fun http_api/1, Modules)).
+dispatcher(APIs) ->
+    fun(Req, Name, Params) ->
+        case get_value(Name, APIs) of
+            {Mod, Fun, ArgDefs} ->
+                io:format("Handle ~s API: ~s:~s~n", [Name, Mod, Fun]),
+                Args = lists:map(fun(Def) -> parse_arg(Def, Params) end, ArgDefs),
+                case catch apply(Mod, Fun, Args) of
+                    {ok, Data} ->
+                        respond(Req, 200, Data);
+                    {'EXIT', Reason} ->
+                        lager:error("Execute API '~s' Error: ~p", [Name, Reason]),
+                        respond(Req, 404, [])
+                end;
+            undefined ->
+                respond(Req, 404, [])
+        end
+    end.
 
-http_api(Mod) ->
-    [{Name, {Mod, Fun, Args}} || {http_api, [{Name, Fun, Args}]} <- Mod:module_info(attributes)].
+parse_arg({Arg, Type}, Params) ->
+    parse_arg({Arg, Type, undefined}, Params);
+parse_arg({Arg, Type, Def}, Params) ->
+    case get_value(Arg, Params) of
+        undefined -> Def;
+        Val       -> format(Type, Val)
+    end.
 
-find_api(Name, Env) ->
-    get_value(Name, get_value(api, Env)).
+respond(Req, 401, Data) ->
+    Req:respond({401, [{"WWW-Authenticate", "Basic Realm=\"emqttd dashboard\""}], Data});
+respond(Req, 404, Data) ->
+    Req:respond({404, [{"Content-Type", "text/plain"}], Data});
+respond(Req, 200, Data) ->
+    Req:respond({200, [{"Content-Type", "application/json"}], to_json(Data)});
+respond(Req, Code, Data) ->
+    Req:respond({Code, [{"Content-Type", "text/plain"}], Data}).
 
 %%--------------------------------------------------------------------
 %% Handle HTTP Request
 %%--------------------------------------------------------------------
 
-handle_request(Req, Env) ->
-    if_authorized(Req, fun() -> Path = Req:get(path), handle_request(Path, Req, Env) end).
+handle_request(Req, State) ->
+    if_authorized(Req, fun() -> Path = Req:get(path), handle_request(Path, Req, State) end).
 
-handle_request("/api/current_user", Req, _Env) ->
+handle_request("/api/current_user", Req, _State) ->
     "Basic " ++ BasicAuth =  Req:get_header_value("Authorization"),
     {Username, _Password} = user_passwd(BasicAuth),
-    json_respond(Req, [{username, bin(Username)}]);
+    respond(Req, 200, [{username, bin(Username)}]);
 
-handle_request("/api/logout", Req, _Env)  ->
-    Req:respond({401, [?AUTH_HEADER], []});
+handle_request("/api/logout", Req, _State) ->
+    respond(Req, 401, []);
 
-handle_request("/api/" ++ Name, Req, Env) ->
-    Params = Req:parse_post(),
-    case find_api(Name, Env)  of
-        {Mod, Fun, InitArgs} ->
-            Args = lists:map(fun({Arg, Type, Def})->
-                                case get_value(Arg, Params)of
-                                    undefined -> format(Type, Def);
-                                    Value     -> format(Type, Value)
-                                end
-                             end, InitArgs),
-            case catch apply(Mod, Fun, Args) of
-                {ok, JsonData} ->
-                    json_respond(Req, JsonData);
-                {'EXIT', Reason} ->
-                    lager:error("Execute API '~s' Error: ~p", [Name, Reason]),
-                    Req:respond({404, [{"Content-Type", "application/json"}], []})
-            end;
-        undefined ->
-            Req:respond({404, [{"Content-Type", "application/json"}], []})
-    end;
-       
-handle_request("/" ++ Rest, Req, Env) ->
-    mochiweb_request:serve_file(Rest, get_value(docroot, Env), Req).
+handle_request("/api/" ++ Name, Req, #state{dispatch = Dispatch}) ->
+    Dispatch(Req, Name, Req:parse_post());
+
+handle_request("/" ++ Rest, Req, #state{docroot = DocRoot}) ->
+    mochiweb_request:serve_file(Rest, DocRoot, Req).
 
 %%--------------------------------------------------------------------
-%% Paging
+%% Table Query and Pagination
 %%--------------------------------------------------------------------
 
-paginate(TotalNum, PageNum, PageSize) ->
-    TotalPage = case TotalNum rem PageSize of
-                    0 -> TotalNum div PageSize;
-                    _ -> (TotalNum div PageSize) + 1
-                end,
-    if
-        PageNum > TotalPage -> {TotalPage, TotalPage};
-        true                -> {PageNum, TotalPage}
+query_table(Qh, PageNo, PageSize, TotalNum, RowFun) ->
+    Cursor = qlc:cursor(Qh),
+    case PageNo > 1 of
+        true  -> qlc:next_answers(Cursor, (PageNo - 1) * PageSize);
+        false -> ok
+    end,
+    Rows = qlc:next_answers(Cursor, PageSize),
+    {ok, [{currentPage, PageNo}, {pageSize, PageSize},
+          {totalNum, TotalNum},
+          {totalPage, total_page(TotalNum, PageSize)},
+          {result, [RowFun(Row) || Row <- Rows]}]}.
+
+total_page(TotalNum, PageSize) ->
+    case TotalNum rem PageSize of
+        0 -> TotalNum div PageSize;
+        _ -> (TotalNum div PageSize) + 1
     end.
+
+%%--------------------------------------------------------------------
+%% Strftime
+%%--------------------------------------------------------------------
 
 strftime({MegaSecs, Secs, _MicroSecs}) ->
     strftime(datetime(MegaSecs * 1000000 + Secs));
@@ -122,32 +146,26 @@ datetime(Timestamp) when is_integer(Timestamp) ->
 if_authorized(Req, Fun) ->
     case authorized(Req) of
         true  -> Fun();
-        false -> Req:respond({401, [?AUTH_HEADER], []})
+        false -> respond(Req, 401,  [])
     end.
 
 authorized(Req) ->
     case Req:get_header_value("Authorization") of
-        undefined             ->
-            false;
         "Basic " ++ BasicAuth ->
             {Username, Password} = user_passwd(BasicAuth),
             case emqttd_dashboard_admin:check(bin(Username), bin(Password)) of
-                ok                 ->
-                    true;
-                {error, Reason}    ->
+                ok -> true;
+                {error, Reason} ->
                     lager:error("HTTP Auth failure: username=~s, reason=~p",
                                 [Username, Reason]),
                     false
             end;
-        _                     ->
+         _   ->
             false
     end.
 
 user_passwd(BasicAuth) ->
     list_to_tuple(binary:split(base64:decode(BasicAuth), <<":">>)).
-
-json_respond(Req, Data) ->
-    Req:respond({200, [{"Content-Type", "application/json"}], to_json(Data)}).
 
 to_json([])   -> <<"[]">>;
 to_json(Data) -> iolist_to_binary(mochijson2:encode(Data)).
