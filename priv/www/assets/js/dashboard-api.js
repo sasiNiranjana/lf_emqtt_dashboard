@@ -152,8 +152,8 @@
 		},
 		
 		// routes
-		routes : function(callback) {
-			this._ajax("routes", null, callback);
+		routes : function(params, callback) {
+			this._ajax("routes", params, callback);
 		}
 	};
 	

@@ -1,6 +1,6 @@
 <div class="panel panel-default">
     <div class="panel-heading">
-        <h3 class="panel-title">All Routes (<em id="routes_count_all">0</em>)</h3>
+        <h3 class="panel-title">All Routes</h3>
 
         <div class="panel-options">
             <a href="#" data-toggle="panel"> <span class="collapse-icon">–</span>
@@ -26,6 +26,41 @@
                     </tbody>
                 </table>
 
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-sm-6">
+              showing <span id="routes_count_start">0</span> - <span id="routes_count_end">0</span> of <span id="routes_count_all">0</span> records
+            </div>
+            <div class="col-sm-6">
+                <div class="pull-right" id="pagination">
+                <button type="button" class="btn btn-white disabled previous">
+                   Previous
+                </button>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-white dropdown-toggle" data-toggle="dropdown">
+                        records per page <strong id="page_size">100</strong> <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-white" role="menu">
+                        <li>
+                            <a href="javascript:;" onclick="routes.setPageSize(100);">100</a>
+                        </li>
+                        <li>
+                            <a href="javascript:;" onclick="routes.setPageSize(200);">200</a>
+                        </li>
+                        <li>
+                            <a href="javascript:;" onclick="routes.setPageSize(500);">500</a>
+                        </li>
+                        <li>
+                            <a href="javascript:;" onclick="routes.setPageSize(1000);">1000</a>
+                        </li>
+                    </ul>
+                </div>
+                <button type="button" class="btn btn-white disabled next">
+                   Next
+                </button>
+                </div>
             </div>
         </div>
 
