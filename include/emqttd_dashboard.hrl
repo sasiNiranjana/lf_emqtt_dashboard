@@ -18,3 +18,4 @@
 
 -type(mqtt_admin() :: #mqtt_admin{}).
 
+-define(EMPTY_KEY(Key), ((Key == undefined) orelse (Key == <<>>))).

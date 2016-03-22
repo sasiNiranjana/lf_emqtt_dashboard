@@ -25,14 +25,18 @@
 
 -export([list/3]).
 
--http_api({"subscriptions", list, [{"client_id", binary},
-                                   {"curr_page", int, 1},
-                                   {"page_size", int, 100}]}).
+-http_api({"subscriptions", list, [{"client_key", binary},
+                                   {"curr_page",  int, 1},
+                                   {"page_size",  int, 100}]}).
 
-list(_ClientId, PageNo, PageSize) ->
+list(ClientId, PageNo, PageSize) when ?EMPTY_KEY(ClientId) ->
     TotalNum = ets:info(subscription, size),
     Qh = qlc:q([E || E <- ets:table(subscription)]),
-    emqttd_dashboard:query_table(Qh, PageNo, PageSize, TotalNum, fun row/1).
+    emqttd_dashboard:query_table(Qh, PageNo, PageSize, TotalNum, fun row/1);
+
+list(ClientId, PageNo, PageSize) ->
+    Fun = fun() -> ets:lookup(subscription, ClientId) end,
+    emqttd_dashboard:lookup_table(Fun, PageNo, PageSize, fun row/1).
 
 row(#mqtt_subscription{subid = ClientId, topic = Topic, qos = Qos}) ->
     [{clientid, ClientId}, {topic, Topic}, {qos, Qos}].

@@ -734,7 +734,7 @@ function showSessions() {
 				} else {
 					tby.append(
 							'<tr><td colspan="9">' +
-							'<p style="padding: 12px;">... no clients ...</p>' +
+							'<p style="padding: 12px;">... no sessions ...</p>' +
 							'</td></tr>');
 				}
 			} else {
@@ -1014,7 +1014,7 @@ function showSubscriptions() {
 				} else {
 					tby.append(
 							'<tr><td colspan="9">' +
-							'<p style="padding: 12px;">... no clients ...</p>' +
+							'<p style="padding: 12px;">... no subscriptions...</p>' +
 							'</td></tr>');
 				}
 			} else {

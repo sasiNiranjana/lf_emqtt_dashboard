@@ -18,7 +18,7 @@
 
 -import(proplists, [get_value/2]).
 
--export([http_handler/0, handle_request/2, query_table/5]).
+-export([http_handler/0, handle_request/2, query_table/5, lookup_table/4]).
 
 -export([strftime/1]).
 
@@ -48,7 +48,6 @@ dispatcher(APIs) ->
     fun(Req, Name, Params) ->
         case get_value(Name, APIs) of
             {Mod, Fun, ArgDefs} ->
-                io:format("Handle ~s API: ~s:~s~n", [Name, Mod, Fun]),
                 Args = lists:map(fun(Def) -> parse_arg(Def, Params) end, ArgDefs),
                 case catch apply(Mod, Fun, Args) of
                     {ok, Data} ->
@@ -121,6 +120,15 @@ total_page(TotalNum, PageSize) ->
         0 -> TotalNum div PageSize;
         _ -> (TotalNum div PageSize) + 1
     end.
+
+%%TODO: refactor later...
+lookup_table(LookupFun, PageNo, PageSize, RowFun) ->
+    Rows = LookupFun(), TotalNum = length(Rows),
+    io:format("~p\n",[Rows]),
+    {ok, [{currentPage, PageNo}, {pageSize, PageSize},
+          {totalNum, TotalNum},
+          {totalPage, total_page(TotalNum, PageSize)},
+          {result, [RowFun(Row) || Row <- Rows]}]}.
 
 %%--------------------------------------------------------------------
 %% Strftime
