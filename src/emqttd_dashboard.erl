@@ -48,7 +48,6 @@ dispatcher(APIs) ->
     fun(Req, Name, Params) ->
         case get_value(Name, APIs) of
             {Mod, Fun, ArgDefs} ->
-                io:format("Handle ~s API: ~s:~s~n", [Name, Mod, Fun]),
                 Args = lists:map(fun(Def) -> parse_arg(Def, Params) end, ArgDefs),
                 case catch apply(Mod, Fun, Args) of
                     {ok, Data} ->
