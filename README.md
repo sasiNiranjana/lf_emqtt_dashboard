@@ -36,7 +36,7 @@ make
 ./bin/emqttd_ctl plugins load emqttd_dashboard
 ```
 
-## Login 
+## Login
 
 URL: http://host:18083
 
