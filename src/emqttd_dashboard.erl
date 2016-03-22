@@ -18,7 +18,7 @@
 
 -import(proplists, [get_value/2]).
 
--export([http_handler/0, handle_request/2, query_table/5]).
+-export([http_handler/0, handle_request/2, query_table/5, lookup_table/4]).
 
 -export([strftime/1]).
 
@@ -121,6 +121,14 @@ total_page(TotalNum, PageSize) ->
         0 -> TotalNum div PageSize;
         _ -> (TotalNum div PageSize) + 1
     end.
+
+%%TODO: refactor later...
+lookup_table(LookupFun, PageNo, PageSize, RowFun) ->
+    Rows = LookupFun(), TotalNum = length(Rows),
+    {ok, [{currentPage, PageNo}, {pageSize, PageSize},
+          {totalNum, TotalNum},
+          {totalPage, total_page(TotalNum, PageSize)},
+          {result, [RowFun(Row) || Row <- Rows]}]}.
 
 %%--------------------------------------------------------------------
 %% Strftime
