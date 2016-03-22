@@ -25,14 +25,18 @@
 
 -export([list/3]).
 
--http_api({"clients", list, [{"client_id", binary},
-                             {"curr_page", int, 1},
-                             {"page_size", int, 100}]}).
+-http_api({"clients", list, [{"client_key", binary},
+                             {"curr_page",  int, 1},
+                             {"page_size",  int, 100}]}).
 
-list(_ClientId, PageNo, PageSize) ->
+list(ClientId, PageNo, PageSize) when ?EMPTY_KEY(ClientId) ->
     TotalNum = ets:info(mqtt_client, size),
     Qh = qlc:q([R || R <- ets:table(mqtt_client)]),
-    emqttd_dashboard:query_table(Qh, PageNo, PageSize, TotalNum, fun row/1).
+    emqttd_dashboard:query_table(Qh, PageNo, PageSize, TotalNum, fun row/1);
+
+list(ClientId, PageNo, PageSize) ->
+    Fun = fun() -> ets:lookup(mqtt_client, ClientId) end,
+    emqttd_dashboard:lookup_table(Fun, PageNo, PageSize, fun row/1).
 
 row(#mqtt_client{client_id = ClientId,
                  peername = {IpAddr, Port},

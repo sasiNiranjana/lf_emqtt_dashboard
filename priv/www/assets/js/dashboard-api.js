@@ -78,7 +78,7 @@
 
 		// nodes
 		nodes : function(callback) {
-			this._ajax("node", null, callback);
+			this._ajax("nodes", null, callback);
 		},
 		
 		// stats

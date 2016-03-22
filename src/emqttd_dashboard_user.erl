@@ -26,13 +26,13 @@
 -http_api({"users", users, []}).
 
 -http_api({"update_user", update,  [{"user_name", binary},
-                                    {"password", binary},
-                                    {"tags", binary, <<"">>}]}).
+                                    {"password",  binary},
+                                    {"tags",      binary, <<"">>}]}).
 -http_api({"remove_user", remover, [{"user_name", binary}]}).
 
 -http_api({"add_user",    add,     [{"user_name", binary},
-                                    {"password", binary},
-                                    {"tags", binary, <<"">>}]}).
+                                    {"password",  binary},
+                                    {"tags",      binary, <<"">>}]}).
 
 -define(EMPTY(S), (S == <<"">> orelse S == undefined)).
 

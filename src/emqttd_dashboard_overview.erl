@@ -30,7 +30,7 @@
 -http_api({"ptype",    ptype,     []}).
 -http_api({"memory",   memory,    []}).
 -http_api({"cpu",      cpu,       []}).
--http_api({"node",     nodes_info,[]}).
+-http_api({"nodes",    nodes_info,[]}).
 -http_api({"metrics",  metrics,   []}).
 -http_api({"listeners",listeners, []}).
 -http_api({"bnode",    bnode,     []}).
