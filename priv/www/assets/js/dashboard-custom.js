@@ -665,9 +665,16 @@ function showSessions() {
 (function(w) {
 	var se = {};
 	se.pInfo = new PageInfo(1, 100, 0);
+	se.client_key = null;
 	
 	se.setPageSize = function(pageSize) {
 		this.pInfo.pageSize = pageSize;
+		this.pInfo.currPage = 1;
+		this.loadTable();
+	};
+	
+    se.search = function(clientKey) {
+		this.client_key = clientKey;
 		this.pInfo.currPage = 1;
 		this.loadTable();
 	};
@@ -679,9 +686,11 @@ function showSessions() {
 	
 	se.loadTable = function() {
 		var _this = this;
+		$('#user_key').val(this.client_key);
 		
 		var params = {page_size : this.pInfo.pageSize,
-				curr_page : this.pInfo.currPage};
+				curr_page : this.pInfo.currPage,
+				client_key : this.client_key};
 		// Table List
 		dashApi.sessions(params, function(ret, err) {
 			if (ret) {
@@ -756,6 +765,7 @@ function showTopics() {
 (function(w) {
 	var topics = {};
 	topics.pInfo = new PageInfo(1, 100, 0);
+	topics.topic = null;
 	
 	topics.setPageSize = function(pageSize) {
 		this.pInfo.pageSize = pageSize;
@@ -767,12 +777,21 @@ function showTopics() {
 		this.pInfo.currPage = currPage;
 		this.loadTable();
 	};
+
+    topics.search = function(TopicKey) {
+		this.topic= TopicKey;
+		this.pInfo.currPage = 1;
+		this.loadTable();
+	};
+	
 	
 	topics.loadTable = function() {
 		var _this = this;
+		$('#topic_key').val(this.topic);
 		
 		var params = {page_size : this.pInfo.pageSize,
-				curr_page : this.pInfo.currPage};
+				curr_page : this.pInfo.currPage,
+				topic: this.topic};
 		// Table List
 		dashApi.topics(params, function(ret, err) {
 			if (ret) {
@@ -1246,10 +1265,10 @@ var User = {
 		editSubmit : function() {
 			var user = {};
 			var m = $('#modal_user_edit');
-			user.user_name = m.find('#user_edit_name').val();
-			user.tags = m.find('#user_edit_remark').val();
-			user.password = m.find('#user_edit_pwd').val();
-			user.pwd_1 = m.find('#user_edit_pwd_1').val();
+			user.user_name = $.trim(m.find('#user_add_name').val());
+			user.tags = $.trim(m.find('#user_add_remark').val());
+			user.password = $.trim(m.find('#user_add_pwd').val());
+			user.pwd_1 = $.trim(m.find('#user_add_pwd_1').val());
 			if (user.user_name == '') {
 				alert("Username is required.");
 				return;
@@ -1277,10 +1296,10 @@ var User = {
 		addSubmit : function() {
 			var user = {};
 			var m = $('#modal_user_add');
-			user.user_name = m.find('#user_add_name').val();
-			user.tags = m.find('#user_add_remark').val();
-			user.password = m.find('#user_add_pwd').val();
-			user.pwd_1 = m.find('#user_add_pwd_1').val();
+			user.user_name = $.trim(m.find('#user_add_name').val());
+			user.tags = $.trim(m.find('#user_add_remark').val());
+			user.password = $.trim(m.find('#user_add_pwd').val());
+			user.pwd_1 = $.trim(m.find('#user_add_pwd_1').val());
 			if (user.user_name == '') {
 				alert("Username is required.");
 				return;
