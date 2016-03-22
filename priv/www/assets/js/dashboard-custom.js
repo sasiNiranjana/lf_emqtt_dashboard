@@ -951,9 +951,16 @@ function showSubscriptions() {
 (function(w) {
 	var subscriptions = {};
 	subscriptions.pInfo = new PageInfo(1, 100, 0);
+	subscriptions.client_key = null;
 	
 	subscriptions.setPageSize = function(pageSize) {
 		this.pInfo.pageSize = pageSize;
+		this.pInfo.currPage = 1;
+		this.loadTable();
+	};
+	
+    subscriptions.search = function(clientKey) {
+		this.client_key = clientKey;
 		this.pInfo.currPage = 1;
 		this.loadTable();
 	};
@@ -965,9 +972,11 @@ function showSubscriptions() {
 	
 	subscriptions.loadTable = function() {
 		var _this = this;
+		$('#user_key').val(this.client_key);
 		
 		var params = {page_size : this.pInfo.pageSize,
-				curr_page : this.pInfo.currPage};
+				curr_page : this.pInfo.currPage,
+				client_key : this.client_key};
 		// Table List
 		dashApi.subscriptions(params, function(ret, err) {
 			if (ret) {
