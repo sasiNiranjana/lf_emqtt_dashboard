@@ -778,12 +778,11 @@ function showTopics() {
 		this.loadTable();
 	};
 
-    topics.search = function(TopicKey) {
-		this.topic= TopicKey;
+    topics.search = function(topicKey) {
+		this.topic= topicKey;
 		this.pInfo.currPage = 1;
 		this.loadTable();
 	};
-	
 	
 	topics.loadTable = function() {
 		var _this = this;
@@ -859,6 +858,7 @@ function showRoutes() {
 (function(w) {
 	var routes = {};
 	routes.pInfo = new PageInfo(1, 100, 0);
+	routes.topic = null;
 	
 	routes.setPageSize = function(pageSize) {
 		this.pInfo.pageSize = pageSize;
@@ -871,11 +871,19 @@ function showRoutes() {
 		this.loadTable();
 	};
 	
+    routes.search = function(topicKey) {
+		this.topic= topicKey;
+		this.pInfo.currPage = 1;
+		this.loadTable();
+	};
+
 	routes.loadTable = function() {
 		var _this = this;
+		$('#topic_key').val(this.topic);
 		
 		var params = {page_size : this.pInfo.pageSize,
-				curr_page : this.pInfo.currPage};
+				curr_page : this.pInfo.currPage,
+				topic: this.topic};
 		// Table List
 		dashApi.routes(params, function(ret, err) {
 			if (ret) {

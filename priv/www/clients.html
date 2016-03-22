@@ -18,11 +18,11 @@
 
                     <div class="form-group">
                         <input type="text" class="form-control" size="25"
-                            placeholder="Clientid" id="user_key" onchange="clients.search($('#user_key').val());"/>
+                            placeholder="Clientid" id="user_key" onchange="clients.search($.trim($(this).val()));"/>
                     </div>
 
                     <div class="form-group">
-                        <button class="btn btn-success btn-single" onclick="clients.search($('#user_key').val());" type="button">Search</button>
+                        <button class="btn btn-success btn-single" onclick="clients.search($.trim($('#user_key').val()));" type="button">Search</button>
                     </div>
 
                 </form>
