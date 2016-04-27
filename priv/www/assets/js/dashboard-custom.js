@@ -423,7 +423,7 @@ function showOverview() {
                     $('#sys_time').text(ret.datetime);
                 }
             });
-	}
+	};
 	
 	ov.nodes = function() {
 		dashApi.nodes(function(ret, err) {
