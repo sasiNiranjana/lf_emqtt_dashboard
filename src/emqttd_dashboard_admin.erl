@@ -109,33 +109,11 @@ init([]) ->
     %% Wait???
     %% mnesia:wait_for_tables([mqtt_admin], 5000),
     % Init mqtt_admin table
-    case mnesia:table_info(mqtt_admin, size) of
-        0 ->
-            Admin = case application:get_env(emqttd_dashboard, default_admin) of
-                {ok, Default} ->
-                    #mqtt_admin{username = bin(proplists:get_value(login, Default)),
-                                password = hash(bin(proplists:get_value(password, Default))),
-                                tags = <<"administrator">>};
-                undefined -> %% 
-                    #mqtt_admin{username = <<"admin">>,
-                                password = hash(<<"public">>),
-                                tags = <<"administrator">>}
-            end,
-            mnesia:transaction(fun mnesia:write/1, [Admin]);
-        _ ->
-            %% Fix issue #24 
-            mnesia:transaction(fun() ->
-                AtomNames = [Key || Key <- mnesia:all_keys(mqtt_admin), is_atom(Key)],
-                lists:foreach(fun(Name) ->
-                    case mnesia:read(mqtt_admin, Name, write) of
-                        [Admin] ->
-                            mnesia:delete({mqtt_admin, Name}),
-                            mnesia:write(Admin#mqtt_admin{username = bin(Admin)});
-                        [] ->
-                            ok
-                    end
-                end, AtomNames)
-           end)
+    case needs_defaut_user() of
+        true ->
+            insert_default_user();
+        false ->
+            ok
     end,
     {ok, state}.
 
@@ -170,7 +148,16 @@ salt() ->
     Salt = random:uniform(16#ffffffff),
     <<Salt:32>>.
 
-bin(S) when is_list(S)   -> list_to_binary(S);
-bin(A) when is_atom(A)   -> bin(atom_to_list(A));
-bin(B) when is_binary(B) -> B.
+needs_defaut_user() ->
+    is_empty(mqtt_admin).
+
+is_empty(Tab) ->
+    mnesia:dirty_first(Tab) == '$end_of_table'.
+
+insert_default_user() ->
+    Admin = #mqtt_admin{username = <<"admin">>,
+                        password = hash(<<"public">>),
+                        tags = <<"administrator">>},
+    mnesia:transaction(fun mnesia:write/1, [Admin]).
+ 
 
