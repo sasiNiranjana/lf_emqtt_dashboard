@@ -1,7 +1,8 @@
 {application, emqttd_dashboard,
  [
   {description, "emqttd web dashboard"},
-  {vsn, "1.0"},
+  {vsn, "1.1"},
+  {modules, []},
   {registered, []},
   {applications, [
                   kernel,
