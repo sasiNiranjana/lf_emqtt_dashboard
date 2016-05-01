@@ -7,6 +7,8 @@ LOCAL_DEPS = mnesia
 
 dep_emqttd = git https://github.com/emqtt/emqttd plus
 
+COVER = true
+
 include erlang.mk
 
 app:: rebar.config
