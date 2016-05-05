@@ -1082,6 +1082,7 @@ function showWebsocket() {
 		var userName = $('#user_name').val();
 		var password = $('#password').val();
 		var keepAlive = $('#keep_alive').val();
+		var cleanSession = $('#clean_session:checked');
 		if (userName != "") {
 			options.userName = userName;
 		}
@@ -1090,6 +1091,11 @@ function showWebsocket() {
 		}
 		if (keepAlive != "") {
 			options.keepAliveInterval = Number(keepAlive);
+		}
+		if (cleanSession.length > 0) {
+		    options.cleanSession = true;
+		} else {
+		    options.cleanSession = true;
 		}
 		client.connect(options);
 	};
@@ -1104,7 +1110,8 @@ function showWebsocket() {
 	
 	wSocket.subscribe = function(client) {
 		var topic = $('#subscription').val();
-		client.subscribe(topic);
+		var qos = $('#qos_2').val();
+		client.subscribe(topic, {qos : Number(qos)});
 		var nowStr = (new Date()).format("yyyy-MM-dd hh:mm:ss");
 		$('#subscriptions_list').append('<div>Subscribe Topic: ' 
 			+ topic + '<cite> ' 
@@ -1114,8 +1121,16 @@ function showWebsocket() {
 	wSocket.sendMessage = function(client) {
 		var topic = $('#topic').val();
 		var msg = $('#message').val();
+		var qos = $('#qos_3').val();
+		var retained = $('#retained:checked');
 		var message = new Paho.MQTT.Message(msg);
 		message.destinationName = topic;
+		message.qos = Number(qos);
+		if (retained.length > 0) {
+		    message.retained = true;
+		} else {
+		    message.retained = false;
+		}
 		client.send(message);
 		var nowStr = (new Date()).format("yyyy-MM-dd hh:mm:ss");
 		$('#send_message_list').append('<div>Send Message: ' 
