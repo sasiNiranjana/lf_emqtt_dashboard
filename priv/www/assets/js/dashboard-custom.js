@@ -1095,7 +1095,7 @@ function showWebsocket() {
 		if (cleanSession.length > 0) {
 		    options.cleanSession = true;
 		} else {
-		    options.cleanSession = true;
+		    options.cleanSession = false;
 		}
 		client.connect(options);
 	};
