@@ -25,7 +25,7 @@
 -export([start_link/0]).
 
 %%mqtt_admin api
--export([add_user/3, remove_user/1, update_user/3, lookup_user/1,
+-export([add_user/3, remove_user/1, update_user/3, lookup_user/1, change_password/2, 
          all_users/0, check/2]).
 
 %% gen_server Function Exports
@@ -55,7 +55,6 @@ add_user_(Admin = #mqtt_admin{username = Username}) ->
 -spec(remove_user(binary()) -> ok | {error, any()}).
 remove_user(Username) when is_binary(Username) ->
     return(mnesia:transaction(fun mnesia:delete/1, [{mqtt_admin, Username}])).
-
 -spec(update_user(binary(), binary(), binary()) -> ok | {error, any()}).
 update_user(Username, Password, Tags) when is_binary(Username), is_binary(Password) ->
     Admin = #mqtt_admin{username = Username, password = hash(Password), tags = Tags},
@@ -67,6 +66,27 @@ update_user_(Admin = #mqtt_admin{username = Username}) ->
         []  -> mnesia:abort("username not found");
         [_] -> mnesia:write(Admin)
     end.
+
+change_password(Username, Password) when is_binary(Username), is_binary(Password) ->
+    change_password_hash(Username, hash(Password)).
+
+change_password_hash(Username, PasswordHash) ->
+    update_pwd(Username, fun(User) ->
+                        User#mqtt_admin{password = PasswordHash}
+                end).
+
+update_pwd(Username, Fun) ->
+    Trans = fun() ->
+                    User = 
+                    case lookup_user(Username) of
+                    [Admin] -> Admin;
+                    [] ->
+                           mnesia:abort("Username Not Found")
+                    end,
+                    mnesia:write(Fun(User))
+            end,
+    return(mnesia:transaction(Trans)).
+
 
 -spec(lookup_user(binary()) -> [mqtt_admin()]).
 lookup_user(Username) when is_binary(Username) -> mnesia:dirty_read(mqtt_admin, Username).
@@ -159,5 +179,5 @@ insert_default_user() ->
                         password = hash(<<"public">>),
                         tags = <<"administrator">>},
     mnesia:transaction(fun mnesia:write/1, [Admin]).
- 
 
+     
