@@ -54,7 +54,17 @@ add_user_(Admin = #mqtt_admin{username = Username}) ->
 
 -spec(remove_user(binary()) -> ok | {error, any()}).
 remove_user(Username) when is_binary(Username) ->
-    return(mnesia:transaction(fun mnesia:delete/1, [{mqtt_admin, Username}])).
+    Trans = fun() ->
+                    User = 
+                    case lookup_user(Username) of
+                    [Admin] -> Admin;
+                    [] ->
+                           mnesia:abort("Username Not Found")
+                    end,
+                    mnesia:delete(User)
+            end,
+    return(mnesia:transaction(Trans)).
+
 -spec(update_user(binary(), binary(), binary()) -> ok | {error, any()}).
 update_user(Username, Password, Tags) when is_binary(Username), is_binary(Password) ->
     Admin = #mqtt_admin{username = Username, password = hash(Password), tags = Tags},
