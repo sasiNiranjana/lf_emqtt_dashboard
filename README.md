@@ -18,10 +18,6 @@ make
 ```
 [
   {emqttd_dashboard, [
-    {default_admin, [
-        {login, "admin"},
-        {password, "public"}
-    ]},
     {listener, 
         {emqttd_dashboard, 18083, [
             {acceptors, 4},
