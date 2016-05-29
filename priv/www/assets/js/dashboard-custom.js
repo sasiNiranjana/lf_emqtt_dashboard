@@ -435,6 +435,7 @@ function showOverview() {
 						var obj = ret[i];
 						tby.append('<tr>' +
 								'<td>' + obj['name'] + '</td>' +
+								'<td>' + obj['otp_release'] + '</td>' +
 								'<td>' + obj['process_used'] + ' / ' + obj['process_available'] + '</td>' +
 								'<td>' + obj['load1'] + ' / ' + obj['load5'] + ' / ' + obj['load15'] + '</td>' +
 								'<td>' + obj['used_memory'] + ' / ' + obj['total_memory'] + '</td>' +
