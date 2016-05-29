@@ -86,8 +86,8 @@ metrics() ->
 listeners() ->
     {ok, lists:map(fun listener/1, esockd:listeners())}.
 
-listener({{Protocol, Port}, Pid}) ->
-    [{protocol, Protocol}, {port, Port},
+listener({{Protocol, ListenOn}, Pid}) ->
+    [{protocol, Protocol}, {listen, list_to_binary(esockd:to_string(ListenOn))},
      {max_clients, esockd:get_max_clients(Pid)},
      {current_clients, esockd:get_current_clients(Pid)}].
 
