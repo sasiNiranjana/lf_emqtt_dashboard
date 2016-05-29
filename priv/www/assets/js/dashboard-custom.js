@@ -386,7 +386,7 @@ function showCurrentUser() {
 function showOverview() {
 	loading('overview.html', function() {
 		// 加载系统基本信息
-		overview.broker();
+        overview.broker();
 		
 		// 加载nodes
 		overview.nodes();
@@ -402,7 +402,7 @@ function showOverview() {
 	
         clearInterval(overview.timetask);
 		overview.timetask = setInterval(function() {
-		        overview.broker();
+		   overview.broker();
 			overview.nodes();
 			overview.stats();
 			overview.metrics();
@@ -487,7 +487,7 @@ function showOverview() {
 						var obj = ret[i];
 						tby.append('<tr>' +
 								'<td>' + obj['protocol'] + '</td>' +
-								'<td>' + obj['port'] + '</td>' +
+								'<td>' + obj['listen'] + '</td>' +
 								'<td>' + obj['max_clients'] + '</td>' +
 								'<td>' + obj['current_clients'] + '</td>' +
 								'</tr>');
