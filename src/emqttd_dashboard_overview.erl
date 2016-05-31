@@ -73,7 +73,9 @@ nodes_info() ->
 node_info() ->
     CpuInfo = [{K, list_to_binary(V)} || {K, V} <- emqttd_vm:loads()],
     Memory  = emqttd_vm:get_memory(),
+    OtpRel  = "R" ++ erlang:system_info(otp_release) ++ "/" ++ erlang:system_info(version),
     [{name, node()},
+     {otp_release, list_to_binary(OtpRel)},
      {total_memory, kmg(get_value(allocated, Memory))},
      {used_memory,  kmg(get_value(used, Memory))},
      {process_available, erlang:system_info(process_limit)},
@@ -86,8 +88,8 @@ metrics() ->
 listeners() ->
     {ok, lists:map(fun listener/1, esockd:listeners())}.
 
-listener({{Protocol, Port}, Pid}) ->
-    [{protocol, Protocol}, {port, Port},
+listener({{Protocol, ListenOn}, Pid}) ->
+    [{protocol, Protocol}, {listen, list_to_binary(esockd:to_string(ListenOn))},
      {max_clients, esockd:get_max_clients(Pid)},
      {current_clients, esockd:get_current_clients(Pid)}].
 
