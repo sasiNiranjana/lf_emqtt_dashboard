@@ -23,9 +23,18 @@
 
 -import(proplists, [get_value/2]).
 
--export([stats/0, ptype/0, memory/0, cpu/0, nodes_info/0, node_info/0,
-         metrics/0, listeners/0, bnode/0]).
+-export([brokers/0,
+         stats/0,
+         ptype/0, 
+         memory/0,
+         cpu/0, 
+         nodes_info/0,
+         node_info/0,
+         metrics/0, 
+         listeners/0, 
+         bnode/0]).
 
+-http_api({"brokers",  brokers,   []}).
 -http_api({"stats",    stats,     []}).
 -http_api({"ptype",    ptype,     []}).
 -http_api({"memory",   memory,    []}).
@@ -38,6 +47,13 @@
 -define(KB, 1024).
 -define(MB, (1024*1024)).
 -define(GB, (1024*1024*1024)).
+
+brokers() ->
+    Funs = [sysdescr, version, uptime, datetime],
+    {ok, lists:map(fun broker/1, Funs)}.
+
+broker(Fun) ->
+    {Fun, iolist_to_binary(emqttd_broker:Fun())}.
 
 stats() ->
     {ok, emqttd_stats:getstats()}.
@@ -57,7 +73,9 @@ nodes_info() ->
 node_info() ->
     CpuInfo = [{K, list_to_binary(V)} || {K, V} <- emqttd_vm:loads()],
     Memory  = emqttd_vm:get_memory(),
+    OtpRel  = "R" ++ erlang:system_info(otp_release) ++ "/" ++ erlang:system_info(version),
     [{name, node()},
+     {otp_release, list_to_binary(OtpRel)},
      {total_memory, kmg(get_value(allocated, Memory))},
      {used_memory,  kmg(get_value(used, Memory))},
      {process_available, erlang:system_info(process_limit)},
@@ -70,8 +88,8 @@ metrics() ->
 listeners() ->
     {ok, lists:map(fun listener/1, esockd:listeners())}.
 
-listener({{Protocol, Port}, Pid}) ->
-    [{protocol, Protocol}, {port, Port},
+listener({{Protocol, ListenOn}, Pid}) ->
+    [{protocol, Protocol}, {listen, list_to_binary(esockd:to_string(ListenOn))},
      {max_clients, esockd:get_max_clients(Pid)},
      {current_clients, esockd:get_current_clients(Pid)}].
 
