@@ -17,7 +17,7 @@
 
 -module(emqttd_dashboard_cli).
 
--include("../../../include/emqttd_cli.hrl").
+-include_lib("emqttd/include/emqttd_cli.hrl").
 
 -export([load/0, admins/1, unload/0]).
 
