@@ -110,6 +110,7 @@ query_table(Qh, PageNo, PageSize, TotalNum, RowFun) ->
         false -> ok
     end,
     Rows = qlc:next_answers(Cursor, PageSize),
+    qlc:delete_cursor(Cursor),
     {ok, [{currentPage, PageNo}, {pageSize, PageSize},
           {totalNum, TotalNum},
           {totalPage, total_page(TotalNum, PageSize)},
