@@ -12,7 +12,7 @@ make && make ct
 Configurtion
 ------------
 
-.. code::
+```
 
     [
       {emqttd_dashboard, [
@@ -22,6 +22,7 @@ Configurtion
                 {max_clients, 512}]}}
       ]}
     ].
+```
 
 Load Plugin
 -----------
