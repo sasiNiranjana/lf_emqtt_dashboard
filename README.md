@@ -16,10 +16,6 @@ Configurtion
 
     [
       {emqttd_dashboard, [
-        {default_admin, [
-            {login, "admin"},
-            {password, "public"}
-        ]},
         {listener, 
             {emqttd_dashboard, 18083, [
                 {acceptors, 4},
@@ -41,5 +37,5 @@ URL: http://host:18083
 
 Username: admin
 
-Password: public (admin before 0.10.4)
+Password: public
 
