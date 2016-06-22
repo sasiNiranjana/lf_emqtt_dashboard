@@ -4,11 +4,7 @@
   {vsn, "1.1.2"},
   {modules, []},
   {registered, []},
-  {applications, [
-                  kernel,
-                  stdlib,
-                  mnesia
-                 ]},
+  {applications, [kernel, stdlib]},
   {mod, {emqttd_dashboard_app, []}},
   {env, []}
  ]}.
