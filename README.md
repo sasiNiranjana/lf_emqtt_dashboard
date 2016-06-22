@@ -13,15 +13,14 @@ Configurtion
 ------------
 
 ```
-
-    [
-      {emqttd_dashboard, [
-        {listener, 
-            {emqttd_dashboard, 18083, [
-                {acceptors, 4},
-                {max_clients, 512}]}}
-      ]}
-    ].
+[
+  {emqttd_dashboard, [
+    {listener, 
+        {emqttd_dashboard, 18083, [
+            {acceptors, 4},
+            {max_clients, 512}]}}
+  ]}
+].
 ```
 
 Load Plugin
