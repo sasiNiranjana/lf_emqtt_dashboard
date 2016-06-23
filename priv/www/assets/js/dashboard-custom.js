@@ -489,8 +489,10 @@ function showOverview() {
 						tby.append('<tr>' +
 								'<td>' + obj['protocol'] + '</td>' +
 								'<td>' + obj['listen'] + '</td>' +
+								'<td>' + obj['acceptors'] + '</td>' +
 								'<td>' + obj['max_clients'] + '</td>' +
 								'<td>' + obj['current_clients'] + '</td>' +
+								'<td>' + obj['shutdown_count'] + '</td>' +
 								'</tr>');
 					}
 				} else {
