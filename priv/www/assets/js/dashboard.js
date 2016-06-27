@@ -656,6 +656,7 @@
             _this.vmWS = new Vue({
                 el  : _this.$html[0],
                 data: {
+                    connState : false,
                     cInfo : {
                         host : location.hostname,
                         port : 8083,
@@ -663,8 +664,7 @@
                         userName : null,
                         password : null,
                         keepAlive: null,
-                        cleanSession : 1,
-                        connState : false
+                        cleanSession : 1
                     },
                     subInfo : {
                         topic : '/World',
