@@ -663,7 +663,8 @@
                         userName : null,
                         password : null,
                         keepAlive: null,
-                        cleanSession : 1
+                        cleanSession : 1,
+                        connState : false
                     },
                     subInfo : {
                         topic : '/World',
@@ -729,16 +730,17 @@
         var options = {
             onSuccess : function() {
                 console.log("The client connect success.");
-                $('#connect_state', _this.$html)
-                        .text('CONNECTED');
-                $('#connect_btn', _this.$html)
-                        .addClass("disabled")
-                        .removeClass("btn-success")
-                        .addClass("btn-gray");
-                $('#disconnect_btn', _this.$html)
-                        .removeClass("disabled")
-                        .removeClass("btn-gray")
-                        .addClass("btn-success");
+                //$('#connect_state', _this.$html)
+                //        .text('CONNECTED');
+                //$('#connect_btn', _this.$html)
+                //        .addClass("disabled")
+                //        .removeClass("btn-success")
+                //        .addClass("btn-gray");
+                //$('#disconnect_btn', _this.$html)
+                //        .removeClass("disabled")
+                //        .removeClass("btn-gray")
+                //        .addClass("btn-success");
+                _this.vmWS.connState = true;
             }
         };
         var userName = _this.vmWS.cInfo.userName;
@@ -765,11 +767,12 @@
         var _this = this;
         _this.client.disconnect();
         console.log("The client disconnect success.");
-        $('#connect_state', _this.$html).text('DISCONNECTED');
-        $('#connect_btn', _this.$html).removeClass("disabled")
-        .removeClass("btn-gray").addClass("btn-success");
-        $('#disconnect_btn', _this.$html).addClass("disabled")
-        .removeClass("btn-success").addClass("btn-gray");
+        //$('#connect_state', _this.$html).text('DISCONNECTED');
+        //$('#connect_btn', _this.$html).removeClass("disabled")
+        //.removeClass("btn-gray").addClass("btn-success");
+        //$('#disconnect_btn', _this.$html).addClass("disabled")
+        //.removeClass("btn-success").addClass("btn-gray");
+        _this.vmWS.connState = false;
     };
     Websocket.prototype.subscribe = function() {
         var _this = this;

@@ -77,12 +77,19 @@
                     
                     <div class="col-sm-12">
                     <div class="form-group">
+                        <template v-if="connState == false">
                         <button type="button" class="btn btn-success btn-single" id="connect_btn" @click="connect">Connect</button>
-                        <button type="button" class="btn btn-gray btn-single disabled" id="disconnect_btn" @click="disconnect">Disconnect</button>
+                        <button type="button" class="btn btn-gray btn-single disabled" id="disconnect_btn">Disconnect</button>
+                        </template>
+                        <template v-else>
+                        <button type="button" class="btn btn-success btn-single disabled" id="connect_btn">Connect</button>
+                        <button type="button" class="btn btn-gray btn-single" id="disconnect_btn" @click="disconnect">Disconnect</button>
+                        </template>
                     </div>
                     <div class="form-group">
-                        <label class="cbr-inline">
-                            Current State: <strong id="connect_state" class="text-danger">DISCONNECT</strong>
+                        <label class="cbr-inline">Current State: 
+                            <strong id="connect_state" class="text-danger" v-if="connState == false">DISCONNECTED</strong>
+                            <strong id="connect_state" class="text-danger" v-else>CONNECTED</strong>
                         </label>
                     </div>
                     </div>
