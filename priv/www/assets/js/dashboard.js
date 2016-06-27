@@ -695,7 +695,6 @@
                     }
                 }
             });
-            _this.newClient();
         }, _this.$html);
     };
     Websocket.prototype.show = function() {
@@ -714,6 +713,11 @@
     };
     Websocket.prototype.connect = function() {
         var _this = this;
+        _this.newClient();
+
+        if (!_this.client) {
+            return;
+        }
         // called when the client loses its connection
         _this.client.onConnectionLost = function(responseObject) {
             if (responseObject.errorCode !== 0) {
