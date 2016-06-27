@@ -776,6 +776,10 @@
     };
     Websocket.prototype.subscribe = function() {
         var _this = this;
+        if (!_this.vmWS.subInfo.topic) {
+            alert('Please subscribe to the topic.');
+            return;
+        }
         this.client.subscribe(_this.vmWS.subInfo.topic, {
             qos : Number(_this.vmWS.subInfo.qos)
         });
@@ -786,6 +790,14 @@
     Websocket.prototype.sendMessage = function() {
         var _this = this;
         var text = _this.vmWS.sendInfo.text;
+        if (!_this.vmWS.sendInfo.topic) {
+            alert('Please fill in the message topic.');
+            return;
+        }
+        if (!text) {
+            alert('Please fill in the message content.');
+            return;
+        }
         var message = new Paho.MQTT.Message(text);
         message.destinationName = _this.vmWS.sendInfo.topic;
         message.qos = Number(_this.vmWS.sendInfo.qos);
