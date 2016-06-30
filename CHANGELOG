@@ -1,6 +1,13 @@
 
+1.1.2-beta (2016-06-30)
+-----------------------
+
+Add shutdown stats to listeners api (PR #66)
+
+Process Leak when querying 'clients', 'sessions', 'topics', 'routes'... (#63)
+
 1.0-beta (2016-04-13)
-------------------------
+----------------------
 
 Tag 1.0
 
