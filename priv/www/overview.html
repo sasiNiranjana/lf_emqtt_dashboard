@@ -127,10 +127,22 @@
             <div class="panel-body">
 
                 <div class="row">
-                    <div class="col-sm-4">
-                        <strong>Packets</strong>
-                        <table
-                            class="table table-bordered table-striped table-condensed table-hover">
+                
+                    <div class="col-md-12 tabs-bordered">
+
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a href="#ov_packets" data-toggle="tab"> <span class="hidden-xs">Packets</span>
+                        </a></li>
+                        <li class=""><a href="#ov_message" data-toggle="tab"> <span class="hidden-xs">Messages</span>
+                        </a></li>
+                        <li class=""><a href="#ov_bytes" data-toggle="tab"> <span class="hidden-xs">Bytes</span>
+                        </a></li>
+                    </ul>
+
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="ov_packets">
+
+                            <table class="table table-striped table-condensed">
                             <tbody>
                                 <!-- received/sent -->
                                 <tr>
@@ -230,12 +242,12 @@
                                     <td class="ta-right" id="packets_unsuback">0</td>
                                 </tr>
                             </tbody>
-                        </table>
-                    </div>
-                    <div class="col-sm-4">
-                        <strong>Messages</strong>
-                        <table
-                            class="table table-bordered table-striped table-condensed table-hover">
+                            </table>
+
+                        </div>
+                        <div class="tab-pane" id="ov_message">
+
+                            <table class="table table-striped table-condensed">
                             <tbody>
                                 <!-- received -->
                                 <tr>
@@ -285,12 +297,12 @@
                                     <td class="ta-right" id="messages_retained">0</td>
                                 </tr>
                             </tbody>
-                        </table>
-                    </div>
-                    <div class="col-sm-4">
-                        <strong>Bytes</strong>
-                        <table
-                            class="table table-bordered table-striped table-condensed table-hover">
+                            </table>
+
+                        </div>
+                        <div class="tab-pane" id="ov_bytes">
+
+                            <table class="table table-striped table-condensed">
                             <tbody>
                                 <tr>
                                     <td>received</td>
@@ -301,7 +313,12 @@
                                     <td class="ta-right" id="bytes_sent">0</td>
                                 </tr>
                             </tbody>
-                        </table>
+                            </table>
+
+                        </div>
+
+                    </div>
+
                     </div>
                 </div>
 
