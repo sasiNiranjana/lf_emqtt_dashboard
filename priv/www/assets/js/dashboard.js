@@ -217,6 +217,43 @@
         this.$html = $('#dashboard_overview',
                 sog.mainCenter.$html);
         
+        this._matrics();
+
+        this._chart1();
+        this._chart2();
+        this._chart3();
+        
+        this._init();
+    };
+    Overview.prototype._init = function() {
+        var _this = this;
+        loading('overview.html', function() {
+            _this.vmBroker = new Vue({
+                el : $('#overview_broker', _this.$html)[0]
+            });
+            _this.vmNodes = new Vue({
+                el  : $('#overview_nodes', _this.$html)[0],
+                data: {
+                    nodes: []
+                }
+            });
+            _this.vmLiss = new Vue({
+                el  : $('#voerview_listeners', _this.$html)[0],
+                data: {
+                    listeners: []
+                }
+            });
+            
+            _this.broker();
+            _this.nodes();
+            _this.stats();
+            _this.metrics();
+            _this.listeners();
+            // Start Timertask
+            _this.startTask()
+        }, _this.$html);
+    };
+    Overview.prototype._matrics = function() {
         this.packets = [];
         this.messages = [];
         this.bytes = [];
@@ -270,40 +307,6 @@
                 values : []
             });
         }
-
-        this._chart1();
-        this._chart2();
-        this._chart3();
-        
-        this._init();
-    };
-    Overview.prototype._init = function() {
-        var _this = this;
-        loading('overview.html', function() {
-            _this.vmBroker = new Vue({
-                el : $('#overview_broker', _this.$html)[0]
-            });
-            _this.vmNodes = new Vue({
-                el  : $('#overview_nodes', _this.$html)[0],
-                data: {
-                    nodes: []
-                }
-            });
-            _this.vmLiss = new Vue({
-                el  : $('#voerview_listeners', _this.$html)[0],
-                data: {
-                    listeners: []
-                }
-            });
-            
-            _this.broker();
-            _this.nodes();
-            _this.stats();
-            _this.metrics();
-            _this.listeners();
-            // Start Timertask
-            _this.startTask()
-        }, _this.$html);
     };
     Overview.prototype._chart1 = function() {
         this.chart1 = nv.models.lineChart()
