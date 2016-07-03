@@ -220,7 +220,27 @@
         this.packets = [];
         this.messages = [];
         this.bytes = [];
-        var matrics1 = ['packets/received', 'packets/sent'];
+        var matrics1 = ['packets/received',
+                        'packets/sent',
+                        'packets/connect',
+                        'packets/connack',
+                        'packets/disconnect',
+                        'packets/pingreq',
+                        'packets/pingresp',
+                        'packets/publish/received',
+                        'packets/publish/sent',
+                        'packets/puback/received',
+                        'packets/puback/sent',
+                        'packets/pubcomp/received',
+                        'packets/pubcomp/sent',
+                        'packets/pubrec/received',
+                        'packets/pubrec/sent',
+                        'packets/pubrel/received',
+                        'packets/pubrel/sent',
+                        'packets/subscribe',
+                        'packets/suback',
+                        'packets/unsubscribe',
+                        'packets/unsuback'];
         var matrics2 = ['messages/received',
                         'messages/sent',
                         'messages/dropped',
@@ -251,16 +271,9 @@
             });
         }
 
-        this.chart = nv.models.lineChart()
-                .color(d3.scale.category10().range())
-                .useInteractiveGuideline(true);
-        //this.chart.xAxis.tickValues(
-        //    [ 1078030800000, 1122782400000, 1167541200000, 1251691200000 ]);
-        this.chart.xAxis.tickFormat(function(d) {
-            return (new Date(d)).format('hh:mm:ss');
-        });
-        //this.chart.yAxis.tickFormat(d3.format(',.1%'));
-        //nv.utils.windowResize(this.chart.update);
+        this._chart1();
+        this._chart2();
+        this._chart3();
         
         this._init();
     };
@@ -291,6 +304,42 @@
             // Start Timertask
             _this.startTask()
         }, _this.$html);
+    };
+    Overview.prototype._chart1 = function() {
+        this.chart1 = nv.models.lineChart()
+                .color(d3.scale.category10().range())
+                .useInteractiveGuideline(true);
+        //this.chart1.xAxis.tickValues(
+        //    [ 1078030800000, 1122782400000, 1167541200000, 1251691200000 ]);
+        this.chart1.xAxis.tickFormat(function(d) {
+            return (new Date(d)).format('hh:mm:ss');
+        });
+        //this.chart1.yAxis.tickFormat(d3.format(',.1%'));
+        nv.utils.windowResize(this.chart1.update);
+    };
+    Overview.prototype._chart2 = function() {
+        this.chart2 = nv.models.lineChart()
+                .color(d3.scale.category10().range())
+                .useInteractiveGuideline(true);
+        //this.chart2.xAxis.tickValues(
+        //    [ 1078030800000, 1122782400000, 1167541200000, 1251691200000 ]);
+        this.chart2.xAxis.tickFormat(function(d) {
+            return (new Date(d)).format('hh:mm:ss');
+        });
+        //this.chart2.yAxis.tickFormat(d3.format(',.1%'));
+        nv.utils.windowResize(this.chart2.update);
+    };
+    Overview.prototype._chart3 = function() {
+        this.chart3 = nv.models.lineChart()
+                .color(d3.scale.category10().range())
+                .useInteractiveGuideline(true);
+        //this.chart3.xAxis.tickValues(
+        //    [ 1078030800000, 1122782400000, 1167541200000, 1251691200000 ]);
+        this.chart3.xAxis.tickFormat(function(d) {
+            return (new Date(d)).format('hh:mm:ss');
+        });
+        //this.chart3.yAxis.tickFormat(d3.format(',.1%'));
+        nv.utils.windowResize(this.chart3.update);
     };
     Overview.prototype.show = function() {
         hideAllMods();
@@ -336,23 +385,25 @@
                 for (var key in ret) {
                     var keyStr = key.split('/').join('_');
                     $('#' + keyStr, $metrics).text(ret[key]);
+                    
+                    var ts = (new Date()).getTime();
                     for (var i = 0, len = _this.packets.length; i < len; i++) {
                         if (_this.packets[i].key == key) {
-                            var v = {x:(new Date()).getTime(), y:ret[key]};
+                            var v = {x:ts, y:ret[key]};
                             _this.packets[i].values.push(v);
                             break;
                         }
                     }
                     for (var i = 0, len = _this.messages.length; i < len; i++) {
                         if (_this.messages[i].key == key) {
-                            var v = {x:(new Date()).getTime(), y:ret[key]};
+                            var v = {x:ts, y:ret[key]};
                             _this.messages[i].values.push(v);
                             break;
                         }
                     }
                     for (var i = 0, len = _this.bytes.length; i < len; i++) {
                         if (_this.bytes[i].key == key) {
-                            var v = {x:(new Date()).getTime(), y:ret[key]};
+                            var v = {x:ts, y:ret[key]};
                             _this.bytes[i].values.push(v);
                             break;
                         }
@@ -367,20 +418,20 @@
         nv.addGraph(function() {
             d3.select('#packets_chart svg')
                 .datum(data1)
-                .call(_this.chart);
-            return _this.chart;
+                .call(_this.chart1);
+            return _this.chart1;
         });
         nv.addGraph(function() {
             d3.select('#messages_chart svg')
                 .datum(data2)
-                .call(_this.chart);
-            return _this.chart;
+                .call(_this.chart2);
+            return _this.chart2;
         });
         nv.addGraph(function() {
             d3.select('#bytes_chart svg')
                 .datum(data3)
-                .call(_this.chart);
-            return _this.chart;
+                .call(_this.chart3);
+            return _this.chart3;
         });
     };
     Overview.prototype.listeners = function() {
