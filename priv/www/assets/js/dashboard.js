@@ -413,36 +413,36 @@
                     var keyStr = key.split('/').join('_');
                     $('#' + keyStr, $metrics).text(ret[key]);
                     
-                    var ts = (new Date()).getTime();
-                    for (var i = 0, len = _this.packets.length; i < len; i++) {
-                        if (_this.packets[i].key == key) {
-                            var v = {};
-                            v[ts] = ret[key];
-                            _this.packets[i].values.push(v);
-                            break;
-                        }
-                    }
-                    for (var i = 0, len = _this.messages.length; i < len; i++) {
-                        if (_this.messages[i].key == key) {
-                            var v = {};
-                            v[ts] = ret[key];
-                            _this.messages[i].values.push(v);
-                            break;
-                        }
-                    }
-                    for (var i = 0, len = _this.bytes.length; i < len; i++) {
-                        if (_this.bytes[i].key == key) {
-                            var v = {};
-                            v[ts] = ret[key];
-                            _this.bytes[i].values.push(v);
-                            break;
-                        }
-                    }
+//                    var ts = (new Date()).getTime();
+//                    for (var i = 0, len = _this.packets.length; i < len; i++) {
+//                        if (_this.packets[i].key == key) {
+//                            var v = {};
+//                            v[ts] = ret[key];
+//                            _this.packets[i].values.push(v);
+//                            break;
+//                        }
+//                    }
+//                    for (var i = 0, len = _this.messages.length; i < len; i++) {
+//                        if (_this.messages[i].key == key) {
+//                            var v = {};
+//                            v[ts] = ret[key];
+//                            _this.messages[i].values.push(v);
+//                            break;
+//                        }
+//                    }
+//                    for (var i = 0, len = _this.bytes.length; i < len; i++) {
+//                        if (_this.bytes[i].key == key) {
+//                            var v = {};
+//                            v[ts] = ret[key];
+//                            _this.bytes[i].values.push(v);
+//                            break;
+//                        }
+//                    }
                 }
-                _this.metricsChart(_this.packets, _this.messages, _this.bytes);
+//                _this.metricsChart(_this.packets, _this.messages, _this.bytes);
             }
         });
-        //_this.chart();
+        _this.chart();
     };
     Overview.prototype.metricsChart = function(data1, data2, data3) {
         var _this = this;
@@ -469,29 +469,25 @@
         var _this = this;
         dashboard.webapi.m_chart(function(ret, err) {
             if (ret) {
-                for (var j = 0, len = ret.lenght; j < len; j++) {
-                    var metric = ret[j];
-                    for (var key in metric) {
-                        
-                        for (var i = 0, l = _this.packets.length; i < l; i++) {
-                            if (_this.packets[i].key == key) {
-                                _this.packets[i].values = metric[key];
-                                break;
-                            }
+                for (var key in ret) {
+                    for (var i = 0, l = _this.packets.length; i < l; i++) {
+                        if (_this.packets[i].key == key) {
+                            _this.packets[i].values = ret[key];
+                            break;
                         }
-                        
-                        for (var i = 0, l = _this.messages.length; i < l; i++) {
-                            if (_this.messages[i].key == key) {
-                                _this.messages[i].values = metric[key];
-                                break;
-                            }
+                    }
+                    
+                    for (var i = 0, l = _this.messages.length; i < l; i++) {
+                        if (_this.messages[i].key == key) {
+                            _this.messages[i].values = ret[key];
+                            break;
                         }
-                        
-                        for (var i = 0, l = _this.bytes.length; i < l; i++) {
-                            if (_this.bytes[i].key == key) {
-                                _this.bytes[i].values = metric[key];
-                                break;
-                            }
+                    }
+                    
+                    for (var i = 0, l = _this.bytes.length; i < l; i++) {
+                        if (_this.bytes[i].key == key) {
+                            _this.bytes[i].values = ret[key];
+                            break;
                         }
                     }
                 }
