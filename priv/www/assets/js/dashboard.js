@@ -321,13 +321,13 @@
                 .showLegend(true) 
                 .showYAxis(true)
                 .showXAxis(true)
-                .x(function(d) {for (var k in d) {return k}})
+                .x(function(d) {for (var k in d) {return Number(k)}})
                 .y(function(d) {for (var k in d) {return d[k]}})
                 .useInteractiveGuideline(true);
         //this.chart1.xAxis.tickValues(
         //    [ 1078030800000, 1122782400000, 1167541200000, 1251691200000 ]);
         this.chart1.xAxis.tickFormat(function(d) {
-            return (new Date(d)).format('hh:mm:ss');
+            return (new Date(Number(d))).format('hh:mm:ss');
         });
         //this.chart1.yAxis.tickFormat(d3.format(',.1%'));
         nv.utils.windowResize(this.chart1.update);
@@ -339,13 +339,13 @@
                 .showLegend(true) 
                 .showYAxis(true)
                 .showXAxis(true)
-                .x(function(d) {for (var k in d) {return k}})
+                .x(function(d) {for (var k in d) {return Number(k)}})
                 .y(function(d) {for (var k in d) {return d[k]}})
                 .useInteractiveGuideline(true);
         //this.chart2.xAxis.tickValues(
         //    [ 1078030800000, 1122782400000, 1167541200000, 1251691200000 ]);
         this.chart2.xAxis.tickFormat(function(d) {
-            return (new Date(d)).format('hh:mm:ss');
+            return (new Date(Number(d))).format('hh:mm:ss');
         });
         //this.chart2.yAxis.tickFormat(d3.format(',.1%'));
         nv.utils.windowResize(this.chart2.update);
@@ -357,13 +357,13 @@
                 .showLegend(true) 
                 .showYAxis(true)
                 .showXAxis(true)
-                .x(function(d) {for (var k in d) {return k}})
+                .x(function(d) {for (var k in d) {return Number(k)}})
                 .y(function(d) {for (var k in d) {return d[k]}})
                 .useInteractiveGuideline(true);
         //this.chart3.xAxis.tickValues(
         //    [ 1078030800000, 1122782400000, 1167541200000, 1251691200000 ]);
         this.chart3.xAxis.tickFormat(function(d) {
-            return (new Date(d)).format('hh:mm:ss');
+            return (new Date(Number(d))).format('hh:mm:ss');
         });
         //this.chart3.yAxis.tickFormat(d3.format(',.1%'));
         nv.utils.windowResize(this.chart3.update);
@@ -936,16 +936,6 @@
         var options = {
             onSuccess : function() {
                 console.log("The client connect success.");
-                //$('#connect_state', _this.$html)
-                //        .text('CONNECTED');
-                //$('#connect_btn', _this.$html)
-                //        .addClass("disabled")
-                //        .removeClass("btn-success")
-                //        .addClass("btn-gray");
-                //$('#disconnect_btn', _this.$html)
-                //        .removeClass("disabled")
-                //        .removeClass("btn-gray")
-                //        .addClass("btn-success");
                 _this.vmWS.connState = true;
             }
         };
@@ -973,11 +963,6 @@
         var _this = this;
         _this.client.disconnect();
         console.log("The client disconnect success.");
-        //$('#connect_state', _this.$html).text('DISCONNECTED');
-        //$('#connect_btn', _this.$html).removeClass("disabled")
-        //.removeClass("btn-gray").addClass("btn-success");
-        //$('#disconnect_btn', _this.$html).addClass("disabled")
-        //.removeClass("btn-success").addClass("btn-gray");
         _this.vmWS.connState = false;
     };
     Websocket.prototype.subscribe = function() {
