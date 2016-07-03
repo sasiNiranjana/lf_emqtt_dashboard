@@ -105,6 +105,11 @@
             this._ajax('api/metrics', null, callback);
         },
 
+        // m_chart
+        m_chart : function(callback) {
+            this._ajax('api/m_chart', null, callback);
+        },
+
         // listeners
         listeners : function(callback) {
             this._ajax('api/listeners', null, callback);
@@ -288,7 +293,8 @@
                         'messages/qos2/received',
                         'messages/qos2/sent',
                         'messages/retained'];
-        var matrics3 = ['bytes/received', 'bytes/sent'];
+        var matrics3 = ['bytes/received',
+                        'bytes/sent'];
         for (var i = 0; i < matrics1.length; i++) {
             this.packets.push({
                 key : matrics1[i],
@@ -315,6 +321,8 @@
                 .showLegend(true) 
                 .showYAxis(true)
                 .showXAxis(true)
+                .x(function(d) {for (var k in d) {return k}})
+                .y(function(d) {for (var k in d) {return d[k]}})
                 .useInteractiveGuideline(true);
         //this.chart1.xAxis.tickValues(
         //    [ 1078030800000, 1122782400000, 1167541200000, 1251691200000 ]);
@@ -331,6 +339,8 @@
                 .showLegend(true) 
                 .showYAxis(true)
                 .showXAxis(true)
+                .x(function(d) {for (var k in d) {return k}})
+                .y(function(d) {for (var k in d) {return d[k]}})
                 .useInteractiveGuideline(true);
         //this.chart2.xAxis.tickValues(
         //    [ 1078030800000, 1122782400000, 1167541200000, 1251691200000 ]);
@@ -347,6 +357,8 @@
                 .showLegend(true) 
                 .showYAxis(true)
                 .showXAxis(true)
+                .x(function(d) {for (var k in d) {return k}})
+                .y(function(d) {for (var k in d) {return d[k]}})
                 .useInteractiveGuideline(true);
         //this.chart3.xAxis.tickValues(
         //    [ 1078030800000, 1122782400000, 1167541200000, 1251691200000 ]);
@@ -404,21 +416,24 @@
                     var ts = (new Date()).getTime();
                     for (var i = 0, len = _this.packets.length; i < len; i++) {
                         if (_this.packets[i].key == key) {
-                            var v = {x:ts, y:ret[key]};
+                            var v = {};
+                            v[ts] = ret[key];
                             _this.packets[i].values.push(v);
                             break;
                         }
                     }
                     for (var i = 0, len = _this.messages.length; i < len; i++) {
                         if (_this.messages[i].key == key) {
-                            var v = {x:ts, y:ret[key]};
+                            var v = {};
+                            v[ts] = ret[key];
                             _this.messages[i].values.push(v);
                             break;
                         }
                     }
                     for (var i = 0, len = _this.bytes.length; i < len; i++) {
                         if (_this.bytes[i].key == key) {
-                            var v = {x:ts, y:ret[key]};
+                            var v = {};
+                            v[ts] = ret[key];
                             _this.bytes[i].values.push(v);
                             break;
                         }
@@ -427,6 +442,7 @@
                 _this.metricsChart(_this.packets, _this.messages, _this.bytes);
             }
         });
+        //_this.chart();
     };
     Overview.prototype.metricsChart = function(data1, data2, data3) {
         var _this = this;
@@ -447,6 +463,40 @@
                 .datum(data3)
                 .call(_this.chart3);
             return _this.chart3;
+        });
+    };
+    Overview.prototype.chart = function() {
+        var _this = this;
+        dashboard.webapi.m_chart(function(ret, err) {
+            if (ret) {
+                for (var j = 0, len = ret.lenght; j < len; j++) {
+                    var metric = ret[j];
+                    for (var key in metric) {
+                        
+                        for (var i = 0, l = _this.packets.length; i < l; i++) {
+                            if (_this.packets[i].key == key) {
+                                _this.packets[i].values = metric[key];
+                                break;
+                            }
+                        }
+                        
+                        for (var i = 0, l = _this.messages.length; i < l; i++) {
+                            if (_this.messages[i].key == key) {
+                                _this.messages[i].values = metric[key];
+                                break;
+                            }
+                        }
+                        
+                        for (var i = 0, l = _this.bytes.length; i < l; i++) {
+                            if (_this.bytes[i].key == key) {
+                                _this.bytes[i].values = metric[key];
+                                break;
+                            }
+                        }
+                    }
+                }
+                _this.metricsChart(_this.packets, _this.messages, _this.bytes);
+            }
         });
     };
     Overview.prototype.listeners = function() {
