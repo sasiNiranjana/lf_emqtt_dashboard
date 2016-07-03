@@ -208,6 +208,7 @@
 
     // Modules save container.
     var modules = {};
+    dashboard.modules = modules;
 
     // Overview-----------------------------------------
 
@@ -215,6 +216,52 @@
         this.modName = 'overview';
         this.$html = $('#dashboard_overview',
                 sog.mainCenter.$html);
+        
+        this.packets = [];
+        this.messages = [];
+        this.bytes = [];
+        var matrics1 = ['packets/received', 'packets/sent'];
+        var matrics2 = ['messages/received',
+                        'messages/sent',
+                        'messages/dropped',
+                        'messages/qos0/received',
+                        'messages/qos0/sent',
+                        'messages/qos1/received',
+                        'messages/qos1/sent',
+                        'messages/qos2/received',
+                        'messages/qos2/sent',
+                        'messages/retained'];
+        var matrics3 = ['bytes/received', 'bytes/sent'];
+        for (var i = 0; i < matrics1.length; i++) {
+            this.packets.push({
+                key : matrics1[i],
+                values : []
+            });
+        }
+        for (var i = 0; i < matrics2.length; i++) {
+            this.messages.push({
+                key : matrics2[i],
+                values : []
+            });
+        }
+        for (var i = 0; i < matrics3.length; i++) {
+            this.bytes.push({
+                key : matrics3[i],
+                values : []
+            });
+        }
+
+        this.chart = nv.models.lineChart()
+                .color(d3.scale.category10().range())
+                .useInteractiveGuideline(true);
+        //this.chart.xAxis.tickValues(
+        //    [ 1078030800000, 1122782400000, 1167541200000, 1251691200000 ]);
+        this.chart.xAxis.tickFormat(function(d) {
+            return (new Date(d)).format('hh:mm:ss');
+        });
+        //this.chart.yAxis.tickFormat(d3.format(',.1%'));
+        //nv.utils.windowResize(this.chart.update);
+        
         this._init();
     };
     Overview.prototype._init = function() {
@@ -274,7 +321,7 @@
         var $stats = $('#overview_stats', _this.$html);
         dashboard.webapi.stats(function(ret, err) {
             if (ret) {
-                for ( var key in ret) {
+                for (var key in ret) {
                     var keyStr = key.split('/').join('_');
                     $('#' + keyStr, $stats).text(ret[key]);
                 }
@@ -286,11 +333,54 @@
         var $metrics = $('#overview_metrics', _this.$html);
         dashboard.webapi.metrics(function(ret, err) {
             if (ret) {
-                for ( var key in ret) {
+                for (var key in ret) {
                     var keyStr = key.split('/').join('_');
                     $('#' + keyStr, $metrics).text(ret[key]);
+                    for (var i = 0, len = _this.packets.length; i < len; i++) {
+                        if (_this.packets[i].key == key) {
+                            var v = {x:(new Date()).getTime(), y:ret[key]};
+                            _this.packets[i].values.push(v);
+                            break;
+                        }
+                    }
+                    for (var i = 0, len = _this.messages.length; i < len; i++) {
+                        if (_this.messages[i].key == key) {
+                            var v = {x:(new Date()).getTime(), y:ret[key]};
+                            _this.messages[i].values.push(v);
+                            break;
+                        }
+                    }
+                    for (var i = 0, len = _this.bytes.length; i < len; i++) {
+                        if (_this.bytes[i].key == key) {
+                            var v = {x:(new Date()).getTime(), y:ret[key]};
+                            _this.bytes[i].values.push(v);
+                            break;
+                        }
+                    }
                 }
+                _this.metricsChart(_this.packets, _this.messages, _this.bytes);
             }
+        });
+    };
+    Overview.prototype.metricsChart = function(data1, data2, data3) {
+        var _this = this;
+        nv.addGraph(function() {
+            d3.select('#packets_chart svg')
+                .datum(data1)
+                .call(_this.chart);
+            return _this.chart;
+        });
+        nv.addGraph(function() {
+            d3.select('#messages_chart svg')
+                .datum(data2)
+                .call(_this.chart);
+            return _this.chart;
+        });
+        nv.addGraph(function() {
+            d3.select('#bytes_chart svg')
+                .datum(data3)
+                .call(_this.chart);
+            return _this.chart;
         });
     };
     Overview.prototype.listeners = function() {
