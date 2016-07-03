@@ -311,6 +311,10 @@
     Overview.prototype._chart1 = function() {
         this.chart1 = nv.models.lineChart()
                 .color(d3.scale.category10().range())
+                .margin({left: 30})
+                .showLegend(true) 
+                .showYAxis(true)
+                .showXAxis(true)
                 .useInteractiveGuideline(true);
         //this.chart1.xAxis.tickValues(
         //    [ 1078030800000, 1122782400000, 1167541200000, 1251691200000 ]);
@@ -323,6 +327,10 @@
     Overview.prototype._chart2 = function() {
         this.chart2 = nv.models.lineChart()
                 .color(d3.scale.category10().range())
+                .margin({left: 30})
+                .showLegend(true) 
+                .showYAxis(true)
+                .showXAxis(true)
                 .useInteractiveGuideline(true);
         //this.chart2.xAxis.tickValues(
         //    [ 1078030800000, 1122782400000, 1167541200000, 1251691200000 ]);
@@ -335,6 +343,10 @@
     Overview.prototype._chart3 = function() {
         this.chart3 = nv.models.lineChart()
                 .color(d3.scale.category10().range())
+                .margin({left: 30})
+                .showLegend(true) 
+                .showYAxis(true)
+                .showXAxis(true)
                 .useInteractiveGuideline(true);
         //this.chart3.xAxis.tickValues(
         //    [ 1078030800000, 1122782400000, 1167541200000, 1251691200000 ]);
