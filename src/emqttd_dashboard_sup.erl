@@ -31,5 +31,6 @@ start_link() ->
     supervisor:start_link({local, ?MODULE}, ?MODULE, []).
 
 init([]) ->
-    {ok, { {one_for_all, 10, 100}, [?CHILD(emqttd_dashboard_admin)] } }.
+    {ok, { {one_for_all, 10, 100}, [?CHILD(emqttd_dashboard_admin),
+                                    ?CHILD(emqttd_dashboard_meter)] } }.
 
