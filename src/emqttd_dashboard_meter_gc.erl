@@ -18,13 +18,16 @@
 
 -behaviour(gen_server).
 
+%% Metrics GC  State
 -record(gc_state, {gc_interval,
                    gc_table,
                    gc_timer}).
 
+%% API Exports
 -export([start_link/1,
          named/1]).
 
+%% gen_server Function Exports
 -export([init/1,
         handle_call/3,
         handle_cast/2,
@@ -43,6 +46,13 @@ start_link(Table) ->
     Else ->
         Else
     end.
+
+named(Table) ->
+    list_to_atom(atom_to_list(Table) ++ "_gc").
+
+%%--------------------------------------------------------------------
+%% gen_server Callbacks
+%%--------------------------------------------------------------------
 
 init(Table) ->
     {ok, set_gc_timer(#gc_state{gc_table = Table,
@@ -72,8 +82,9 @@ reply(Reply, NewState) ->
 noreply(NewState) ->
     {noreply, NewState}.
 
-named(Table) ->
-    list_to_atom(atom_to_list(Table) ++ "_gc").
+%%--------------------------------------------------------------------
+%% Internal functions
+%%--------------------------------------------------------------------
 
 set_gc_timer(#gc_state{gc_interval = Interval} = State) ->
     TRef = erlang:send_after(Interval, self(), gc),

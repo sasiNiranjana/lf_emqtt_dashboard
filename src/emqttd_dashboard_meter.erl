@@ -17,10 +17,12 @@
 
 -behaviour(gen_server).
 
+%% API Exports
 -export([start_link/0,
          update_interval/1,
          get_report/2]).
 
+%% gen_server Function Exports
 -export([init/1,
         handle_call/3,
         handle_cast/2,
@@ -44,6 +46,10 @@ update_interval(Val) when is_integer(Val)  ->
 
 get_report(Metric, Limit) ->
     gen_server:call(?SERVER, {get_report, Metric, Limit}).
+
+%%--------------------------------------------------------------------
+%% gen_server Callbacks
+%%--------------------------------------------------------------------
 
 init([]) ->
     NewTab = fun(Tab) -> 
@@ -85,6 +91,10 @@ code_change(_OldVsn, State, _Extra) ->
 
 terminate(_Reason, _State) ->
     ok.
+
+%% ====================================================================
+%% Internal functions
+%% ====================================================================
 
 save(Data) ->
     Ts = timestamp(),
