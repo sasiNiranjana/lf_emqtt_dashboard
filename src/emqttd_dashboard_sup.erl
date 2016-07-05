@@ -27,7 +27,7 @@
 
 -define(CHILD(I), {I, {I, start_link, []}, permanent, 5000, worker, [I]}).
 
--define(CHILD2(I, Table), {I, {I, start_link, [Table]}, permanent, 5000, worker, [I]}).
+-define(CHILD2(I, Table), {emqttd_dashboard_meter_gc:named(Table), {I, start_link, [Table]}, permanent, 5000, worker, [I]}).
 
 -include("emqttd_dashboard_meter.hrl").
 
@@ -35,7 +35,7 @@ start_link() ->
     supervisor:start_link({local, ?MODULE}, ?MODULE, []).
 
 init([]) ->
-    GC = [?CHILD2(emqttd_dashboard_meter_gc:named(Table), Table) || Table <- ?METRICS],
+    GC = [?CHILD2(emqttd_dashboard_meter_gc, Table) || Table <- ?METRICS],
     {ok, { {one_for_all, 10, 100}, [?CHILD(emqttd_dashboard_admin),
-                                    ?CHILD(emqttd_dashboard_meter) | GC]}}.
+                ?CHILD(emqttd_dashboard_meter) | GC]}}.
 

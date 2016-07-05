@@ -38,17 +38,11 @@
 -define(INTERVAL, 5000).
 
 start_link(Table) ->
-    case gen_server:start_link({local, named(Table)}, 
-        ?MODULE, [Table], []) of
-    {ok, Pid} -> 
-        register(named(Table), Pid),
-        {ok, Pid};
-    Else ->
-        Else
-    end.
+    gen_server:start_link({local, named(Table)}, 
+        ?MODULE, [Table], []).
 
 named(Table) ->
-    list_to_atom(atom_to_list(Table) ++ "_gc").
+    list_to_atom((atom_to_list(Table) ++ "_gc")).
 
 %%--------------------------------------------------------------------
 %% gen_server Callbacks
