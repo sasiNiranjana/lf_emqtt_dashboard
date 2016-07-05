@@ -222,12 +222,6 @@
         this.$html = $('#dashboard_overview',
                 sog.mainCenter.$html);
         
-        this._matrics();
-
-        this._chart1();
-        this._chart2();
-        this._chart3();
-        
         this._init();
     };
     Overview.prototype._init = function() {
@@ -258,7 +252,99 @@
             _this.startTask()
         }, _this.$html);
     };
-    Overview.prototype._matrics = function() {
+    Overview.prototype.show = function() {
+        this.$html.show();
+    };
+    Overview.prototype.hide = function() {
+        this.$html.hide();
+    };
+    Overview.prototype.broker = function() {
+        var _this = this;
+        dashboard.webapi.broker(function(ret, err) {
+            if (ret) {
+                _this.vmBroker.$data = ret;
+            }
+        });
+    };
+    Overview.prototype.nodes = function() {
+        var _this = this;
+        dashboard.webapi.nodes(function(ret, err) {
+            if (ret) {
+                _this.vmNodes.nodes = ret;
+            }
+        });
+    };
+    Overview.prototype.stats = function() {
+        var _this = this;
+        var $stats = $('#overview_stats', _this.$html);
+        dashboard.webapi.stats(function(ret, err) {
+            if (ret) {
+                for (var key in ret) {
+                    var keyStr = key.split('/').join('_');
+                    $('#' + keyStr, $stats).text(ret[key]);
+                }
+            }
+        });
+    };
+    Overview.prototype.metrics = function() {
+        var _this = this;
+        var $metrics = $('#overview_metrics', _this.$html);
+        dashboard.webapi.metrics(function(ret, err) {
+            if (ret) {
+                for (var key in ret) {
+                    var keyStr = key.split('/').join('_');
+                    $('#' + keyStr, $metrics).text(ret[key]);
+                }
+            }
+        });
+    };
+    Overview.prototype.listeners = function() {
+        var _this = this;
+        dashboard.webapi.listeners(function(ret, err) {
+            if (ret) {
+                _this.vmLiss.listeners = ret;
+            }
+        });
+    };
+    Overview.prototype.startTask = function() {
+        var _this = this;
+        _this.timertask = setInterval(function() {
+            _this.broker();
+            _this.nodes();
+            _this.stats();
+            _this.metrics();
+        }, 10000);
+    };
+
+    // Metrics------------------------------------------
+
+    var Metrics = function() {
+        this.modName = 'metrics';
+        this.$html = $('#dashboard_metrics',
+                sog.mainCenter.$html);
+
+        this._matrics();
+
+        this._chart1();
+        this._chart2();
+        this._chart3();
+        
+        this._init();
+    };
+    Metrics.prototype._init = function() {
+        var _this = this;
+        loading('metrics.html', function() {
+            _this.chart();
+            _this.startTask();
+        }, _this.$html);
+    };
+    Metrics.prototype.startTask = function() {
+        var _this = this;
+        _this.timertask = setInterval(function() {
+            _this.chart();
+        }, 10000);
+    };
+    Metrics.prototype._matrics = function() {
         this.packets = [];
         this.messages = [];
         this.bytes = [];
@@ -314,7 +400,7 @@
             });
         }
     };
-    Overview.prototype._chart1 = function() {
+    Metrics.prototype._chart1 = function() {
         this.chart1 = nv.models.lineChart()
                 .color(d3.scale.category10().range())
                 .margin({left: 30})
@@ -332,7 +418,7 @@
         //this.chart1.yAxis.tickFormat(d3.format(',.1%'));
         nv.utils.windowResize(this.chart1.update);
     };
-    Overview.prototype._chart2 = function() {
+    Metrics.prototype._chart2 = function() {
         this.chart2 = nv.models.lineChart()
                 .color(d3.scale.category10().range())
                 .margin({left: 30})
@@ -350,7 +436,7 @@
         //this.chart2.yAxis.tickFormat(d3.format(',.1%'));
         nv.utils.windowResize(this.chart2.update);
     };
-    Overview.prototype._chart3 = function() {
+    Metrics.prototype._chart3 = function() {
         this.chart3 = nv.models.lineChart()
                 .color(d3.scale.category10().range())
                 .margin({left: 30})
@@ -368,83 +454,13 @@
         //this.chart3.yAxis.tickFormat(d3.format(',.1%'));
         nv.utils.windowResize(this.chart3.update);
     };
-    Overview.prototype.show = function() {
-        hideAllMods();
-        activeMenu(this.modName);
+    Metrics.prototype.show = function() {
         this.$html.show();
     };
-    Overview.prototype.hide = function() {
+    Metrics.prototype.hide = function() {
         this.$html.hide();
     };
-    Overview.prototype.broker = function() {
-        var _this = this;
-        dashboard.webapi.broker(function(ret, err) {
-            if (ret) {
-                _this.vmBroker.$data = ret;
-            }
-        });
-    };
-    Overview.prototype.nodes = function() {
-        var _this = this;
-        dashboard.webapi.nodes(function(ret, err) {
-            if (ret) {
-                _this.vmNodes.nodes = ret;
-            }
-        });
-    };
-    Overview.prototype.stats = function() {
-        var _this = this;
-        var $stats = $('#overview_stats', _this.$html);
-        dashboard.webapi.stats(function(ret, err) {
-            if (ret) {
-                for (var key in ret) {
-                    var keyStr = key.split('/').join('_');
-                    $('#' + keyStr, $stats).text(ret[key]);
-                }
-            }
-        });
-    };
-    Overview.prototype.metrics = function() {
-        var _this = this;
-        var $metrics = $('#overview_metrics', _this.$html);
-        dashboard.webapi.metrics(function(ret, err) {
-            if (ret) {
-                for (var key in ret) {
-                    var keyStr = key.split('/').join('_');
-                    $('#' + keyStr, $metrics).text(ret[key]);
-                    
-//                    var ts = (new Date()).getTime();
-//                    for (var i = 0, len = _this.packets.length; i < len; i++) {
-//                        if (_this.packets[i].key == key) {
-//                            var v = {};
-//                            v[ts] = ret[key];
-//                            _this.packets[i].values.push(v);
-//                            break;
-//                        }
-//                    }
-//                    for (var i = 0, len = _this.messages.length; i < len; i++) {
-//                        if (_this.messages[i].key == key) {
-//                            var v = {};
-//                            v[ts] = ret[key];
-//                            _this.messages[i].values.push(v);
-//                            break;
-//                        }
-//                    }
-//                    for (var i = 0, len = _this.bytes.length; i < len; i++) {
-//                        if (_this.bytes[i].key == key) {
-//                            var v = {};
-//                            v[ts] = ret[key];
-//                            _this.bytes[i].values.push(v);
-//                            break;
-//                        }
-//                    }
-                }
-//                _this.metricsChart(_this.packets, _this.messages, _this.bytes);
-            }
-        });
-        _this.chart();
-    };
-    Overview.prototype.metricsChart = function(data1, data2, data3) {
+    Metrics.prototype.graph = function(data1, data2, data3) {
         var _this = this;
         nv.addGraph(function() {
             d3.select('#packets_chart svg')
@@ -465,7 +481,7 @@
             return _this.chart3;
         });
     };
-    Overview.prototype.chart = function() {
+    Metrics.prototype.chart = function() {
         var _this = this;
         dashboard.webapi.m_chart(function(ret, err) {
             if (ret) {
@@ -491,26 +507,9 @@
                         }
                     }
                 }
-                _this.metricsChart(_this.packets, _this.messages, _this.bytes);
+                _this.graph(_this.packets, _this.messages, _this.bytes);
             }
         });
-    };
-    Overview.prototype.listeners = function() {
-        var _this = this;
-        dashboard.webapi.listeners(function(ret, err) {
-            if (ret) {
-                _this.vmLiss.listeners = ret;
-            }
-        });
-    };
-    Overview.prototype.startTask = function() {
-        var _this = this;
-        _this.timertask = setInterval(function() {
-            _this.broker();
-            _this.nodes();
-            _this.stats();
-            _this.metrics();
-        }, 10000);
     };
 
     // Clients------------------------------------------
@@ -552,8 +551,6 @@
         }, _this.$html);
     };
     Clients.prototype.show = function() {
-        hideAllMods();
-        activeMenu(this.modName);
         this.$html.show();
     };
     Clients.prototype.hide = function() {
@@ -561,7 +558,8 @@
     };
     Clients.prototype.list = function() {
         var _this = this;
-        _this.vmClients.clientKey = _this.vmClients.clientKey ? _this.vmClients.clientKey.trim() : '';
+        var cKey = _this.vmClients.clientKey;
+        _this.vmClients.clientKey = cKey ? cKey.trim() : '';
         var params = {
             page_size : _this.pageInfo.pageSize,
             curr_page : _this.pageInfo.currPage,
@@ -618,8 +616,6 @@
         }, _this.$html);
     };
     Sessions.prototype.show = function() {
-        hideAllMods();
-        activeMenu(this.modName);
         this.$html.show();
     };
     Sessions.prototype.hide = function() {
@@ -627,7 +623,8 @@
     };
     Sessions.prototype.list = function() {
         var _this = this;
-        _this.vmSessions.clientKey = _this.vmSessions.clientKey ? _this.vmSessions.clientKey.trim() : '';
+        var cKey = _this.vmSessions.clientKey;
+        _this.vmSessions.clientKey = cKey ? cKey.trim() : '';
         var params = {
             page_size : _this.pageInfo.pageSize,
             curr_page : _this.pageInfo.currPage,
@@ -684,8 +681,6 @@
         }, _this.$html);
     };
     Topics.prototype.show = function() {
-        hideAllMods();
-        activeMenu(this.modName);
         this.$html.show();
     };
     Topics.prototype.hide = function() {
@@ -693,7 +688,8 @@
     };
     Topics.prototype.list = function() {
         var _this = this;
-        _this.vmTopics.topic = _this.vmTopics.topic ? _this.vmTopics.topic.trim() : '';
+        var tc = _this.vmTopics.topic;
+        _this.vmTopics.topic = tc ? tc.trim() : '';
         var params = {
             page_size : _this.pageInfo.pageSize,
             curr_page : _this.pageInfo.currPage,
@@ -750,8 +746,6 @@
         }, _this.$html);
     };
     Routes.prototype.show = function() {
-        hideAllMods();
-        activeMenu(this.modName);
         this.$html.show();
     };
     Routes.prototype.hide = function() {
@@ -759,7 +753,8 @@
     };
     Routes.prototype.list = function() {
         var _this = this;
-        _this.vmRoutes.topic = _this.vmRoutes.topic ? _this.vmRoutes.topic.trim() : '';
+        var tc = _this.vmRoutes.topic;
+        _this.vmRoutes.topic = tc ? tc.trim() : '';
         var params = {
             page_size : _this.pageInfo.pageSize,
             curr_page : _this.pageInfo.currPage,
@@ -816,8 +811,6 @@
         }, _this.$html);
     };
     Subscriptions.prototype.show = function() {
-        hideAllMods();
-        activeMenu(this.modName);
         this.$html.show();
     };
     Subscriptions.prototype.hide = function() {
@@ -825,7 +818,8 @@
     };
     Subscriptions.prototype.list = function() {
         var _this = this;
-        _this.vmSubs.clientKey = _this.vmSubs.clientKey ? _this.vmSubs.clientKey.trim():'';
+        var cKey = _this.vmSubs.clientKey;
+        _this.vmSubs.clientKey = cKey ? cKey.trim() : '';
         var params = {
             page_size : _this.pageInfo.pageSize,
             curr_page : _this.pageInfo.currPage,
@@ -862,7 +856,7 @@
                     cInfo : {
                         host : location.hostname,
                         port : 8083,
-                        clientId : 'c_' + new Date().getTime(),
+                        clientId : 'C_' + new Date().getTime(),
                         userName : null,
                         password : null,
                         keepAlive: null,
@@ -900,8 +894,6 @@
         }, _this.$html);
     };
     Websocket.prototype.show = function() {
-        hideAllMods();
-        activeMenu(this.modName);
         this.$html.show();
     };
     Websocket.prototype.hide = function() {
@@ -1152,8 +1144,6 @@
         }, _this.$html);
     };
     Users.prototype.show = function() {
-        hideAllMods();
-        activeMenu(this.modName);
         this.$html.show();
     };
     Users.prototype.hide = function() {
@@ -1184,8 +1174,6 @@
         }, _this.$html);
     };
     HttpApi.prototype.show = function() {
-        hideAllMods();
-        activeMenu(this.modName);
         this.$html.show();
     };
     HttpApi.prototype.hide = function() {
@@ -1233,12 +1221,21 @@
         });
     };
     var openModule = function(modName) {
+        hideAllMods();
+        activeMenu(modName);
+
         switch (modName) {
         case 'overview':
             if (!modules.overview) {
                 modules.overview = new Overview();
             }
             modules.overview.show();
+            break;
+        case 'metrics':
+            if (!modules.metrics) {
+                modules.metrics = new Metrics();
+            }
+            modules.metrics.show();
             break;
         case 'clients':
             if (!modules.clients) {
