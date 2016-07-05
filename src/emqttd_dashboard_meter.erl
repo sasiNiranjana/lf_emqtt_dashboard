@@ -1,3 +1,18 @@
+%%-------------------------------------------------------------------------
+%% Copyright (c) 2012-2016 Feng Lee <feng@emqtt.io>.
+%%
+%% Licensed under the Apache License, Version 2.0 (the "License");
+%% you may not use this file except in compliance with the License.
+%% You may obtain a copy of the License at
+%%
+%%     http://www.apache.org/licenses/LICENSE-2.0
+%%
+%% Unless required by applicable law or agreed to in writing, software
+%% distributed under the License is distributed on an "AS IS" BASIS,
+%% WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%% See the License for the specific language governing permissions and
+%% limitations under the License.
+%%-------------------------------------------------------------------------
 -module(emqttd_dashboard_meter).
 
 -behaviour(gen_server).
@@ -17,39 +32,7 @@
 
 -define(SERVER, ?MODULE).
 
--define(METRICS, ['bytes/received',
-                  'bytes/sent',
-                  'messages/dropped',
-                  'messages/qos0/received',
-                  'messages/qos0/sent',
-                  'messages/qos1/received',
-                  'messages/qos1/sent',
-                  'messages/qos2/received',
-                  'messages/qos2/sent',
-                  'messages/received',
-                  'messages/retained',
-                  'messages/sent',
-                  'packets/connack',
-                  'packets/connect',
-                  'packets/disconnect',
-                  'packets/pingreq',
-                  'packets/pingresp',
-                  'packets/puback/received',
-                  'packets/puback/sent',
-                  'packets/pubcomp/received',
-                  'packets/pubcomp/sent',
-                  'packets/publish/received',
-                  'packets/publish/sent',
-                  'packets/pubrec/received',
-                  'packets/pubrec/sent',
-                  'packets/pubrel/received',
-                  'packets/pubrel/sent',
-                  'packets/received',
-                  'packets/sent',
-                  'packets/suback',
-                  'packets/subscribe',
-                  'packets/unsuback',
-                  'packets/unsubscribe']).
+-include("emqttd_dashboard_meter.hrl").
 
 -record(meter_state, {interval}).
 
