@@ -860,18 +860,18 @@
                         userName : null,
                         password : null,
                         keepAlive: null,
-                        cleanSession : 1
+                        cleanSession : true
                     },
                     subInfo : {
-                        topic : '/World',
+                        topic : '/world',
                         qos : 0
                     },
                     subscriptions : [],
                     sendInfo : {
-                        topic : '/World',
+                        topic : '/world',
                         text : 'Hello world!',
                         qos : 0,
-                        retained : 1
+                        retained : true
                     },
                     sendMsgs : [],
                     receiveMsgs : []
@@ -929,6 +929,10 @@
             onSuccess : function() {
                 console.log("The client connect success.");
                 _this.vmWS.connState = true;
+            },
+            onFailure : function() {
+                console.log("The client connect failure.");
+                _this.vmWS.connState = false;
             }
         };
         var userName = _this.vmWS.cInfo.userName;
@@ -944,7 +948,7 @@
         if (keepAlive) {
             options.keepAliveInterval = Number(keepAlive);
         }
-        if (cleanSession == 1) {
+        if (cleanSession == true) {
             options.cleanSession = true;
         } else {
             options.cleanSession = false;
@@ -984,7 +988,7 @@
         var message = new Paho.MQTT.Message(text);
         message.destinationName = _this.vmWS.sendInfo.topic;
         message.qos = Number(_this.vmWS.sendInfo.qos);
-        if (_this.vmWS.sendInfo.retained == 1) {
+        if (_this.vmWS.sendInfo.retained == true) {
             message.retained = true;
         } else {
             message.retained = false;
@@ -994,7 +998,7 @@
         _this.vmWS.sendMsgs.push(this.vmWS.sendInfo);
         _this.vmWS.sendInfo = {
                 topic : _this.vmWS.sendInfo.topic,
-                qos : 0, retained : 1};
+                qos : 0, retained : true};
     };
 
     // Users---------------------------------------------
