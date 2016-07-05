@@ -339,7 +339,7 @@
                 .showLegend(true) 
                 .showYAxis(true)
                 .showXAxis(true)
-                .x(function(d) {for (var k in d) {return Number(k)}})
+                .x(function(d) {for (var k in d) {return Number(k)*1000}})
                 .y(function(d) {for (var k in d) {return d[k]}})
                 .useInteractiveGuideline(true);
         //this.chart2.xAxis.tickValues(
@@ -357,7 +357,7 @@
                 .showLegend(true) 
                 .showYAxis(true)
                 .showXAxis(true)
-                .x(function(d) {for (var k in d) {return Number(k)}})
+                .x(function(d) {for (var k in d) {return Number(k)*1000}})
                 .y(function(d) {for (var k in d) {return d[k]}})
                 .useInteractiveGuideline(true);
         //this.chart3.xAxis.tickValues(
