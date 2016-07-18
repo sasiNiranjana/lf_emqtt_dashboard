@@ -445,7 +445,7 @@
     s.mainFooter.toBottom();
     s.loadingBar = new LoadingBar();
 
-    $(window).resize(function() {
+    $(window).on('resize', function() {
         $(window).trigger('sog.resize');
     });
     $(window).on('sog.resize', function() {

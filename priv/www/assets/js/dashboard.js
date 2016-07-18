@@ -403,7 +403,8 @@
         }
     };
     Metrics.prototype._chart1 = function() {
-        this.chart1 = nv.models.lineChart()
+        var _this = this;
+        _this.chart1 = nv.models.lineChart()
                 .color(d3.scale.category10().range())
                 .margin({left: 30})
                 .showLegend(true) 
@@ -412,16 +413,19 @@
                 .x(function(d) {for (var k in d) {return Number(k)*1000}})
                 .y(function(d) {for (var k in d) {return d[k]}})
                 .useInteractiveGuideline(true);
-        //this.chart1.xAxis.tickValues(
+        //_this.chart1.xAxis.tickValues(
         //    [ 1078030800000, 1122782400000, 1167541200000, 1251691200000 ]);
-        this.chart1.xAxis.tickFormat(function(d) {
+        _this.chart1.xAxis.tickFormat(function(d) {
             return (new Date(Number(d))).format('hh:mm:ss');
         });
-        //this.chart1.yAxis.tickFormat(d3.format(',.1%'));
-        nv.utils.windowResize(this.chart1.update);
+        //_this.chart1.yAxis.tickFormat(d3.format(',.1%'));
+        nv.utils.windowResize(function() {
+            _this.chart1.update();
+        });
     };
     Metrics.prototype._chart2 = function() {
-        this.chart2 = nv.models.lineChart()
+        var _this = this;
+        _this.chart2 = nv.models.lineChart()
                 .color(d3.scale.category10().range())
                 .margin({left: 30})
                 .showLegend(true) 
@@ -430,16 +434,19 @@
                 .x(function(d) {for (var k in d) {return Number(k)*1000}})
                 .y(function(d) {for (var k in d) {return d[k]}})
                 .useInteractiveGuideline(true);
-        //this.chart2.xAxis.tickValues(
+        //_this.chart2.xAxis.tickValues(
         //    [ 1078030800000, 1122782400000, 1167541200000, 1251691200000 ]);
-        this.chart2.xAxis.tickFormat(function(d) {
+        _this.chart2.xAxis.tickFormat(function(d) {
             return (new Date(Number(d))).format('hh:mm:ss');
         });
-        //this.chart2.yAxis.tickFormat(d3.format(',.1%'));
-        nv.utils.windowResize(this.chart2.update);
+        //_this.chart2.yAxis.tickFormat(d3.format(',.1%'));
+        nv.utils.windowResize(function() {
+            _this.chart2.update();
+        });
     };
     Metrics.prototype._chart3 = function() {
-        this.chart3 = nv.models.lineChart()
+        var _this = this;
+        _this.chart3 = nv.models.lineChart()
                 .color(d3.scale.category10().range())
                 .margin({left: 30})
                 .showLegend(true) 
@@ -448,16 +455,27 @@
                 .x(function(d) {for (var k in d) {return Number(k)*1000}})
                 .y(function(d) {for (var k in d) {return d[k]}})
                 .useInteractiveGuideline(true);
-        //this.chart3.xAxis.tickValues(
+        //_this.chart3.xAxis.tickValues(
         //    [ 1078030800000, 1122782400000, 1167541200000, 1251691200000 ]);
-        this.chart3.xAxis.tickFormat(function(d) {
+        _this.chart3.xAxis.tickFormat(function(d) {
             return (new Date(Number(d))).format('hh:mm:ss');
         });
-        //this.chart3.yAxis.tickFormat(d3.format(',.1%'));
-        nv.utils.windowResize(this.chart3.update);
+        //_this.chart3.yAxis.tickFormat(d3.format(',.1%'));
+        nv.utils.windowResize(function() {
+            _this.chart3.update();
+        });
     };
     Metrics.prototype.show = function() {
         this.$html.show();
+        if (this.chart1.update) {
+            this.chart1.update();
+        }
+        if (this.chart2.update) {
+            this.chart2.update();
+        }
+        if (this.chart3.update) {
+            this.chart3.update();
+        }
     };
     Metrics.prototype.hide = function() {
         this.$html.hide();
@@ -467,18 +485,21 @@
         nv.addGraph(function() {
             d3.select('#packets_chart svg')
                 .datum(data1)
+                .transition().duration(500)
                 .call(_this.chart1);
             return _this.chart1;
         });
         nv.addGraph(function() {
             d3.select('#messages_chart svg')
                 .datum(data2)
+                .transition().duration(500)
                 .call(_this.chart2);
             return _this.chart2;
         });
         nv.addGraph(function() {
             d3.select('#bytes_chart svg')
                 .datum(data3)
+                .transition().duration(500)
                 .call(_this.chart3);
             return _this.chart3;
         });
