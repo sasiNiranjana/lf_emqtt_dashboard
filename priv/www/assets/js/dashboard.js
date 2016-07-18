@@ -1354,25 +1354,7 @@
             openModule('overview');
             return;
         }
-        if (strs[1] == '/clients') {
-            openModule('clients');
-        } else if (strs[1] == '/sessions') {
-            openModule('sessions');
-        } else if (strs[1] == '/topics') {
-            openModule('topics');
-        } else if (strs[1] == '/routes') {
-            openModule('routes');
-        } else if (strs[1] == '/subscriptions') {
-            openModule('subscriptions');
-        } else if (strs[1] == '/websocket') {
-            openModule('websocket');
-        } else if (strs[1] == '/users') {
-            openModule('users');
-        } else if (strs[1] == '/http_api') {
-            openModule('http_api');
-        } else {
-            openModule('overview');
-        }
+        openModule(strs[1].substring(1));
     };
 
 })((function() {
