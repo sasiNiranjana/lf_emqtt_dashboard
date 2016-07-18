@@ -90,8 +90,10 @@ listeners() ->
 
 listener({{Protocol, ListenOn}, Pid}) ->
     [{protocol, Protocol}, {listen, list_to_binary(esockd:to_string(ListenOn))},
-     {max_clients, esockd:get_max_clients(Pid)},
-     {current_clients, esockd:get_current_clients(Pid)}].
+     {acceptors,       esockd:get_acceptors(Pid)},
+     {max_clients,     esockd:get_max_clients(Pid)},
+     {current_clients, esockd:get_current_clients(Pid)},
+     {shutdown_count,  esockd:get_shutdown_count(Pid)}].
 
 bnode() ->
     {ok, [{node, node()}]}.
