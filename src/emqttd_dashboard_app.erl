@@ -22,11 +22,14 @@
 %% Application callbacks
 -export([start/2, stop/1]).
 
+-define(APP, emqttd_dashboard).
+
 start(_StartType, _StartArgs) ->
+    gen_conf:init(?APP),
     {ok, Sup} = emqttd_dashboard_sup:start_link(),
-    {ok, Listener} = application:get_env(emqttd_dashboard, listener),
+    {ok, Listener} = gen_conf:value(?APP, listener),
     ok = emqttd_access_control:register_mod(auth, emqttd_auth_dashboard, [Listener], 9999),
-    open_listener(Listener),
+    start_listener(Listener),
     emqttd_dashboard_cli:load(),
     {ok, Sup}.
 
@@ -36,7 +39,7 @@ stop(_State) ->
     {ok, {_Proto, Port, _Opts}} = application:get_env(emqttd_dashboard, listener),
     mochiweb:stop_http(Port).
 
-%% open http port
-open_listener({_Http, Port, Options}) ->
-    mochiweb:start_http(Port, Options, emqttd_dashboard:http_handler()).
+%% start http listener
+start_listener({Name, Port, Options}) ->
+    mochiweb:start_http(Name, Port, Options, emqttd_dashboard:http_handler()).
 
