@@ -5,9 +5,11 @@
  * 
  */
 
-(function(dashboad, $) {
+(function(dashboard, $) {
 
     'use strict';
+
+    dashboard.version = '1.0';
 
     var WebAPI = function(options) {
         this.options = $.extend(
