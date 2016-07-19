@@ -55,6 +55,9 @@ a {
 .dash-icon-http-api {
   background-image: url(../imgs/http_api_d.png);
 }
+.dash-icon-metrics {
+  background-image: url(../imgs/metrics_d.png);
+}
 
 .sidebar-menu .main-menu a:hover .dash-icon-overview {
   background-image: url(../imgs/overview_h.png);
@@ -83,6 +86,9 @@ a {
 .sidebar-menu .main-menu a:hover .dash-icon-http-api {
   background-image: url(../imgs/http_api_h.png);
 }
+.sidebar-menu .main-menu a:hover .dash-icon-metrics {
+  background-image: url(../imgs/metrics_h.png);
+}
 
 .sidebar-menu .main-menu li.active > a .dash-icon-overview {
   background-image: url(../imgs/overview_h.png);
@@ -110,4 +116,7 @@ a {
 }
 .sidebar-menu .main-menu li.active > a .dash-icon-http-api {
   background-image: url(../imgs/http_api_h.png);
+}
+.sidebar-menu .main-menu li.active > a .dash-icon-metrics {
+  background-image: url(../imgs/metrics_h.png);
 }
