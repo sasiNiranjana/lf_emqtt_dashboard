@@ -328,7 +328,10 @@
         this._matrics();
 
         this._chart1();
+        this._chart1_2();
+        this._chart1_3();
         this._chart2();
+        this._chart2_2();
         this._chart3();
         
         this._init();
@@ -348,15 +351,13 @@
     };
     Metrics.prototype._matrics = function() {
         this.packets = [];
+        this.packets_2 = [];
+        this.packets_3 = [];
         this.messages = [];
+        this.messages_2 = [];
         this.bytes = [];
         var matrics1 = ['packets/received',
                         'packets/sent',
-                        'packets/connect',
-                        'packets/connack',
-                        'packets/disconnect',
-                        'packets/pingreq',
-                        'packets/pingresp',
                         'packets/publish/received',
                         'packets/publish/sent',
                         'packets/puback/received',
@@ -366,21 +367,26 @@
                         'packets/pubrec/received',
                         'packets/pubrec/sent',
                         'packets/pubrel/received',
-                        'packets/pubrel/sent',
-                        'packets/subscribe',
-                        'packets/suback',
-                        'packets/unsubscribe',
-                        'packets/unsuback'];
+                        'packets/pubrel/sent'];
+        var matrics1_2 = ['packets/connect',
+                          'packets/connack',
+                          'packets/disconnect',
+                          'packets/pingreq',
+                          'packets/pingresp'];
+        var matrics1_3 = ['packets/subscribe',
+                          'packets/suback',
+                          'packets/unsubscribe',
+                          'packets/unsuback'];
         var matrics2 = ['messages/received',
                         'messages/sent',
-                        'messages/dropped',
                         'messages/qos0/received',
                         'messages/qos0/sent',
                         'messages/qos1/received',
                         'messages/qos1/sent',
                         'messages/qos2/received',
-                        'messages/qos2/sent',
-                        'messages/retained'];
+                        'messages/qos2/sent'];
+        var matrics2_2 = ['messages/dropped',
+                          'messages/retained'];
         var matrics3 = ['bytes/received',
                         'bytes/sent'];
         for (var i = 0; i < matrics1.length; i++) {
@@ -389,9 +395,27 @@
                 values : []
             });
         }
+        for (var i = 0; i < matrics1_2.length; i++) {
+            this.packets_2.push({
+                key : matrics1_2[i],
+                values : []
+            });
+        }
+        for (var i = 0; i < matrics1_3.length; i++) {
+            this.packets_3.push({
+                key : matrics1_3[i],
+                values : []
+            });
+        }
         for (var i = 0; i < matrics2.length; i++) {
             this.messages.push({
                 key : matrics2[i],
+                values : []
+            });
+        }
+        for (var i = 0; i < matrics2_2.length; i++) {
+            this.messages_2.push({
+                key : matrics2_2[i],
                 values : []
             });
         }
@@ -405,7 +429,7 @@
     Metrics.prototype._chart1 = function() {
         var _this = this;
         _this.chart1 = nv.models.lineChart()
-                .color(d3.scale.category10().range())
+                .color(d3.scale.category20().range())
                 .margin({left: 30})
                 .showLegend(true) 
                 .showYAxis(true)
@@ -421,6 +445,48 @@
         //_this.chart1.yAxis.tickFormat(d3.format(',.1%'));
         nv.utils.windowResize(function() {
             _this.chart1.update();
+        });
+    };
+    Metrics.prototype._chart1_2 = function() {
+        var _this = this;
+        _this.chart1_2 = nv.models.lineChart()
+                .color(d3.scale.category10().range())
+                .margin({left: 30})
+                .showLegend(true) 
+                .showYAxis(true)
+                .showXAxis(true)
+                .x(function(d) {for (var k in d) {return Number(k)*1000}})
+                .y(function(d) {for (var k in d) {return d[k]}})
+                .useInteractiveGuideline(true);
+        //_this.chart1_2.xAxis.tickValues(
+        //    [ 1078030800000, 1122782400000, 1167541200000, 1251691200000 ]);
+        _this.chart1_2.xAxis.tickFormat(function(d) {
+            return (new Date(Number(d))).format('hh:mm:ss');
+        });
+        //_this.chart1_2.yAxis.tickFormat(d3.format(',.1%'));
+        nv.utils.windowResize(function() {
+            _this.chart1_2.update();
+        });
+    };
+    Metrics.prototype._chart1_3 = function() {
+        var _this = this;
+        _this.chart1_3 = nv.models.lineChart()
+                .color(d3.scale.category10().range())
+                .margin({left: 30})
+                .showLegend(true) 
+                .showYAxis(true)
+                .showXAxis(true)
+                .x(function(d) {for (var k in d) {return Number(k)*1000}})
+                .y(function(d) {for (var k in d) {return d[k]}})
+                .useInteractiveGuideline(true);
+        //_this.chart1_3.xAxis.tickValues(
+        //    [ 1078030800000, 1122782400000, 1167541200000, 1251691200000 ]);
+        _this.chart1_3.xAxis.tickFormat(function(d) {
+            return (new Date(Number(d))).format('hh:mm:ss');
+        });
+        //_this.chart1_3.yAxis.tickFormat(d3.format(',.1%'));
+        nv.utils.windowResize(function() {
+            _this.chart1_3.update();
         });
     };
     Metrics.prototype._chart2 = function() {
@@ -442,6 +508,27 @@
         //_this.chart2.yAxis.tickFormat(d3.format(',.1%'));
         nv.utils.windowResize(function() {
             _this.chart2.update();
+        });
+    };
+    Metrics.prototype._chart2_2 = function() {
+        var _this = this;
+        _this.chart2_2 = nv.models.lineChart()
+                .color(d3.scale.category10().range())
+                .margin({left: 30})
+                .showLegend(true) 
+                .showYAxis(true)
+                .showXAxis(true)
+                .x(function(d) {for (var k in d) {return Number(k)*1000}})
+                .y(function(d) {for (var k in d) {return d[k]}})
+                .useInteractiveGuideline(true);
+        //_this.chart2_2.xAxis.tickValues(
+        //    [ 1078030800000, 1122782400000, 1167541200000, 1251691200000 ]);
+        _this.chart2_2.xAxis.tickFormat(function(d) {
+            return (new Date(Number(d))).format('hh:mm:ss');
+        });
+        //_this.chart2_2.yAxis.tickFormat(d3.format(',.1%'));
+        nv.utils.windowResize(function() {
+            _this.chart2_2.update();
         });
     };
     Metrics.prototype._chart3 = function() {
@@ -470,8 +557,17 @@
         if (this.chart1.update) {
             this.chart1.update();
         }
+        if (this.chart1_2.update) {
+            this.chart1_2.update();
+        }
+        if (this.chart1_3.update) {
+            this.chart1_3.update();
+        }
         if (this.chart2.update) {
             this.chart2.update();
+        }
+        if (this.chart2_2.update) {
+            this.chart2_2.update();
         }
         if (this.chart3.update) {
             this.chart3.update();
@@ -480,7 +576,7 @@
     Metrics.prototype.hide = function() {
         this.$html.hide();
     };
-    Metrics.prototype.graph = function(data1, data2, data3) {
+    Metrics.prototype.graph = function(data1, data2, data3, data1_2, data1_3, data2_2) {
         var _this = this;
         nv.addGraph(function() {
             d3.select('#packets_chart svg')
@@ -490,11 +586,32 @@
             return _this.chart1;
         });
         nv.addGraph(function() {
+            d3.select('#packets_chart_2 svg')
+                .datum(data1_2)
+                .transition().duration(500)
+                .call(_this.chart1_2);
+            return _this.chart1_2;
+        });
+        nv.addGraph(function() {
+            d3.select('#packets_chart_3 svg')
+                .datum(data1_3)
+                .transition().duration(500)
+                .call(_this.chart1_3);
+            return _this.chart1_3;
+        });
+        nv.addGraph(function() {
             d3.select('#messages_chart svg')
                 .datum(data2)
                 .transition().duration(500)
                 .call(_this.chart2);
             return _this.chart2;
+        });
+        nv.addGraph(function() {
+            d3.select('#messages_chart_2 svg')
+                .datum(data2_2)
+                .transition().duration(500)
+                .call(_this.chart2_2);
+            return _this.chart2_2;
         });
         nv.addGraph(function() {
             d3.select('#bytes_chart svg')
@@ -515,10 +632,28 @@
                             break;
                         }
                     }
+                    for (var i = 0, l = _this.packets_2.length; i < l; i++) {
+                        if (_this.packets_2[i].key == key) {
+                            _this.packets_2[i].values = ret[key];
+                            break;
+                        }
+                    }
+                    for (var i = 0, l = _this.packets_3.length; i < l; i++) {
+                        if (_this.packets_3[i].key == key) {
+                            _this.packets_3[i].values = ret[key];
+                            break;
+                        }
+                    }
                     
                     for (var i = 0, l = _this.messages.length; i < l; i++) {
                         if (_this.messages[i].key == key) {
                             _this.messages[i].values = ret[key];
+                            break;
+                        }
+                    }
+                    for (var i = 0, l = _this.messages_2.length; i < l; i++) {
+                        if (_this.messages_2[i].key == key) {
+                            _this.messages_2[i].values = ret[key];
                             break;
                         }
                     }
@@ -530,7 +665,7 @@
                         }
                     }
                 }
-                _this.graph(_this.packets, _this.messages, _this.bytes);
+                _this.graph(_this.packets, _this.messages, _this.bytes, _this.packets_2, _this.packets_3,  _this.messages_2);
             }
         });
     };
