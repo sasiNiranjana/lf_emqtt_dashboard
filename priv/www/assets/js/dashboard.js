@@ -971,11 +971,7 @@
         if (keepAlive) {
             options.keepAliveInterval = Number(keepAlive);
         }
-        if (cleanSession == true) {
-            options.cleanSession = true;
-        } else {
-            options.cleanSession = false;
-        }
+        options.cleanSession = cleanSession;
         _this.client.connect(options);
     };
     Websocket.prototype.disconnect = function() {
@@ -1011,11 +1007,7 @@
         var message = new Paho.MQTT.Message(text);
         message.destinationName = _this.vmWS.sendInfo.topic;
         message.qos = Number(_this.vmWS.sendInfo.qos);
-        if (_this.vmWS.sendInfo.retained == true) {
-            message.retained = true;
-        } else {
-            message.retained = false;
-        }
+        message.retained = _this.vmWS.sendInfo.retained;
         _this.client.send(message);
         _this.vmWS.sendInfo.time = (new Date()).format("yyyy-MM-dd hh:mm:ss");
         _this.vmWS.sendMsgs.push(this.vmWS.sendInfo);
