@@ -995,7 +995,7 @@
         });
         this.vmWS.subInfo.time = (new Date()).format("yyyy-MM-dd hh:mm:ss");
         this.vmWS.subscriptions.push(this.vmWS.subInfo);
-        this.vmWS.subInfo = {qos : 0};
+        this.vmWS.subInfo = {qos : _this.vmWS.subInfo.qos};
     };
     Websocket.prototype.sendMessage = function() {
         var _this = this;
@@ -1021,7 +1021,8 @@
         _this.vmWS.sendMsgs.push(this.vmWS.sendInfo);
         _this.vmWS.sendInfo = {
                 topic : _this.vmWS.sendInfo.topic,
-                qos : 0, retained : true};
+                qos : _this.vmWS.sendInfo.qos,
+                retained : _this.vmWS.sendInfo.retained};
     };
 
     // Users---------------------------------------------
