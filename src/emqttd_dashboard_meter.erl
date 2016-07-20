@@ -32,6 +32,8 @@
 
 -define(INTERVAL, 10 * 1000).
 
+-define(Suffix, ".dets").
+
 -define(SERVER, ?MODULE).
 
 -include("emqttd_dashboard_meter.hrl").
@@ -53,11 +55,11 @@ get_report(Metric, Limit) ->
 
 init([]) ->
     NewTab = fun(Tab) -> 
-                ets:new(Tab, [ordered_set, named_table, public]) 
+                create_table(Tab)
              end,
     lists:foreach(NewTab, ?METRICS),
     erlang:send_after(?INTERVAL, self(), collect_meter),
-    case application:get_env(emqttd_dashboard, interval) of
+    case application:get_env(emqttd_dashboard, collect_interval) of
     {ok, Interval} ->
         {ok, #meter_state{interval = Interval}};
     undefined ->
@@ -66,42 +68,73 @@ init([]) ->
 
 handle_call({get_report, Metric, Limit}, _From, State) ->
     Reply = get_metrics(Metric, Limit),
-    {reply, Reply, State};
+    reply(Reply, State);
 
 handle_call(Req, _From, State) ->
     lager:info("unexpectd info ~p", [Req]),
-    {reply, State}.
+    reply(unexpectd, State).
 
-handle_cast({update_interval, Interval}, _State) ->
+handle_cast({update_interval, Interval}, State) ->
     UpdateInterval = Interval * 1000,
-    {noreply, #meter_state{interval = UpdateInterval}};
+    noreply(State#meter_state{interval = UpdateInterval});
 
 handle_cast(Info, State) ->
     lager:info("unexpectd info ~p", [Info]),
-    {noreply, State}.
+    noreply(State). 
 
 handle_info(collect_meter, #meter_state{interval = Interval}=State) ->
     MetricsData = emqttd_metrics:all(),
     save(MetricsData),
     erlang:send_after(Interval, self(), collect_meter),
-    {noreply, State}.
+    noreply(State). 
 
 code_change(_OldVsn, State, _Extra) ->
     {ok, State}.
 
 terminate(_Reason, _State) ->
-    ok.
+    close_table().
+
+reply(Reply, NewState) ->
+    {reply, Reply, NewState}.
+
+noreply(NewState) ->
+    {noreply, NewState}.
 
 %% ====================================================================
 %% Internal functions
 %% ====================================================================
+create_table(Tab) ->
+    Path = filename:join([code:root_dir(), "data", "metrics"]),
+    case file:make_dir(Path) of
+    ok ->
+        ok;
+    {error, eexist} ->
+        io:format("file is exist~n"),
+        ignore
+    end,
+    FileName = filename_replace(atom_to_list(Tab)),
+    File = filename:join(Path, FileName),
+    case dets:open_file(Tab, [{file, File}]) of
+                 {ok, Tab} ->
+                     ok;
+                 {error, Reason} ->
+                     io:format("reanson:~p~n", [Reason]),
+                     exit(edestOpen)
+         end.
+
+close_table() ->
+    CloseTab = fun(Tab) -> 
+                dets:close(Tab)
+             end,
+    lists:foreach(CloseTab, ?METRICS).
+ 
 
 save(Data) ->
     Ts = timestamp(),
     Fun = fun(Metric) ->
         case proplists:get_value(Metric, Data) of
             undefined -> ignore;
-            V -> ets:insert(Metric, {Ts, V})
+            V -> dets:insert(Metric, {Ts, V})
         end
         end,
     lists:foreach(Fun, ?METRICS).
@@ -114,7 +147,7 @@ get_metrics(all, Limit) ->
     get_metrics(?METRICS, Limit);
 
 get_metrics(Metric, Limit) when is_atom(Metric) ->
-    Result = ets:match(Metric, '$1', Limit),
+    Result = dets:match(Metric, '$1', Limit),
     List = case Result of
              {M, _C} -> M;
              '$end_of_table' -> []
@@ -124,3 +157,6 @@ get_metrics(Metric, Limit) when is_atom(Metric) ->
 get_metrics(Metrics, Limit) when is_list(Metrics) ->
     [get_metrics(M, Limit) || M <- Metrics].
 
+filename_replace(Src) when is_list(Src) ->
+    Des = re:replace(Src, "/", "_", [global, {return, list}]),
+    Des ++ ?Suffix.
