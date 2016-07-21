@@ -101,35 +101,15 @@ gc_batch(#gc_state{gc_table = Table,
 
 gc_batch(Max, Total, State)  when is_integer(Max), 
                                   is_integer(Total),
-                                  Max > Total ->
+                                  Max >= Total ->
     State;
 
-gc_batch(Max, Total, State)  ->
-    Rows = Total - Max,
-    gc(Rows, State).
-
-gc(0, State) ->
-    State;
-
-gc(Rows, State = #gc_state{gc_table = Table, gc_index = Con}) ->
-   Select = case Con of
-            undefined ->
-                dets:first(Table);
-            _ ->
-                dets:next(Table, Con)
-            end,
-    NewCont = case Select of
-              '$end_of_table' ->
-                undefined;
-              Key ->
-                remove(Table, Key),
-                Key
-                end,
-    gc(Rows - 1, State#gc_state{gc_index = NewCont}).
-
-remove(Table, Key) ->
-    case dets:lookup(Table, Key) of
-        [] -> ok;
-        _Metric -> 
-            dets:delete(Table, Key)
-    end.
+gc_batch(Max, Total, #gc_state{gc_table = Table})  ->
+    RowInx = Total - Max,
+    Qh = qlc:sort(dets:table(Table)),
+    Cursor = qlc:cursor(Qh),
+    Rows = qlc:next_answers(Cursor, RowInx),
+    qlc:delete_cursor(Cursor),
+    lists:foreach(fun({Key, _V}) ->
+                    dets:delete(Table, Key)
+                  end, Rows).
