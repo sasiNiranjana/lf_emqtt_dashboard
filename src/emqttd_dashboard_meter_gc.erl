@@ -38,7 +38,7 @@
         code_change/3,
         terminate/2]).
 
--define(INTERVAL, 5000).
+-define(INTERVAL, 60 * 60 * 1000).
 
 start_link(Table) ->
     gen_server:start_link({local, named(Table)}, 
