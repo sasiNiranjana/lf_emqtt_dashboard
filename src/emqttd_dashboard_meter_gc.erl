@@ -128,7 +128,7 @@ gc(Rows, State = #gc_state{gc_table = Table, gc_index = Con}) ->
     gc(Rows - 1, State#gc_state{gc_index = NewCont}).
 
 remove(Table, Key) ->
-    case dets:lookup(Table, key) of
+    case dets:lookup(Table, Key) of
         [] -> ok;
         _Metric -> 
             io:format("remove:~p, ~p ~n", [Table, Key]),
