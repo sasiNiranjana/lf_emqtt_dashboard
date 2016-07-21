@@ -144,7 +144,11 @@ get_metrics(Metric, Limit) when is_atom(Metric) ->
         true  -> qlc:next_answers(Cursor, TotalNum - Limit);
         false -> ignore
     end,
-    Rows = qlc:next_answers(Cursor, TotalNum),
+    Rows = 
+    case TotalNum >= 1 of
+        true  -> qlc:next_answers(Cursor, TotalNum);
+        false -> []
+    end,
     L = [[{x, Ts}, {y, V}] || {Ts, V} <- Rows],
     {Metric, L};
 
