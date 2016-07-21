@@ -434,7 +434,7 @@
                 .showLegend(true) 
                 .showYAxis(true)
                 .showXAxis(true)
-                .x(function(d) {return d.x * 1000)
+                .x(function(d) {return d.x * 1000})
                 .y(function(d) {return d.y})
                 .useInteractiveGuideline(true);
         //_this.chart1.xAxis.tickValues(
@@ -455,7 +455,7 @@
                 .showLegend(true) 
                 .showYAxis(true)
                 .showXAxis(true)
-                .x(function(d) {return d.x * 1000)
+                .x(function(d) {return d.x * 1000})
                 .y(function(d) {return d.y})
                 .useInteractiveGuideline(true);
         //_this.chart1_2.xAxis.tickValues(
@@ -476,7 +476,7 @@
                 .showLegend(true) 
                 .showYAxis(true)
                 .showXAxis(true)
-                .x(function(d) {return d.x * 1000)
+                .x(function(d) {return d.x * 1000})
                 .y(function(d) {return d.y})
                 .useInteractiveGuideline(true);
         //_this.chart1_3.xAxis.tickValues(
@@ -497,7 +497,7 @@
                 .showLegend(true) 
                 .showYAxis(true)
                 .showXAxis(true)
-                .x(function(d) {return d.x * 1000)
+                .x(function(d) {return d.x * 1000})
                 .y(function(d) {return d.y})
                 .useInteractiveGuideline(true);
         //_this.chart2.xAxis.tickValues(
@@ -518,7 +518,7 @@
                 .showLegend(true) 
                 .showYAxis(true)
                 .showXAxis(true)
-                .x(function(d) {return d.x * 1000)
+                .x(function(d) {return d.x * 1000})
                 .y(function(d) {return d.y})
                 .useInteractiveGuideline(true);
         //_this.chart2_2.xAxis.tickValues(
@@ -539,7 +539,7 @@
                 .showLegend(true) 
                 .showYAxis(true)
                 .showXAxis(true)
-                .x(function(d) {return d.x * 1000)
+                .x(function(d) {return d.x * 1000})
                 .y(function(d) {return d.y})
                 .useInteractiveGuideline(true);
         //_this.chart3.xAxis.tickValues(

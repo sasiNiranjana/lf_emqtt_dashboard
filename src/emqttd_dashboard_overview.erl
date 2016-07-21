@@ -31,7 +31,6 @@
          nodes_info/0,
          node_info/0,
          metrics/0, 
-         m_chart/0, 
          listeners/0, 
          bnode/0]).
 
@@ -44,7 +43,6 @@
 -http_api({"metrics",  metrics,   []}).
 -http_api({"listeners",listeners, []}).
 -http_api({"bnode",    bnode,     []}).
--http_api({"m_chart",  m_chart,   []}).
 
 -define(KB, 1024).
 -define(MB, (1024*1024)).
@@ -97,9 +95,6 @@ listener({{Protocol, ListenOn}, Pid}) ->
 
 bnode() ->
     {ok, [{node, node()}]}.
-
-m_chart() ->
-    {ok, emqttd_dashboard_meter:get_report(all, 30)}.
 
 kmg(Byte) when Byte > ?GB ->
     float(Byte / ?GB, "G");

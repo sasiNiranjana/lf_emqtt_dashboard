@@ -131,6 +131,5 @@ remove(Table, Key) ->
     case dets:lookup(Table, Key) of
         [] -> ok;
         _Metric -> 
-            io:format("remove:~p, ~p ~n", [Table, Key]),
             dets:delete(Table, Key)
     end.
