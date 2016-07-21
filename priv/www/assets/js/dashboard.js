@@ -434,13 +434,13 @@
                 .showLegend(true) 
                 .showYAxis(true)
                 .showXAxis(true)
-                .x(function(d) {for (var k in d) {return Number(k)*1000}})
-                .y(function(d) {for (var k in d) {return d[k]}})
+                .x(function(d) {return d.x * 1000)
+                .y(function(d) {return d.y})
                 .useInteractiveGuideline(true);
         //_this.chart1.xAxis.tickValues(
         //    [ 1078030800000, 1122782400000, 1167541200000, 1251691200000 ]);
         _this.chart1.xAxis.tickFormat(function(d) {
-            return (new Date(Number(d))).format('hh:mm:ss');
+            return (new Date(d)).format('hh:mm:ss');
         });
         //_this.chart1.yAxis.tickFormat(d3.format(',.1%'));
         nv.utils.windowResize(function() {
@@ -455,13 +455,13 @@
                 .showLegend(true) 
                 .showYAxis(true)
                 .showXAxis(true)
-                .x(function(d) {for (var k in d) {return Number(k)*1000}})
-                .y(function(d) {for (var k in d) {return d[k]}})
+                .x(function(d) {return d.x * 1000)
+                .y(function(d) {return d.y})
                 .useInteractiveGuideline(true);
         //_this.chart1_2.xAxis.tickValues(
         //    [ 1078030800000, 1122782400000, 1167541200000, 1251691200000 ]);
         _this.chart1_2.xAxis.tickFormat(function(d) {
-            return (new Date(Number(d))).format('hh:mm:ss');
+            return (new Date(d)).format('hh:mm:ss');
         });
         //_this.chart1_2.yAxis.tickFormat(d3.format(',.1%'));
         nv.utils.windowResize(function() {
@@ -476,13 +476,13 @@
                 .showLegend(true) 
                 .showYAxis(true)
                 .showXAxis(true)
-                .x(function(d) {for (var k in d) {return Number(k)*1000}})
-                .y(function(d) {for (var k in d) {return d[k]}})
+                .x(function(d) {return d.x * 1000)
+                .y(function(d) {return d.y})
                 .useInteractiveGuideline(true);
         //_this.chart1_3.xAxis.tickValues(
         //    [ 1078030800000, 1122782400000, 1167541200000, 1251691200000 ]);
         _this.chart1_3.xAxis.tickFormat(function(d) {
-            return (new Date(Number(d))).format('hh:mm:ss');
+            return (new Date(d)).format('hh:mm:ss');
         });
         //_this.chart1_3.yAxis.tickFormat(d3.format(',.1%'));
         nv.utils.windowResize(function() {
@@ -497,13 +497,13 @@
                 .showLegend(true) 
                 .showYAxis(true)
                 .showXAxis(true)
-                .x(function(d) {for (var k in d) {return Number(k)*1000}})
-                .y(function(d) {for (var k in d) {return d[k]}})
+                .x(function(d) {return d.x * 1000)
+                .y(function(d) {return d.y})
                 .useInteractiveGuideline(true);
         //_this.chart2.xAxis.tickValues(
         //    [ 1078030800000, 1122782400000, 1167541200000, 1251691200000 ]);
         _this.chart2.xAxis.tickFormat(function(d) {
-            return (new Date(Number(d))).format('hh:mm:ss');
+            return (new Date(d)).format('hh:mm:ss');
         });
         //_this.chart2.yAxis.tickFormat(d3.format(',.1%'));
         nv.utils.windowResize(function() {
@@ -518,13 +518,13 @@
                 .showLegend(true) 
                 .showYAxis(true)
                 .showXAxis(true)
-                .x(function(d) {for (var k in d) {return Number(k)*1000}})
-                .y(function(d) {for (var k in d) {return d[k]}})
+                .x(function(d) {return d.x * 1000)
+                .y(function(d) {return d.y})
                 .useInteractiveGuideline(true);
         //_this.chart2_2.xAxis.tickValues(
         //    [ 1078030800000, 1122782400000, 1167541200000, 1251691200000 ]);
         _this.chart2_2.xAxis.tickFormat(function(d) {
-            return (new Date(Number(d))).format('hh:mm:ss');
+            return (new Date(d)).format('hh:mm:ss');
         });
         //_this.chart2_2.yAxis.tickFormat(d3.format(',.1%'));
         nv.utils.windowResize(function() {
@@ -539,13 +539,13 @@
                 .showLegend(true) 
                 .showYAxis(true)
                 .showXAxis(true)
-                .x(function(d) {for (var k in d) {return Number(k)*1000}})
-                .y(function(d) {for (var k in d) {return d[k]}})
+                .x(function(d) {return d.x * 1000)
+                .y(function(d) {return d.y})
                 .useInteractiveGuideline(true);
         //_this.chart3.xAxis.tickValues(
         //    [ 1078030800000, 1122782400000, 1167541200000, 1251691200000 ]);
         _this.chart3.xAxis.tickFormat(function(d) {
-            return (new Date(Number(d))).format('hh:mm:ss');
+            return (new Date(d)).format('hh:mm:ss');
         });
         //_this.chart3.yAxis.tickFormat(d3.format(',.1%'));
         nv.utils.windowResize(function() {
