@@ -18,6 +18,8 @@
 
 -behaviour(gen_server).
 
+-include_lib("stdlib/include/qlc.hrl").
+
 %% Metrics GC  State
 -record(gc_state, {collect_interval,
                    gc_table,
@@ -50,14 +52,7 @@ named(Table) ->
 %%--------------------------------------------------------------------
 
 init([Table]) ->
-    case application:get_env(emqttd_dashboard, collect_interval) of
-    {ok, Interval} ->
-        {ok, set_gc_timer(#gc_state{gc_table = Table,
-                                collect_interval = Interval})};
-    undefined ->
-        {ok, set_gc_timer(#gc_state{gc_table = Table,
-                                collect_interval = ?INTERVAL})}
-    end.
+    {ok, set_gc_timer(#gc_state{gc_table = Table})}.
 
 handle_call(_Req, _From, State) ->
     reply(unexpected, State).
@@ -66,7 +61,9 @@ handle_cast(_Req, State) ->
     noreply(State). 
 
 handle_info(gc, State) ->
-    noreply(set_gc_timer(gc_batch(State)));
+    Interval = emqttd_dashboard_meter:collect_interval(),
+    gc_batch(State#gc_state{collect_interval = Interval}),
+    noreply(set_gc_timer(State));
 
 handle_info(_Info, State) ->
     noreply(State). 
@@ -93,18 +90,17 @@ set_gc_timer(State) ->
     State#gc_state{gc_timer = TRef}.
 
 gc_batch(#gc_state{gc_table = Table, 
-        collect_interval = Interval} = State) ->
-%%    Max = 7 * 60 * 60 * 24 * 1000 / Interval,
-    Max = 10, 
+        collect_interval = Interval}) ->
+    Max = (7 * 60 * 60 * 24 * 1000) div Interval,
     Total = dets:info(Table, size),
-    gc_batch(Max, Total, State).
+    gc_batch(Max, Total, Table).
 
-gc_batch(Max, Total, State)  when is_integer(Max), 
+gc_batch(Max, Total, _Table)  when is_integer(Max), 
                                   is_integer(Total),
                                   Max >= Total ->
-    State;
+    ignore;
 
-gc_batch(Max, Total, #gc_state{gc_table = Table})  ->
+gc_batch(Max, Total, Table)  ->
     RowInx = Total - Max,
     Qh = qlc:sort(dets:table(Table)),
     Cursor = qlc:cursor(Qh),

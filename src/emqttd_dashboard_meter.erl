@@ -39,7 +39,8 @@
 %% API Function Exports
 -export([start_link/0,
          get_report/2,
-         m_chart/1]).
+         m_chart/1,
+         collect_interval/0]).
 
 start_link() ->
     gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
@@ -50,18 +51,14 @@ get_report(Metric, Limit) ->
 m_chart(Limit) ->
     {ok, get_report(all, Limit)}.
 
+collect_interval() ->
+    gen_server:call(?SERVER, collect_interval).
+
 %%--------------------------------------------------------------------
 %% gen_server Callbacks
 %%--------------------------------------------------------------------
 
 init([]) ->
-%%     NewTab = 
-%%     fun(Tab) ->
-%%         ets:new(Tab, [ordered_set,
-%%                       named_table,
-%%                       public,
-%%                      {keypos, #metric.timestamp}])
-%%     end,
     lists:foreach(fun create_table/1, ?METRICS),
     {ok, MState} =
     case application:get_env(emqttd_dashboard, interval) of
@@ -72,6 +69,9 @@ init([]) ->
     end,
     erlang:send_after(MState#meter_state.interval, self(), collect_meter),
     {ok, MState}.
+
+handle_call(collect_interval, _From, State) ->
+    {reply, State#meter_state.interval, State};
 
 handle_call(Req, _From, State) ->
     Reply = Req,
