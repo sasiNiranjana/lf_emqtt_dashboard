@@ -138,7 +138,8 @@ get_metrics(all, Limit) ->
 
 get_metrics(Metric, Limit) when is_atom(Metric) ->
     TotalNum = dets:info(Metric, size),
-    Qh = qlc:q([R || R <- dets:table(Metric)]),
+    Qh = qlc:sort(dets:table(Metric)),
+    %Qh = qlc:q([R || R <- dets:table(Metric)]),
     Cursor = qlc:cursor(Qh),
     case TotalNum > Limit of
         true  -> qlc:next_answers(Cursor, TotalNum - Limit);
@@ -150,6 +151,7 @@ get_metrics(Metric, Limit) when is_atom(Metric) ->
         false -> []
     end,
     L = [[{x, Ts}, {y, V}] || {Ts, V} <- Rows],
+    qlc:delete_cursor(Cursor),
     {Metric, L};
 
 get_metrics(Metrics, Limit) when is_list(Metrics) ->
