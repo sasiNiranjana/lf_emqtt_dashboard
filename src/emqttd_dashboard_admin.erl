@@ -55,13 +55,12 @@ add_user_(Admin = #mqtt_admin{username = Username}) ->
 -spec(remove_user(binary()) -> ok | {error, any()}).
 remove_user(Username) when is_binary(Username) ->
     Trans = fun() ->
-                    User = 
                     case lookup_user(Username) of
-                    [Admin] -> Admin;
                     [] ->
-                           mnesia:abort("Username Not Found")
+                        mnesia:abort("Username Not Found");
+                    _  -> ok
                     end,
-                    mnesia:delete(User)
+                    mnesia:delete({mqtt_admin, Username})
             end,
     return(mnesia:transaction(Trans)).
 
