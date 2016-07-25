@@ -341,18 +341,18 @@
         loading('metrics.html', function() {
             _this.vmRecent = new Vue({
                 el  : $('#metrics_recent', _this.$html)[0],
-                data: {limit: 60},
+                data: {limit: 360},
                 methods : {
                     hour : function() {
-                        this.limit = 60;
+                        this.limit = 360;
                         _this.chart();
                     },
                     day : function() {
-                        this.limit = 60 * 24;
+                        this.limit = 360 * 24;
                         _this.chart();
                     },
                     week : function() {
-                        this.limit = 60 * 24 * 7;
+                        this.limit = 360 * 24 * 7;
                         _this.chart();
                     }
                 }
