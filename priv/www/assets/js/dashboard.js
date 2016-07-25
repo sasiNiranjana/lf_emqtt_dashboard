@@ -108,8 +108,8 @@
         },
 
         // m_chart
-        m_chart : function(limit, callback) {
-            this._ajax('api/m_chart', {limit : limit}, callback);
+        m_chart : function(minutes, callback) {
+            this._ajax('api/m_chart', {minutes : minutes}, callback);
         },
 
         // listeners
@@ -341,18 +341,18 @@
         loading('metrics.html', function() {
             _this.vmRecent = new Vue({
                 el  : $('#metrics_recent', _this.$html)[0],
-                data: {limit: 360},
+                data: {minutes: 60},
                 methods : {
                     hour : function() {
-                        this.limit = 360;
+                        this.minutes = 60;
                         _this.chart();
                     },
                     day : function() {
-                        this.limit = 360 * 24;
+                        this.minutes = 60 * 24;
                         _this.chart();
                     },
                     week : function() {
-                        this.limit = 360 * 24 * 7;
+                        this.minutes = 60 * 24 * 7;
                         _this.chart();
                     }
                 }
@@ -365,7 +365,7 @@
         var _this = this;
         _this.timertask = setInterval(function() {
             _this.chart();
-        }, 30000);
+        }, 20000);
     };
     Metrics.prototype._matrics = function() {
         this.packets = [];
@@ -641,7 +641,7 @@
     };
     Metrics.prototype.chart = function() {
         var _this = this;
-        dashboard.webapi.m_chart(_this.vmRecent.limit, function(ret, err) {
+        dashboard.webapi.m_chart(_this.vmRecent.minutes, function(ret, err) {
             if (ret) {
                 for (var key in ret) {
                     for (var i = 0, l = _this.packets.length; i < l; i++) {

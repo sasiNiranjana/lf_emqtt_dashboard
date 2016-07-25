@@ -22,12 +22,11 @@
 
 -define(SERVER, ?MODULE).
 -define(INTERVAL, 10 * 1000).
--define(METRICS_LIMIT, 150).
 -define(Suffix, ".dets").
 
 -record(meter_state, {interval = ?INTERVAL}).
 
--http_api({"m_chart", m_chart, [{"limit", int, ?METRICS_LIMIT}]}).
+-http_api({"m_chart", m_chart, [{"minutes", int, 60}]}).
 
 %% gen_server Function Exports
 -export([init/1,
@@ -45,11 +44,11 @@
 start_link() ->
     gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
 
-get_report(Metric, Limit) ->
-    get_metrics(Metric, Limit).
+get_report(Metric, Minutes) ->
+    get_metrics(Metric, Minutes).
 
-m_chart(Limit) ->
-    {ok, get_report(all, Limit)}.
+m_chart(Minutes) ->
+    {ok, get_report(all, Minutes)}.
 
 collect_interval() ->
     gen_server:call(?SERVER, collect_interval).
@@ -133,13 +132,15 @@ timestamp() ->
     {MegaSecs, Secs, _MicroSecs} = os:timestamp(),
     MegaSecs * 1000000 + Secs.
 
-get_metrics(all, Limit) ->
-    get_metrics(?METRICS, Limit);
+get_metrics(all, Minutes) ->
+    get_metrics(?METRICS, Minutes);
 
-get_metrics(Metric, Limit) when is_atom(Metric) ->
+get_metrics(Metric, Minutes) when is_atom(Metric) ->
     TotalNum = dets:info(Metric, size),
     Qh = qlc:sort(dets:table(Metric)),
     %Qh = qlc:q([R || R <- dets:table(Metric)]),
+    Start = timestamp() - (Minutes * 60),
+    Limit = (Minutes * 60) div collect_interval(),
     Cursor = qlc:cursor(Qh),
     case TotalNum > Limit of
         true  -> qlc:next_answers(Cursor, TotalNum - Limit);
@@ -150,10 +151,10 @@ get_metrics(Metric, Limit) when is_atom(Metric) ->
         true  -> qlc:next_answers(Cursor, TotalNum);
         false -> []
     end,
-    L = [[{x, Ts}, {y, V}] || {Ts, V} <- Rows],
     qlc:delete_cursor(Cursor),
+    L = [[{x, Ts}, {y, V}] || {Ts, V} <- Rows, Ts >= Start],
     {Metric, L};
 
-get_metrics(Metrics, Limit) when is_list(Metrics) ->
-    [get_metrics(M, Limit) || M <- Metrics].
+get_metrics(Metrics, Minutes) when is_list(Metrics) ->
+    [get_metrics(M, Minutes) || M <- Metrics].
 
