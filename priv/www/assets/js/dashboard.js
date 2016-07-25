@@ -108,8 +108,8 @@
         },
 
         // m_chart
-        m_chart : function(callback) {
-            this._ajax('api/m_chart', null, callback);
+        m_chart : function(minutes, callback) {
+            this._ajax('api/m_chart', {minutes : minutes}, callback);
         },
 
         // listeners
@@ -339,6 +339,24 @@
     Metrics.prototype._init = function() {
         var _this = this;
         loading('metrics.html', function() {
+            _this.vmRecent = new Vue({
+                el  : $('#metrics_recent', _this.$html)[0],
+                data: {minutes: 60},
+                methods : {
+                    hour : function() {
+                        this.minutes = 60;
+                        _this.chart();
+                    },
+                    day : function() {
+                        this.minutes = 60 * 24;
+                        _this.chart();
+                    },
+                    week : function() {
+                        this.minutes = 60 * 24 * 7;
+                        _this.chart();
+                    }
+                }
+            });
             _this.chart();
             _this.startTask();
         }, _this.$html);
@@ -347,7 +365,7 @@
         var _this = this;
         _this.timertask = setInterval(function() {
             _this.chart();
-        }, 10000);
+        }, 20000);
     };
     Metrics.prototype._matrics = function() {
         this.packets = [];
@@ -440,7 +458,7 @@
         //_this.chart1.xAxis.tickValues(
         //    [ 1078030800000, 1122782400000, 1167541200000, 1251691200000 ]);
         _this.chart1.xAxis.tickFormat(function(d) {
-            return (new Date(d)).format('hh:mm:ss');
+            return (new Date(d)).format('MM-dd hh:mm');
         });
         //_this.chart1.yAxis.tickFormat(d3.format(',.1%'));
         nv.utils.windowResize(function() {
@@ -461,7 +479,7 @@
         //_this.chart1_2.xAxis.tickValues(
         //    [ 1078030800000, 1122782400000, 1167541200000, 1251691200000 ]);
         _this.chart1_2.xAxis.tickFormat(function(d) {
-            return (new Date(d)).format('hh:mm:ss');
+            return (new Date(d)).format('MM-dd hh:mm');
         });
         //_this.chart1_2.yAxis.tickFormat(d3.format(',.1%'));
         nv.utils.windowResize(function() {
@@ -482,7 +500,7 @@
         //_this.chart1_3.xAxis.tickValues(
         //    [ 1078030800000, 1122782400000, 1167541200000, 1251691200000 ]);
         _this.chart1_3.xAxis.tickFormat(function(d) {
-            return (new Date(d)).format('hh:mm:ss');
+            return (new Date(d)).format('MM-dd hh:mm');
         });
         //_this.chart1_3.yAxis.tickFormat(d3.format(',.1%'));
         nv.utils.windowResize(function() {
@@ -503,7 +521,7 @@
         //_this.chart2.xAxis.tickValues(
         //    [ 1078030800000, 1122782400000, 1167541200000, 1251691200000 ]);
         _this.chart2.xAxis.tickFormat(function(d) {
-            return (new Date(d)).format('hh:mm:ss');
+            return (new Date(d)).format('MM-dd hh:mm');
         });
         //_this.chart2.yAxis.tickFormat(d3.format(',.1%'));
         nv.utils.windowResize(function() {
@@ -524,7 +542,7 @@
         //_this.chart2_2.xAxis.tickValues(
         //    [ 1078030800000, 1122782400000, 1167541200000, 1251691200000 ]);
         _this.chart2_2.xAxis.tickFormat(function(d) {
-            return (new Date(d)).format('hh:mm:ss');
+            return (new Date(d)).format('MM-dd hh:mm');
         });
         //_this.chart2_2.yAxis.tickFormat(d3.format(',.1%'));
         nv.utils.windowResize(function() {
@@ -545,7 +563,7 @@
         //_this.chart3.xAxis.tickValues(
         //    [ 1078030800000, 1122782400000, 1167541200000, 1251691200000 ]);
         _this.chart3.xAxis.tickFormat(function(d) {
-            return (new Date(d)).format('hh:mm:ss');
+            return (new Date(d)).format('MM-dd hh:mm');
         });
         //_this.chart3.yAxis.tickFormat(d3.format(',.1%'));
         nv.utils.windowResize(function() {
@@ -623,7 +641,7 @@
     };
     Metrics.prototype.chart = function() {
         var _this = this;
-        dashboard.webapi.m_chart(function(ret, err) {
+        dashboard.webapi.m_chart(_this.vmRecent.minutes, function(ret, err) {
             if (ret) {
                 for (var key in ret) {
                     for (var i = 0, l = _this.packets.length; i < l; i++) {
