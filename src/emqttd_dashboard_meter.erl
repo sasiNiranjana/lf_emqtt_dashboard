@@ -140,7 +140,7 @@ get_metrics(Metric, Minutes) when is_atom(Metric) ->
     Qh = qlc:sort(dets:table(Metric)),
     %Qh = qlc:q([R || R <- dets:table(Metric)]),
     Start = timestamp() - (Minutes * 60),
-    Limit = (Minutes * 60) div collect_interval(),
+    Limit = (Minutes * 60 * 1000) div collect_interval(),
     Cursor = qlc:cursor(Qh),
     case TotalNum > Limit of
         true  -> qlc:next_answers(Cursor, TotalNum - Limit);
