@@ -1,19 +1,19 @@
 <div style="margin-bottom: 22px;">
 <div class="btn-group" id="metrics_recent">
     <template v-if="minutes == 60">
-    <button type="button" class="btn btn-success disabled">The recent 1 hour</button>
-    <button type="button" class="btn btn-primary" @click="day();">The recent 1 day</button>
-    <button type="button" class="btn btn-primary" @click="week();">In recent 7 days</button>
+    <button style="border:1px solid #ddd;" type="button" class="btn btn-success disabled">The recent 1 hour</button>
+    <button style="border:1px solid #ddd;" type="button" class="btn btn-gray" @click="day();">The recent 1 day</button>
+    <button style="border:1px solid #ddd;" type="button" class="btn btn-gray" @click="week();">In recent 7 days</button>
     </template>
     <template v-if="minutes == 60 * 24">
-    <button type="button" class="btn btn-primary" @click="hour();">The recent 1 hour</button>
-    <button type="button" class="btn btn-success disabled">The recent 1 day</button>
-    <button type="button" class="btn btn-primary" @click="week();">In recent 7 days</button>
+    <button style="border:1px solid #ddd;" type="button" class="btn btn-gray" @click="hour();">The recent 1 hour</button>
+    <button style="border:1px solid #ddd;" type="button" class="btn btn-success disabled">The recent 1 day</button>
+    <button style="border:1px solid #ddd;" type="button" class="btn btn-gray" @click="week();">In recent 7 days</button>
     </template>
     <template v-if="minutes == 60 * 24 * 7">
-    <button type="button" class="btn btn-primary" @click="hour();">The recent 1 hour</button>
-    <button type="button" class="btn btn-primary" @click="day();">The recent 1 day</button>
-    <button type="button" class="btn btn-success disabled">In recent 7 days</button>
+    <button style="border:1px solid #ddd;" type="button" class="btn btn-gray" @click="hour();">The recent 1 hour</button>
+    <button style="border:1px solid #ddd;" type="button" class="btn btn-gray" @click="day();">The recent 1 day</button>
+    <button style="border:1px solid #ddd;" type="button" class="btn btn-success disabled">In recent 7 days</button>
     </template>
 </div>
 </div>
