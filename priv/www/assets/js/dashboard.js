@@ -455,8 +455,7 @@
                 .x(function(d) {return d.x * 1000})
                 .y(function(d) {return d.y})
                 .useInteractiveGuideline(true);
-        //_this.chart1.xAxis.tickValues(
-        //    [ 1078030800000, 1122782400000, 1167541200000, 1251691200000 ]);
+        //_this.chart1.yAxis.tickValues([1, 2]);
         _this.chart1.xAxis.tickFormat(function(d) {
             return (new Date(d)).format('MM-dd hh:mm');
         });

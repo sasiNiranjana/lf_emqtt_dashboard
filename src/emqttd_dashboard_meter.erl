@@ -152,8 +152,27 @@ get_metrics(Metric, Minutes) when is_atom(Metric) ->
     end,
     qlc:delete_cursor(Cursor),
     L = [[{x, Ts}, {y, V}] || {Ts, V} <- Rows, Ts >= Start],
-    {Metric, L};
+    {Metric, pick(L)};
 
 get_metrics(Metrics, Minutes) when is_list(Metrics) ->
     [get_metrics(M, Minutes) || M <- Metrics].
 
+pick(List) when (length(List) div 60) =< 1 ->
+    List;
+pick(List) ->
+    Space = length(List) div 60 * collect_interval() div 1000,
+    pick(List, Space, undefined).
+
+pick([], _Space, _CurrTs) ->
+    [];
+pick([H|T], Space, CurrTs) when CurrTs =:= undefined ->
+    [{x, Ts}, {y, _V}] = H,
+    [H] ++ pick(T, Space, Ts + Space);
+pick([H|T], Space, CurrTs) ->
+    [{x, Ts}, {y, _V}] = H,
+    if 
+        Ts >= CurrTs ->
+            [H] ++ pick(T, Space, Ts + Space);
+        true         ->
+            pick(T, Space, CurrTs)
+    end.
