@@ -21,7 +21,7 @@
 -behaviour(gen_server).
 
 -define(SERVER, ?MODULE).
--define(INTERVAL, 10 * 1000).
+-define(INTERVAL, 60 * 1000).
 -define(Suffix, ".dets").
 
 -record(meter_state, {interval = ?INTERVAL}).
@@ -138,7 +138,6 @@ get_metrics(all, Minutes) ->
 get_metrics(Metric, Minutes) when is_atom(Metric) ->
     TotalNum = dets:info(Metric, size),
     Qh = qlc:sort(dets:table(Metric)),
-    %Qh = qlc:q([R || R <- dets:table(Metric)]),
     Start = timestamp() - (Minutes * 60),
     Limit = (Minutes * 60 * 1000) div collect_interval(),
     Cursor = qlc:cursor(Qh),
