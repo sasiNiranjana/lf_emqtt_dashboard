@@ -160,19 +160,19 @@ get_metrics(Metrics, Minutes) when is_list(Metrics) ->
 pick(List) when (length(List) div 60) =< 1 ->
     List;
 pick(List) ->
-    Space = length(List) div 60 * collect_interval() div 1000,
-    pick(List, Space, undefined).
+    Steps = length(List) div 60,
+    pick(List, Steps, 0).
 
-pick([], _Space, _CurrTs) ->
+pick([], _Steps, _Count) ->
     [];
-pick([H|T], Space, CurrTs) when CurrTs =:= undefined ->
-    [{x, Ts}, {y, _V}] = H,
-    [H] ++ pick(T, Space, Ts + Space);
-pick([H|T], Space, CurrTs) ->
-    [{x, Ts}, {y, _V}] = H,
+pick([H|[]], _Steps, _Count) ->
+    [H];
+pick([H|T], Steps, Count) when Count =< 0 ->
+    [H] ++ pick(T, Steps, 1);
+pick([H|T], Steps, Count) ->
     if 
-        Ts >= CurrTs ->
-            [H] ++ pick(T, Space, Ts + Space);
-        true         ->
-            pick(T, Space, CurrTs)
+        Steps =:= Count ->
+            [H] ++ pick(T, Steps, 1);
+        true            ->
+            pick(T, Steps, 1 + Count)
     end.
