@@ -26,8 +26,6 @@
 
 -record(meter_state, {interval = ?INTERVAL}).
 
--http_api({"m_chart", m_chart, [{"minutes", int, 60}]}).
-
 %% gen_server Function Exports
 -export([init/1,
         handle_call/3,
@@ -37,28 +35,25 @@
         terminate/2]).
 %% API Function Exports
 -export([start_link/0,
-         get_report/2,
-         m_chart/1,
+         get_report/1,
          collect_interval/0]).
 
 start_link() ->
     gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
 
-get_report(Metric, Minutes) ->
-    get_metrics(Metric, Minutes).
-
-m_chart(Minutes) ->
-    {ok, get_report(all, Minutes)}.
-
 collect_interval() ->
     gen_server:call(?SERVER, collect_interval).
+
+get_report(Minutes) ->
+    gen_server:call(?SERVER, {all, Minutes}).
+
 
 %%--------------------------------------------------------------------
 %% gen_server Callbacks
 %%--------------------------------------------------------------------
 
 init([]) ->
-    lists:foreach(fun create_table/1, ?METRICS),
+    open_table(),
     {ok, MState} =
     case application:get_env(emqttd_dashboard, interval) of
         {ok, Interval} ->
@@ -68,6 +63,10 @@ init([]) ->
     end,
     erlang:send_after(MState#meter_state.interval, self(), collect_meter),
     {ok, MState}.
+
+handle_call({all, Minutes}, _From, State = #meter_state{interval = Interval}) ->
+    Metrics = get_metrics(all, Minutes, Interval),
+    {reply, Metrics, State};
 
 handle_call(collect_interval, _From, State) ->
     {reply, State#meter_state.interval, State};
@@ -95,7 +94,10 @@ terminate(_Reason, _State) ->
 %% ====================================================================
 %% Internal functions
 %% ====================================================================
-create_table(Tab) ->
+open_table() ->
+    lists:foreach(fun open_table/1, ?METRICS).
+
+open_table(Tab) ->
     Path = filename:join([code:root_dir(), "data", "metrics"]),
     case file:make_dir(Path) of
         ok -> ok;
@@ -117,6 +119,8 @@ filename_replace(Src) when is_list(Src) ->
     Des ++ ?Suffix.
 
 save(Data) ->
+    open_table(),
+    try
     Ts = timestamp(),
     Fun = 
     fun(Metric) ->
@@ -126,20 +130,23 @@ save(Data) ->
                 dets:insert(Metric, {Ts, Value})
         end
     end,
-    lists:foreach(Fun, ?METRICS).
+    lists:foreach(Fun, ?METRICS)
+    after
+        close_table()
+    end.
 
 timestamp() ->
     {MegaSecs, Secs, _MicroSecs} = os:timestamp(),
     MegaSecs * 1000000 + Secs.
 
-get_metrics(all, Minutes) ->
-    get_metrics(?METRICS, Minutes);
+get_metrics(all, Minutes, Interval) ->
+    get_metrics(?METRICS, Minutes, Interval);
 
-get_metrics(Metric, Minutes) when is_atom(Metric) ->
+get_metrics(Metric, Minutes, Interval) when is_atom(Metric) ->
     TotalNum = dets:info(Metric, size),
     Qh = qlc:sort(dets:table(Metric)),
     Start = timestamp() - (Minutes * 60),
-    Limit = (Minutes * 60 * 1000) div collect_interval(),
+    Limit = (Minutes * 60 * 1000) div Interval,
     Cursor = qlc:cursor(Qh),
     case TotalNum > Limit of
         true  -> qlc:next_answers(Cursor, TotalNum - Limit);
@@ -154,8 +161,8 @@ get_metrics(Metric, Minutes) when is_atom(Metric) ->
     L = [[{x, Ts}, {y, V}] || {Ts, V} <- Rows, Ts >= Start],
     {Metric, pick(L)};
 
-get_metrics(Metrics, Minutes) when is_list(Metrics) ->
-    [get_metrics(M, Minutes) || M <- Metrics].
+get_metrics(Metrics, Minutes, Interval) when is_list(Metrics) ->
+    [get_metrics(M, Minutes, Interval) || M <- Metrics].
 
 pick(List) when (length(List) div 60) =< 1 ->
     List;
