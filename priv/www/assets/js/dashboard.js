@@ -448,13 +448,16 @@
         } ];
         this.packets_10 = [ {
             key : 'packets/connect',
-            values : []
+            values : [],
+            color : '#a9d796'
         }, {
             key : 'packets/connack',
-            values : []
+            values : [],
+            color : '#8cc9e7'
         }, {
             key : 'packets/disconnect',
-            values : []
+            values : [],
+            color : '#cccccc'
         } ];
         
         this.messages = [ {
@@ -467,10 +470,12 @@
             color : '#8cc9e7'
         }, {
             key : 'messages/dropped',
-            values : []
+            values : [],
+            color : 'rgb(44, 160, 44)'
         }, {
             key : 'messages/retained',
-            values : []
+            values : [],
+            color : '#cccccc'
         } ];
         this.messages_2 = [{
             key : 'messages/qos0/received',
