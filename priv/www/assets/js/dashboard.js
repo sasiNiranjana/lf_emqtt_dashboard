@@ -367,131 +367,160 @@
     Metrics.prototype._matrics = function() {
         this.packets = [ {
             key : 'packets/received',
-            values : []
+            values : [],
+            color : '#a9d796'
         }, {
             key : 'packets/sent',
             values : [],
+            color : '#8cc9e7'
         } ];
         this.packets_2 = [ {
             key : 'packets/publish/received',
             values : [],
+            color : '#a9d796'
         }, {
             key : 'packets/publish/sent',
             values : [],
+            color : '#8cc9e7'
         } ];
         this.packets_3 = [ {
             key : 'packets/puback/received',
             values : [],
+            color : '#a9d796'
         }, {
             key : 'packets/puback/sent',
             values : [],
+            color : '#8cc9e7'
         } ];
         this.packets_4 = [ {
             key : 'packets/pubcomp/received',
             values : [],
+            color : '#a9d796'
         }, {
             key : 'packets/pubcomp/sent',
             values : [],
+            color : '#8cc9e7'
         } ];
         this.packets_5 = [ {
             key : 'packets/pubrec/received',
             values : [],
+            color : '#a9d796'
         }, {
             key : 'packets/pubrec/sent',
             values : [],
+            color : '#8cc9e7'
         } ];
         this.packets_6 = [ {
             key : 'packets/pubrel/received',
             values : [],
+            color : '#a9d796'
         }, {
             key : 'packets/pubrel/sent',
             values : [],
+            color : '#8cc9e7'
         } ];
         this.packets_7 = [ {
             key : 'packets/pingreq',
             values : [],
+            color : '#a9d796'
         }, {
             key : 'packets/pingresp',
             values : [],
+            color : '#8cc9e7'
         } ];
         this.packets_8 = [ {
             key : 'packets/suback',
             values : [],
+            color : '#a9d796'
         }, {
             key : 'packets/unsuback',
             values : [],
+            color : '#8cc9e7'
         } ];
         this.packets_9 = [ {
             key : 'packets/subscribe',
             values : [],
+            color : '#a9d796'
         }, {
             key : 'packets/unsubscribe',
             values : [],
+            color : '#8cc9e7'
         } ];
         this.packets_10 = [ {
             key : 'packets/connect',
-            values : [],
+            values : []
         }, {
             key : 'packets/connack',
-            values : [],
+            values : []
         }, {
             key : 'packets/disconnect',
-            values : [],
+            values : []
         } ];
         
         this.messages = [ {
             key : 'messages/received',
             values : [],
+            color : '#a9d796'
         }, {
             key : 'messages/sent',
             values : [],
+            color : '#8cc9e7'
         }, {
             key : 'messages/dropped',
-            values : [],
+            values : []
         }, {
             key : 'messages/retained',
-            values : [],
+            values : []
         } ];
         this.messages_2 = [{
             key : 'messages/qos0/received',
             values : [],
+            color : '#a9d796'
         }, {
             key : 'messages/qos0/sent',
             values : [],
+            color : '#8cc9e7'
         } ];
         this.messages_3 = [ {
             key : 'messages/qos1/received',
             values : [],
+            color : '#a9d796'
         }, {
             key : 'messages/qos1/sent',
             values : [],
+            color : '#8cc9e7'
         } ];
         this.messages_4 = [ {
             key : 'messages/qos2/received',
             values : [],
+            color : '#a9d796'
         }, {
             key : 'messages/qos2/sent',
             values : [],
+            color : '#8cc9e7'
         } ];
         
         this.bytes = [ {
             key : 'bytes/received',
             values : [],
+            color : '#a9d796'
         }, {
             key : 'bytes/sent',
             values : [],
+            color : '#8cc9e7'
         } ];
     };
     Metrics.prototype.newChart = function() {
         var chart = nv.models.lineChart()
             .color(d3.scale.category10().range())
-            .margin({left: 30})
+            //.margin({left: 30})
+            .useInteractiveGuideline(true)
+            .transitionDuration(350)
             .showLegend(true) 
             .showYAxis(true)
             .showXAxis(true)
             .x(function(d) {return d.x * 1000})
-            .y(function(d) {return d.y})
-            .useInteractiveGuideline(true);
+            .y(function(d) {return d.y});
         //chart.yAxis.tickValues([1, 2]);
         chart.xAxis.tickFormat(function(d) {
             return (new Date(d)).format('MM-dd hh:mm');
