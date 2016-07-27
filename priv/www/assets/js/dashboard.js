@@ -511,6 +511,7 @@
         } ];
     };
     Metrics.prototype.newChart = function() {
+        var _this = this;
         var chart = nv.models.lineChart()
             .color(d3.scale.category10().range())
             //.margin({left: 30})
@@ -523,7 +524,16 @@
             .y(function(d) {return d.y});
         //chart.yAxis.tickValues([1, 2]);
         chart.xAxis.tickFormat(function(d) {
-            return (new Date(d)).format('MM-dd hh:mm');
+            var ms = _this.vmRecent.minutes;
+            if (ms == 60) {
+                return (new Date(d)).format('hh:mm');
+            } else if (ms == 60 * 24) {
+                return (new Date(d)).format('hh/dd');
+            } else if (ms == 60 * 24 * 7) {
+                return (new Date(d)).format('MM-dd');
+            } else {
+                return (new Date(d)).format('hh:mm/MM-dd');
+            }
         });
         nv.utils.windowResize(function() {
             chart.update();
