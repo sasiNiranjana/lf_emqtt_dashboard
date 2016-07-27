@@ -586,25 +586,29 @@
             return chart;
         });
     };
-    Metrics.prototype.graph = function(data1, data2, data3, data1_2, data1_3, data2_2, data2_3, data2_4) {
+    Metrics.prototype.graph = function(packets, messages, bytes,
+            packets_2, packets_3, packets_4,
+            packets_5, packets_6, packets_7,
+            packets_8, packets_9, packets_10,
+            messages_2, messages_3, messages_4) {
         var _this = this;
-        _this.newGraph('#packets_chart svg', _this.chart1, data1);
-        _this.newGraph('#packets_chart_2 svg', _this.chart1_2, data1_2);
-        _this.newGraph('#packets_chart_3 svg', _this.chart1_3, data1_3);
-        _this.newGraph('#packets_chart_4 svg', _this.chart1_4, data1_3);
-        _this.newGraph('#packets_chart_5 svg', _this.chart1_5, data1_3);
-        _this.newGraph('#packets_chart_6 svg', _this.chart1_6, data1_3);
-        _this.newGraph('#packets_chart_7 svg', _this.chart1_7, data1_3);
-        _this.newGraph('#packets_chart_8 svg', _this.chart1_8, data1_3);
-        _this.newGraph('#packets_chart_9 svg', _this.chart1_9, data1_3);
-        _this.newGraph('#packets_chart_10 svg', _this.chart1_10, data1_3);
+        _this.newGraph('#packets_chart svg', _this.chart1, packets);
+        _this.newGraph('#packets_chart_2 svg', _this.chart1_2, packets_2);
+        _this.newGraph('#packets_chart_3 svg', _this.chart1_3, packets_3);
+        _this.newGraph('#packets_chart_4 svg', _this.chart1_4, packets_4);
+        _this.newGraph('#packets_chart_5 svg', _this.chart1_5, packets_5);
+        _this.newGraph('#packets_chart_6 svg', _this.chart1_6, packets_6);
+        _this.newGraph('#packets_chart_7 svg', _this.chart1_7, packets_7);
+        _this.newGraph('#packets_chart_8 svg', _this.chart1_8, packets_8);
+        _this.newGraph('#packets_chart_9 svg', _this.chart1_9, packets_9);
+        _this.newGraph('#packets_chart_10 svg', _this.chart1_10, packets_10);
         
-        _this.newGraph('#messages_chart svg', _this.chart2, data2);
-        _this.newGraph('#messages_chart_2 svg', _this.chart2_2, data2_2);
-        _this.newGraph('#messages_chart_3 svg', _this.chart2_3, data2_3);
-        _this.newGraph('#messages_chart_4 svg', _this.chart2_4, data2_4);
+        _this.newGraph('#messages_chart svg', _this.chart2, messages);
+        _this.newGraph('#messages_chart_2 svg', _this.chart2_2, messages_2);
+        _this.newGraph('#messages_chart_3 svg', _this.chart2_3, messages_3);
+        _this.newGraph('#messages_chart_4 svg', _this.chart2_4, messages_4);
         
-        _this.newGraph('#bytes_chart svg', _this.chart3, data3);
+        _this.newGraph('#bytes_chart svg', _this.chart3, bytes);
     };
     Metrics.prototype.chart = function() {
         var _this = this;
@@ -707,7 +711,7 @@
                 _this.graph(_this.packets, _this.messages, _this.bytes,
                         _this.packets_2, _this.packets_3, _this.packets_4,
                         _this.packets_5, _this.packets_6, _this.packets_7,
-                        _this.packets_8, _this.packets_8, _this.packets_10,
+                        _this.packets_8, _this.packets_9, _this.packets_10,
                         _this.messages_2, _this.messages_3, _this.messages_4);
             }
         });
