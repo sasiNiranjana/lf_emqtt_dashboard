@@ -328,10 +328,7 @@
         this._matrics();
 
         this._chart1();
-        this._chart1_2();
-        this._chart1_3();
         this._chart2();
-        this._chart2_2();
         this._chart3();
         
         this._init();
@@ -368,206 +365,165 @@
         }, 20000);
     };
     Metrics.prototype._matrics = function() {
-        this.packets = [];
-        this.packets_2 = [];
-        this.packets_3 = [];
-        this.messages = [];
-        this.messages_2 = [];
-        this.bytes = [];
-        var matrics1 = ['packets/received',
-                        'packets/sent',
-                        'packets/publish/received',
-                        'packets/publish/sent',
-                        'packets/puback/received',
-                        'packets/puback/sent',
-                        'packets/pubcomp/received',
-                        'packets/pubcomp/sent',
-                        'packets/pubrec/received',
-                        'packets/pubrec/sent',
-                        'packets/pubrel/received',
-                        'packets/pubrel/sent'];
-        var matrics1_2 = ['packets/connect',
-                          'packets/connack',
-                          'packets/disconnect',
-                          'packets/pingreq',
-                          'packets/pingresp'];
-        var matrics1_3 = ['packets/subscribe',
-                          'packets/suback',
-                          'packets/unsubscribe',
-                          'packets/unsuback'];
-        var matrics2 = ['messages/received',
-                        'messages/sent',
-                        'messages/qos0/received',
-                        'messages/qos0/sent',
-                        'messages/qos1/received',
-                        'messages/qos1/sent',
-                        'messages/qos2/received',
-                        'messages/qos2/sent'];
-        var matrics2_2 = ['messages/dropped',
-                          'messages/retained'];
-        var matrics3 = ['bytes/received',
-                        'bytes/sent'];
-        for (var i = 0; i < matrics1.length; i++) {
-            this.packets.push({
-                key : matrics1[i],
-                values : []
-            });
-        }
-        for (var i = 0; i < matrics1_2.length; i++) {
-            this.packets_2.push({
-                key : matrics1_2[i],
-                values : []
-            });
-        }
-        for (var i = 0; i < matrics1_3.length; i++) {
-            this.packets_3.push({
-                key : matrics1_3[i],
-                values : []
-            });
-        }
-        for (var i = 0; i < matrics2.length; i++) {
-            this.messages.push({
-                key : matrics2[i],
-                values : []
-            });
-        }
-        for (var i = 0; i < matrics2_2.length; i++) {
-            this.messages_2.push({
-                key : matrics2_2[i],
-                values : []
-            });
-        }
-        for (var i = 0; i < matrics3.length; i++) {
-            this.bytes.push({
-                key : matrics3[i],
-                values : []
-            });
-        }
+        this.packets = [ {
+            key : 'packets/received',
+            values : []
+        }, {
+            key : 'packets/sent',
+            values : [],
+        } ];
+        this.packets_2 = [ {
+            key : 'packets/publish/received',
+            values : [],
+        }, {
+            key : 'packets/publish/sent',
+            values : [],
+        } ];
+        this.packets_3 = [ {
+            key : 'packets/puback/received',
+            values : [],
+        }, {
+            key : 'packets/puback/sent',
+            values : [],
+        } ];
+        this.packets_4 = [ {
+            key : 'packets/pubcomp/received',
+            values : [],
+        }, {
+            key : 'packets/pubcomp/sent',
+            values : [],
+        } ];
+        this.packets_5 = [ {
+            key : 'packets/pubrec/received',
+            values : [],
+        }, {
+            key : 'packets/pubrec/sent',
+            values : [],
+        } ];
+        this.packets_6 = [ {
+            key : 'packets/pubrel/received',
+            values : [],
+        }, {
+            key : 'packets/pubrel/sent',
+            values : [],
+        } ];
+        this.packets_7 = [ {
+            key : 'packets/pingreq',
+            values : [],
+        }, {
+            key : 'packets/pingresp',
+            values : [],
+        } ];
+        this.packets_8 = [ {
+            key : 'packets/suback',
+            values : [],
+        }, {
+            key : 'packets/unsuback',
+            values : [],
+        } ];
+        this.packets_9 = [ {
+            key : 'packets/subscribe',
+            values : [],
+        }, {
+            key : 'packets/unsubscribe',
+            values : [],
+        } ];
+        this.packets_10 = [ {
+            key : 'packets/connect',
+            values : [],
+        }, {
+            key : 'packets/connack',
+            values : [],
+        }, {
+            key : 'packets/disconnect',
+            values : [],
+        } ];
+        
+        this.messages = [ {
+            key : 'messages/received',
+            values : [],
+        }, {
+            key : 'messages/sent',
+            values : [],
+        }, {
+            key : 'messages/dropped',
+            values : [],
+        }, {
+            key : 'messages/retained',
+            values : [],
+        } ];
+        this.messages_2 = [{
+            key : 'messages/qos0/received',
+            values : [],
+        }, {
+            key : 'messages/qos0/sent',
+            values : [],
+        } ];
+        this.messages_3 = [ {
+            key : 'messages/qos1/received',
+            values : [],
+        }, {
+            key : 'messages/qos1/sent',
+            values : [],
+        } ];
+        this.messages_4 = [ {
+            key : 'messages/qos2/received',
+            values : [],
+        }, {
+            key : 'messages/qos2/sent',
+            values : [],
+        } ];
+        
+        this.bytes = [ {
+            key : 'bytes/received',
+            values : [],
+        }, {
+            key : 'bytes/sent',
+            values : [],
+        } ];
+    };
+    Metrics.prototype.newChart = function() {
+        var chart = nv.models.lineChart()
+            .color(d3.scale.category10().range())
+            .margin({left: 30})
+            .showLegend(true) 
+            .showYAxis(true)
+            .showXAxis(true)
+            .x(function(d) {return d.x * 1000})
+            .y(function(d) {return d.y})
+            .useInteractiveGuideline(true);
+        //chart.yAxis.tickValues([1, 2]);
+        chart.xAxis.tickFormat(function(d) {
+            return (new Date(d)).format('MM-dd hh:mm');
+        });
+        nv.utils.windowResize(function() {
+            chart.update();
+        });
+        return chart;
     };
     Metrics.prototype._chart1 = function() {
         var _this = this;
-        _this.chart1 = nv.models.lineChart()
-                .color(d3.scale.category20().range())
-                .margin({left: 30})
-                .showLegend(true) 
-                .showYAxis(true)
-                .showXAxis(true)
-                .x(function(d) {return d.x * 1000})
-                .y(function(d) {return d.y})
-                .useInteractiveGuideline(true);
-        //_this.chart1.yAxis.tickValues([1, 2]);
-        _this.chart1.xAxis.tickFormat(function(d) {
-            return (new Date(d)).format('MM-dd hh:mm');
-        });
-        //_this.chart1.yAxis.tickFormat(d3.format(',.1%'));
-        nv.utils.windowResize(function() {
-            _this.chart1.update();
-        });
-    };
-    Metrics.prototype._chart1_2 = function() {
-        var _this = this;
-        _this.chart1_2 = nv.models.lineChart()
-                .color(d3.scale.category10().range())
-                .margin({left: 30})
-                .showLegend(true) 
-                .showYAxis(true)
-                .showXAxis(true)
-                .x(function(d) {return d.x * 1000})
-                .y(function(d) {return d.y})
-                .useInteractiveGuideline(true);
-        //_this.chart1_2.xAxis.tickValues(
-        //    [ 1078030800000, 1122782400000, 1167541200000, 1251691200000 ]);
-        _this.chart1_2.xAxis.tickFormat(function(d) {
-            return (new Date(d)).format('MM-dd hh:mm');
-        });
-        //_this.chart1_2.yAxis.tickFormat(d3.format(',.1%'));
-        nv.utils.windowResize(function() {
-            _this.chart1_2.update();
-        });
-    };
-    Metrics.prototype._chart1_3 = function() {
-        var _this = this;
-        _this.chart1_3 = nv.models.lineChart()
-                .color(d3.scale.category10().range())
-                .margin({left: 30})
-                .showLegend(true) 
-                .showYAxis(true)
-                .showXAxis(true)
-                .x(function(d) {return d.x * 1000})
-                .y(function(d) {return d.y})
-                .useInteractiveGuideline(true);
-        //_this.chart1_3.xAxis.tickValues(
-        //    [ 1078030800000, 1122782400000, 1167541200000, 1251691200000 ]);
-        _this.chart1_3.xAxis.tickFormat(function(d) {
-            return (new Date(d)).format('MM-dd hh:mm');
-        });
-        //_this.chart1_3.yAxis.tickFormat(d3.format(',.1%'));
-        nv.utils.windowResize(function() {
-            _this.chart1_3.update();
-        });
+        _this.chart1 = _this.newChart();
+        _this.chart1_2 = _this.newChart();
+        _this.chart1_3 = _this.newChart();
+        _this.chart1_4 = _this.newChart();
+        _this.chart1_5 = _this.newChart();
+        _this.chart1_6 = _this.newChart();
+        _this.chart1_7 = _this.newChart();
+        _this.chart1_8 = _this.newChart();
+        _this.chart1_9 = _this.newChart();
+        _this.chart1_10 = _this.newChart();
     };
     Metrics.prototype._chart2 = function() {
         var _this = this;
-        _this.chart2 = nv.models.lineChart()
-                .color(d3.scale.category10().range())
-                .margin({left: 30})
-                .showLegend(true) 
-                .showYAxis(true)
-                .showXAxis(true)
-                .x(function(d) {return d.x * 1000})
-                .y(function(d) {return d.y})
-                .useInteractiveGuideline(true);
-        //_this.chart2.xAxis.tickValues(
-        //    [ 1078030800000, 1122782400000, 1167541200000, 1251691200000 ]);
-        _this.chart2.xAxis.tickFormat(function(d) {
-            return (new Date(d)).format('MM-dd hh:mm');
-        });
-        //_this.chart2.yAxis.tickFormat(d3.format(',.1%'));
-        nv.utils.windowResize(function() {
-            _this.chart2.update();
-        });
-    };
-    Metrics.prototype._chart2_2 = function() {
-        var _this = this;
-        _this.chart2_2 = nv.models.lineChart()
-                .color(d3.scale.category10().range())
-                .margin({left: 30})
-                .showLegend(true) 
-                .showYAxis(true)
-                .showXAxis(true)
-                .x(function(d) {return d.x * 1000})
-                .y(function(d) {return d.y})
-                .useInteractiveGuideline(true);
-        //_this.chart2_2.xAxis.tickValues(
-        //    [ 1078030800000, 1122782400000, 1167541200000, 1251691200000 ]);
-        _this.chart2_2.xAxis.tickFormat(function(d) {
-            return (new Date(d)).format('MM-dd hh:mm');
-        });
-        //_this.chart2_2.yAxis.tickFormat(d3.format(',.1%'));
-        nv.utils.windowResize(function() {
-            _this.chart2_2.update();
-        });
+        _this.chart2 = _this.newChart();
+        _this.chart2_2 = _this.newChart();
+        _this.chart2_3 = _this.newChart();
+        _this.chart2_4 = _this.newChart();
     };
     Metrics.prototype._chart3 = function() {
         var _this = this;
-        _this.chart3 = nv.models.lineChart()
-                .color(d3.scale.category10().range())
-                .margin({left: 30})
-                .showLegend(true) 
-                .showYAxis(true)
-                .showXAxis(true)
-                .x(function(d) {return d.x * 1000})
-                .y(function(d) {return d.y})
-                .useInteractiveGuideline(true);
-        //_this.chart3.xAxis.tickValues(
-        //    [ 1078030800000, 1122782400000, 1167541200000, 1251691200000 ]);
-        _this.chart3.xAxis.tickFormat(function(d) {
-            return (new Date(d)).format('MM-dd hh:mm');
-        });
-        //_this.chart3.yAxis.tickFormat(d3.format(',.1%'));
-        nv.utils.windowResize(function() {
-            _this.chart3.update();
-        });
+        _this.chart3 = _this.newChart();
     };
     Metrics.prototype.show = function() {
         this.$html.show();
@@ -580,11 +536,38 @@
         if (this.chart1_3.update) {
             this.chart1_3.update();
         }
+        if (this.chart1_4.update) {
+            this.chart1_4.update();
+        }
+        if (this.chart1_5.update) {
+            this.chart1_5.update();
+        }
+        if (this.chart1_6.update) {
+            this.chart1_6.update();
+        }
+        if (this.chart1_7.update) {
+            this.chart1_7.update();
+        }
+        if (this.chart1_8.update) {
+            this.chart1_8.update();
+        }
+        if (this.chart1_9.update) {
+            this.chart1_9.update();
+        }
+        if (this.chart1_10.update) {
+            this.chart1_10.update();
+        }
         if (this.chart2.update) {
             this.chart2.update();
         }
         if (this.chart2_2.update) {
             this.chart2_2.update();
+        }
+        if (this.chart2_3.update) {
+            this.chart2_3.update();
+        }
+        if (this.chart2_4.update) {
+            this.chart2_4.update();
         }
         if (this.chart3.update) {
             this.chart3.update();
@@ -593,50 +576,35 @@
     Metrics.prototype.hide = function() {
         this.$html.hide();
     };
-    Metrics.prototype.graph = function(data1, data2, data3, data1_2, data1_3, data2_2) {
+    Metrics.prototype.newGraph = function(area, chart, data) {
+        nv.addGraph(function() {
+            d3.select(area)
+                .datum(data)
+                .transition()
+                .duration(500)
+                .call(chart);
+            return chart;
+        });
+    };
+    Metrics.prototype.graph = function(data1, data2, data3, data1_2, data1_3, data2_2, data2_3, data2_4) {
         var _this = this;
-        nv.addGraph(function() {
-            d3.select('#packets_chart svg')
-                .datum(data1)
-                .transition().duration(500)
-                .call(_this.chart1);
-            return _this.chart1;
-        });
-        nv.addGraph(function() {
-            d3.select('#packets_chart_2 svg')
-                .datum(data1_2)
-                .transition().duration(500)
-                .call(_this.chart1_2);
-            return _this.chart1_2;
-        });
-        nv.addGraph(function() {
-            d3.select('#packets_chart_3 svg')
-                .datum(data1_3)
-                .transition().duration(500)
-                .call(_this.chart1_3);
-            return _this.chart1_3;
-        });
-        nv.addGraph(function() {
-            d3.select('#messages_chart svg')
-                .datum(data2)
-                .transition().duration(500)
-                .call(_this.chart2);
-            return _this.chart2;
-        });
-        nv.addGraph(function() {
-            d3.select('#messages_chart_2 svg')
-                .datum(data2_2)
-                .transition().duration(500)
-                .call(_this.chart2_2);
-            return _this.chart2_2;
-        });
-        nv.addGraph(function() {
-            d3.select('#bytes_chart svg')
-                .datum(data3)
-                .transition().duration(500)
-                .call(_this.chart3);
-            return _this.chart3;
-        });
+        _this.newGraph('#packets_chart svg', _this.chart1, data1);
+        _this.newGraph('#packets_chart_2 svg', _this.chart1_2, data1_2);
+        _this.newGraph('#packets_chart_3 svg', _this.chart1_3, data1_3);
+        _this.newGraph('#packets_chart_4 svg', _this.chart1_4, data1_3);
+        _this.newGraph('#packets_chart_5 svg', _this.chart1_5, data1_3);
+        _this.newGraph('#packets_chart_6 svg', _this.chart1_6, data1_3);
+        _this.newGraph('#packets_chart_7 svg', _this.chart1_7, data1_3);
+        _this.newGraph('#packets_chart_8 svg', _this.chart1_8, data1_3);
+        _this.newGraph('#packets_chart_9 svg', _this.chart1_9, data1_3);
+        _this.newGraph('#packets_chart_10 svg', _this.chart1_10, data1_3);
+        
+        _this.newGraph('#messages_chart svg', _this.chart2, data2);
+        _this.newGraph('#messages_chart_2 svg', _this.chart2_2, data2_2);
+        _this.newGraph('#messages_chart_3 svg', _this.chart2_3, data2_3);
+        _this.newGraph('#messages_chart_4 svg', _this.chart2_4, data2_4);
+        
+        _this.newGraph('#bytes_chart svg', _this.chart3, data3);
     };
     Metrics.prototype.chart = function() {
         var _this = this;
@@ -661,6 +629,48 @@
                             break;
                         }
                     }
+                    for (var i = 0, l = _this.packets_4.length; i < l; i++) {
+                        if (_this.packets_4[i].key == key) {
+                            _this.packets_4[i].values = ret[key];
+                            break;
+                        }
+                    }
+                    for (var i = 0, l = _this.packets_5.length; i < l; i++) {
+                        if (_this.packets_5[i].key == key) {
+                            _this.packets_5[i].values = ret[key];
+                            break;
+                        }
+                    }
+                    for (var i = 0, l = _this.packets_6.length; i < l; i++) {
+                        if (_this.packets_6[i].key == key) {
+                            _this.packets_6[i].values = ret[key];
+                            break;
+                        }
+                    }
+                    for (var i = 0, l = _this.packets_7.length; i < l; i++) {
+                        if (_this.packets_7[i].key == key) {
+                            _this.packets_7[i].values = ret[key];
+                            break;
+                        }
+                    }
+                    for (var i = 0, l = _this.packets_8.length; i < l; i++) {
+                        if (_this.packets_8[i].key == key) {
+                            _this.packets_8[i].values = ret[key];
+                            break;
+                        }
+                    }
+                    for (var i = 0, l = _this.packets_9.length; i < l; i++) {
+                        if (_this.packets_9[i].key == key) {
+                            _this.packets_9[i].values = ret[key];
+                            break;
+                        }
+                    }
+                    for (var i = 0, l = _this.packets_10.length; i < l; i++) {
+                        if (_this.packets_10[i].key == key) {
+                            _this.packets_10[i].values = ret[key];
+                            break;
+                        }
+                    }
                     
                     for (var i = 0, l = _this.messages.length; i < l; i++) {
                         if (_this.messages[i].key == key) {
@@ -674,6 +684,18 @@
                             break;
                         }
                     }
+                    for (var i = 0, l = _this.messages_3.length; i < l; i++) {
+                        if (_this.messages_3[i].key == key) {
+                            _this.messages_3[i].values = ret[key];
+                            break;
+                        }
+                    }
+                    for (var i = 0, l = _this.messages_4.length; i < l; i++) {
+                        if (_this.messages_4[i].key == key) {
+                            _this.messages_4[i].values = ret[key];
+                            break;
+                        }
+                    }
                     
                     for (var i = 0, l = _this.bytes.length; i < l; i++) {
                         if (_this.bytes[i].key == key) {
@@ -682,7 +704,11 @@
                         }
                     }
                 }
-                _this.graph(_this.packets, _this.messages, _this.bytes, _this.packets_2, _this.packets_3,  _this.messages_2);
+                _this.graph(_this.packets, _this.messages, _this.bytes,
+                        _this.packets_2, _this.packets_3, _this.packets_4,
+                        _this.packets_5, _this.packets_6, _this.packets_7,
+                        _this.packets_8, _this.packets_8, _this.packets_10,
+                        _this.messages_2, _this.messages_3, _this.messages_4);
             }
         });
     };
