@@ -183,3 +183,12 @@ pick([H|T], Steps, Count) ->
         true            ->
             pick(T, Steps, 1 + Count)
     end.
+
+
+%%%
+%%% Tests
+%%%
+-ifdef(TEST).
+-include_lib("eunit/include/eunit.hrl").
+
+-endif.

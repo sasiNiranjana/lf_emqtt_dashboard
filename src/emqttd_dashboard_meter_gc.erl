@@ -109,3 +109,11 @@ gc_batch(Max, Total, Table)  ->
     lists:foreach(fun({Key, _V}) ->
                     dets:delete(Table, Key)
                   end, Rows).
+
+%%%
+%%% Tests
+%%%
+-ifdef(TEST).
+-include_lid("eunit/include/eunit.hrl").
+
+-endif.
