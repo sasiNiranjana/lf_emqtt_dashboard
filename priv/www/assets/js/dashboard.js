@@ -573,10 +573,14 @@
             packets_8, packets_9, packets_10,
             messages_2, messages_3, messages_4) {
         var _this = this;
-        //var ms = _this.vmRecent.minutes;
-        //for (var i = 0; i < Metrics.CHART_COUNTS; i++) {
-        //    _this.charts[i].xAxis.tickValues([(new Date()).getTime() - ms * 60 * 1000]);
-        //}
+//        var ts = (new Date()).getTime();
+//        var ms = _this.vmRecent.minutes;
+//        var uniform = ms * 60 * 1000 / 5;
+//        for (var i = 0; i < Metrics.CHART_COUNTS; i++) {
+//            _this.charts[i].xAxis.tickValues([ ts - uniform * 5,
+//                    ts - uniform * 4, ts - uniform * 3, ts - uniform * 2,
+//                    ts - uniform, ts ]);
+//        }
         _this.newGraph('#packets_chart svg', _this.charts[0], packets);
         _this.newGraph('#packets_chart_2 svg', _this.charts[1], packets_2);
         _this.newGraph('#packets_chart_3 svg', _this.charts[2], packets_3);
