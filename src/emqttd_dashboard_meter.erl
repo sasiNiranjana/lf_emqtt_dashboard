@@ -183,7 +183,7 @@ pick([H|T], Space, Start, Count, Sum) ->
         true  ->
             if
                 Count > 0 ->
-                    io:format("New: ~p~n", [[{x, Start}, {y, Sum div Count}]]),
+                    %io:format("New: ~p~n", [[{x, Start}, {y, Sum div Count}]]),
                     [[{x, Start}, {y, Sum div Count}]] ++
                         pick([H|T], Space, End, 0, 0);
                 true      ->
