@@ -1,6 +1,6 @@
 -module(emqttd_dashboard_metric).
 
--http_api({"m_chart", m_chart, [{"minituts", int, 60}]}).
+-http_api({"m_chart", m_chart, [{"minutes", int, 60}]}).
 
 -export([m_chart/1]).
 

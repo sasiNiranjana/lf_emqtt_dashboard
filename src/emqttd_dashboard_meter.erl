@@ -159,31 +159,38 @@ get_metrics(Metric, Minutes, Interval) when is_atom(Metric) ->
     end,
     qlc:delete_cursor(Cursor),
     L = [[{x, Ts}, {y, V}] || {Ts, V} <- Rows, Ts >= Start],
-    {Metric, pick(L)};
+    {Metric, pick(L, Minutes, Start)};
 
 get_metrics(Metrics, Minutes, Interval) when is_list(Metrics) ->
     [get_metrics(M, Minutes, Interval) || M <- Metrics].
 
-pick(List) when (length(List) div 60) =< 1 ->
-    List;
-pick(List) ->
-    Steps = length(List) div 60,
-    pick(List, Steps, 0).
-
-pick([], _Steps, _Count) ->
-    [];
-pick([H|[]], _Steps, _Count) ->
-    [H];
-pick([H|T], Steps, Count) when Count =< 0 ->
-    [H] ++ pick(T, Steps, 1);
-pick([H|T], Steps, Count) ->
-    if 
-        Steps =:= Count ->
-            [H] ++ pick(T, Steps, 1);
-        true            ->
-            pick(T, Steps, 1 + Count)
+pick(List, Minutes, Start) ->
+    case Minutes of
+        60          -> List;
+        60 * 24     -> pick(List, 15 * 60, Start, 0, 0);
+        60 * 24 * 7 -> pick(List, 60 * 60, Start, 0, 0)
     end.
 
+pick([], _Space, Start, Count, Sum) ->
+    case Count > 0 of
+        true  -> [[{x, Start}, {y, Sum div Count}]];
+        false -> []
+    end;
+pick([H|T], Space, Start, Count, Sum) ->
+    End = Start + Space,
+    [{x, Ts}, {y, V}] = H,
+    case Ts > End of
+        true  ->
+            if
+                Count > 0 ->
+                    io:format("New: ~p~n", [[{x, Start}, {y, Sum div Count}]]),
+                    [[{x, Start}, {y, Sum div Count}]] ++
+                        pick([H|T], Space, End, 0, 0);
+                true      ->
+                    pick([H|T], Space, End, 0, 0)
+            end;
+        false -> pick(T, Space, Start, Count + 1, Sum + V)
+    end.
 
 %%%
 %%% Tests
