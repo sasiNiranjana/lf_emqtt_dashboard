@@ -7,7 +7,8 @@
   {applications, [
                   kernel,
                   stdlib,
-                  mnesia
+                  mnesia,
+                  folsom
                  ]},
   {mod, {emqttd_dashboard_app, []}},
   {env, []}
