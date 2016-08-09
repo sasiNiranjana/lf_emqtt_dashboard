@@ -34,6 +34,7 @@
 
 -define(METRICS, [Name || {_, Name} <- ?METRICS_DEF]).
 
+-define(REPORT_INTERVAL, 5 * 1000).
 -define(INTERVAL_1, 60 * 1000 * 1).  %% 1 minutes interval, data merging
 -define(INTERVAL_2, 60 * 1000 * 15). %% 15 minutes interval, data merging
 -define(INTERVAL_3, 60 * 1000 * 60). %% 60 minutes interval, data merging

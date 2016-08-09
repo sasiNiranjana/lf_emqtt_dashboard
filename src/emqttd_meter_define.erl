@@ -24,8 +24,6 @@
 
 -define(SERVER, ?MODULE).
 
--define(REPORT_INTERVAL, 5 * 1000).
-
 -record(state, {metrics_data = []}).
 
 %% api function
