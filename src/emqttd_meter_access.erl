@@ -77,20 +77,9 @@ get_data(Met, Minutes, Interval) ->
         [] -> {Met, [[{x, Start}, {y, 0}], [{x, End}, {y, 0}]]}
     end.
 
-metric_name(Met, Interval) ->
-    case Interval of
-        ?INTERVAL_1 ->
-            list_to_atom(atom_to_list(Met) ++ "/1");
-        ?INTERVAL_2 ->
-            list_to_atom(atom_to_list(Met) ++ "/2");
-        ?INTERVAL_3 ->
-            list_to_atom(atom_to_list(Met) ++ "/3");
-        ?REPORT_INTERVAL -> Met
-    end.
-
 %% Save the Metric data, and do a merge.
 save_data(Metric, Ts, Value) ->
-    gen_server:call(?SERVER, {save_data, Ts, Value, Metric}).
+    gen_server:cast(?SERVER, {save_data, Ts, Value, Metric}).
 
 
 %%--------------------------------------------------------------------
@@ -103,7 +92,10 @@ init([]) ->
     set_timer(metrics_gc, ?GC_INTERVAL),
     {ok, #state{}}.
 
-handle_call({save_data, Ts, Value, Metric}, _From, State) ->
+handle_call(_Request, _From, State) ->
+    {reply, unexpect, State }.
+
+handle_cast({save_data, Ts, Value, Metric}, State) ->
     % Save the basic data (the original).
     open_table(Metric),
     dets:insert(Metric, {Ts, Value}),
@@ -114,8 +106,37 @@ handle_call({save_data, Ts, Value, Metric}, _From, State) ->
     State1 = merge_data(Metric, Ts, Value, ?INTERVAL_1, Extent1, State),
     State2 = merge_data(Metric, Ts, Value, ?INTERVAL_2, Extent2, State1),
     State3 = merge_data(Metric, Ts, Value, ?INTERVAL_3, Extent3, State2),
+    {noreply, State3};
 
-    {reply, ok, State3}.
+handle_cast(_Msg, State) ->
+    {noreply, State}.
+
+handle_info(metrics_gc, State) ->
+    metrics_gc(),
+    set_timer(metrics_gc, ?GC_INTERVAL),
+    {noreply, State}.
+
+terminate(_Reason, _State) ->
+    %close_table(),
+    ok.
+
+code_change(_OldVsn, State, _Extra) ->
+    {ok, State}.
+
+%% ====================================================================
+%% Internal functions
+%% ====================================================================
+
+metric_name(Met, Interval) ->
+    case Interval of
+        ?INTERVAL_1 ->
+            list_to_atom(atom_to_list(Met) ++ "/1");
+        ?INTERVAL_2 ->
+            list_to_atom(atom_to_list(Met) ++ "/2");
+        ?INTERVAL_3 ->
+            list_to_atom(atom_to_list(Met) ++ "/3");
+        ?REPORT_INTERVAL -> Met
+    end.
 
 merge_data(Met, Ts, Value, Interval, Extent, State) ->
     Metric = metric_name(Met, Interval),
@@ -142,25 +163,6 @@ update_met(Met, Key, Value) ->
         _  -> dets:update_counter(Met, Key, {2, Value})
     end,
     close_table(Met).
-
-handle_cast(_Msg, State) ->
-    {noreply, State}.
-
-handle_info(metrics_gc, State) ->
-    metrics_gc(),
-    set_timer(metrics_gc, ?GC_INTERVAL),
-    {noreply, State}.
-
-terminate(_Reason, _State) ->
-    %close_table(),
-    ok.
-
-code_change(_OldVsn, State, _Extra) ->
-    {ok, State}.
-
-%% ====================================================================
-%% Internal functions
-%% ====================================================================
 
 set_timer(Name, Timeout) ->
     erlang:send_after(Timeout, self(), Name).
