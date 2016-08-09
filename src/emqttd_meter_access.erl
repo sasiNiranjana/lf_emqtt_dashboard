@@ -48,12 +48,7 @@ get_data_all(Minutes, Interval) ->
 
 %% Access to specify minutes metric data recently.
 get_data(Met, Minutes, Interval) ->
-    Metric = case Interval of
-                ?INTERVAL_1 -> metric_name(Met, "/1");
-                ?INTERVAL_2 -> metric_name(Met, "/2");
-                ?INTERVAL_3 -> metric_name(Met, "/3");
-                ?REPORT_INTERVAL -> Met
-             end,
+    Metric = metric_name(Met, Interval),
     
     open_table(Metric),
     TotalNum = dets:info(Metric, size),
@@ -82,12 +77,9 @@ get_data(Met, Minutes, Interval) ->
         [] -> {Met, [[{x, Start}, {y, 0}], [{x, End}, {y, 0}]]}
     end.
 
-metric_name(Met, Name) ->
-    list_to_atom(atom_to_list(Met) ++ Name).
-
 %% Save the Metric data, and do a merge.
 save_data(Metric, Ts, Value) ->
-    gen_server:call(?SERVER, {save_data, Ts, Value, Metric}).
+    gen_server:cast(?SERVER, {save_data, Ts, Value, Metric}).
 
 
 %%--------------------------------------------------------------------
@@ -100,7 +92,10 @@ init([]) ->
     set_timer(metrics_gc, ?GC_INTERVAL),
     {ok, #state{}}.
 
-handle_call({save_data, Ts, Value, Metric}, _From, State) ->
+handle_call(_Request, _From, State) ->
+    {reply, unexpect, State }.
+
+handle_cast({save_data, Ts, Value, Metric}, State) ->
     % Save the basic data (the original).
     open_table(Metric),
     dets:insert(Metric, {Ts, Value}),
@@ -108,36 +103,10 @@ handle_call({save_data, Ts, Value, Metric}, _From, State) ->
     
     % Do a data merge.
     #state{extent_1 = Extent1, extent_2 = Extent2, extent_3 = Extent3} = State,
-    Met1 = metric_name(Metric, "/1"),
-    State1 = merge_data(Met1, Ts, Value, ?INTERVAL_1, Extent1, State),
-    Met2 = metric_name(Metric, "/2"),
-    State2 = merge_data(Met2, Ts, Value, ?INTERVAL_2, Extent2, State1),
-    Met3 = metric_name(Metric, "/3"),
-    State3 = merge_data(Met3, Ts, Value, ?INTERVAL_3, Extent3, State2),
-
-    {reply, ok, State3}.
-
-merge_data(Met, Ts, Value, Interval, Extent, State) ->
-    open_table(Met),
-    case time_extent(Ts, Interval) of
-        [Start, _End] = Extent ->
-            update_met(Met, Start, Value),
-            State;
-        [Start, _End] = Other  ->
-            update_met(Met, Start, Value),
-            case Interval of
-                ?INTERVAL_1 -> State#state{extent_1 = Other};
-                ?INTERVAL_2 -> State#state{extent_2 = Other};
-                ?INTERVAL_3 -> State#state{extent_3 = Other}
-            end
-    end.
-
-update_met(Met, Key, Value) ->
-    case dets:lookup(Met, Key) of
-        [] -> dets:insert(Met, {Key, Value});
-        _  -> dets:update_counter(Met, Key, {2, Value})
-    end,
-    close_table(Met).
+    State1 = merge_data(Metric, Ts, Value, ?INTERVAL_1, Extent1, State),
+    State2 = merge_data(Metric, Ts, Value, ?INTERVAL_2, Extent2, State1),
+    State3 = merge_data(Metric, Ts, Value, ?INTERVAL_3, Extent3, State2),
+    {noreply, State3};
 
 handle_cast(_Msg, State) ->
     {noreply, State}.
@@ -157,6 +126,43 @@ code_change(_OldVsn, State, _Extra) ->
 %% ====================================================================
 %% Internal functions
 %% ====================================================================
+
+metric_name(Met, Interval) ->
+    case Interval of
+        ?INTERVAL_1 ->
+            list_to_atom(atom_to_list(Met) ++ "/1");
+        ?INTERVAL_2 ->
+            list_to_atom(atom_to_list(Met) ++ "/2");
+        ?INTERVAL_3 ->
+            list_to_atom(atom_to_list(Met) ++ "/3");
+        ?REPORT_INTERVAL -> Met
+    end.
+
+merge_data(Met, Ts, Value, Interval, Extent, State) ->
+    Metric = metric_name(Met, Interval),
+    {[Start, _End], NewState} = 
+        case time_extent(Ts, Interval) of
+            Extent ->
+                {Extent, State};
+            Other  ->
+                NState = 
+                case Interval of
+                    ?INTERVAL_1 -> State#state{extent_1 = Other};
+                    ?INTERVAL_2 -> State#state{extent_2 = Other};
+                    ?INTERVAL_3 -> State#state{extent_3 = Other}
+                end,
+                {Other, NState}
+        end,
+    update_met(Metric, Start, Value),
+    NewState.
+
+update_met(Met, Key, Value) ->
+    open_table(Met),
+    case dets:lookup(Met, Key) of
+        [] -> dets:insert(Met, {Key, Value});
+        _  -> dets:update_counter(Met, Key, {2, Value})
+    end,
+    close_table(Met).
 
 set_timer(Name, Timeout) ->
     erlang:send_after(Timeout, self(), Name).
