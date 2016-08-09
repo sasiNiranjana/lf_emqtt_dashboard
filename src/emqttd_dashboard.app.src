@@ -4,7 +4,12 @@
   {vsn, "2.0"},
   {modules, []},
   {registered, []},
-  {applications, [kernel, stdlib]},
+  {applications, [
+                  kernel,
+                  stdlib,
+                  mnesia,
+                  folsom
+                 ]},
   {mod, {emqttd_dashboard_app, []}},
   {env, []}
  ]}.

@@ -1,9 +1,7 @@
 <!-- Modal Confirm -->
-<div class="modal fade" id="modal_confirm_del_user"
-	data-backdrop="static">
+<div class="modal fade" id="modal_confirm_del_user" data-backdrop="static">
 	<div class="modal-dialog">
 		<div class="modal-content">
-
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal"
 					aria-hidden="true">&times;</button>
@@ -11,13 +9,13 @@
 			</div>
 
 			<div class="modal-body">
-			    <input type="hidden" id="user_del_name"/>
+			    <input type="hidden" id="user_del_name" v-model="user.name"/>
 				Are you sure? <br />This object cannot be recovered after deletion.
 			</div>
 
 			<div class="modal-footer">
 				<button type="button" class="btn btn-white" data-dismiss="modal">Close</button>
-				<button type="button" class="btn btn-danger" onclick="User.delSubmit();">Delete</button>
+				<button type="button" class="btn btn-danger" @click="submit">Delete</button>
 			</div>
 		</div>
 	</div>
@@ -41,7 +39,7 @@
 						<div class="form-group">
 							<label for="user_add_name" class="control-label">Name</label>
 							<input
-								type="text" class="form-control" id="user_add_name"
+								type="text" class="form-control" v-model="user.name"
 								placeholder="Name"/>
 						</div>
 
@@ -54,7 +52,7 @@
                         <div class="form-group">
                             <label for="user_add_pwd" class="control-label">Password</label>
                             <input
-                                type="password" class="form-control" id="user_add_pwd"
+                                type="password" class="form-control" v-model="user.password"
                                 placeholder="Password"/>
                         </div>
 
@@ -65,7 +63,7 @@
 
                         <div class="form-group">
                             <input
-                                type="password" class="form-control" id="user_add_pwd_1"
+                                type="password" class="form-control" v-model="user.password2"
                                 placeholder="Password"/>
                         </div>
 
@@ -78,19 +76,18 @@
                         <div class="form-group">
                             <label for="user_add_remark" class="control-label">Remark</label>
                             <input
-                                type="text" class="form-control" id="user_add_remark"
+                                type="text" class="form-control" v-model="user.tags"
                                 placeholder="Remark"/>
                         </div>
 
                     </div>
                 </div>
                 
-
 			</div>
 
 			<div class="modal-footer">
 				<button type="button" class="btn btn-white" data-dismiss="modal">Close</button>
-				<button type="button" class="btn btn-success" onclick="User.addSubmit();">Save</button>
+				<button type="button" class="btn btn-success" @click="submit">Save</button>
 			</div>
 		</div>
 	</div>
@@ -114,7 +111,7 @@
                         <div class="form-group">
                             <label for="user_edit_name" class="control-label">Name</label>
                             <input
-                                type="text" class="form-control" id="user_edit_name"
+                                type="text" class="form-control" v-model="user.name"
                                 placeholder="Name" disabled="disabled"/>
                         </div>
 
@@ -127,7 +124,7 @@
                         <div class="form-group">
                             <label for="user_edit_pwd" class="control-label">Password</label>
                             <input
-                                type="password" class="form-control" id="user_edit_pwd"
+                                type="password" class="form-control" v-model="user.password"
                                 placeholder="Password"/>
                         </div>
 
@@ -138,7 +135,7 @@
 
                         <div class="form-group">
                             <input
-                                type="password" class="form-control" id="user_edit_pwd_1"
+                                type="password" class="form-control" v-model="user.password2"
                                 placeholder="Password"/>
                         </div>
 
@@ -151,19 +148,18 @@
                         <div class="form-group">
                             <label for="user_edit_remark" class="control-label">Remark</label>
                             <input
-                                type="text" class="form-control" id="user_edit_remark"
+                                type="text" class="form-control" id="user_edit_remark" v-model="user.tags"
                                 placeholder="Remark"/>
                         </div>
 
                     </div>
                 </div>
                 
-
             </div>
 
 			<div class="modal-footer">
 				<button type="button" class="btn btn-white" data-dismiss="modal">Close</button>
-				<button type="button" class="btn btn-success" onclick="User.editSubmit();">Edit</button>
+				<button type="button" class="btn btn-success" @click="submit">Edit</button>
 			</div>
 		</div>
 	</div>
