@@ -13,7 +13,7 @@ m_chart(Minutes) ->
     metrics_merge(Minutes).
 
 metrics_org(Minutes) ->
-    Data = emqttd_meter_access:get_data_all(Minutes, 5 * 1000),
+    Data = emqttd_meter_access:get_data_all(Minutes, ?REPORT_INTERVAL),
     {ok, Data}.
 
 metrics_merge(Minutes) ->

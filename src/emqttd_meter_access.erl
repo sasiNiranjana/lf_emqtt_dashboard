@@ -27,8 +27,7 @@
 -define(GC_INTERVAL, 1000 * 60 * 30).
 -define(MAXSIZE, (7 * 60 * 60 * 24 * 1000) div (60 * 1000)).
 
-%%-record(interval, {extent = [], })
--record(state, {interval_1 = [], interval_2 = [], interval_3 = []}).
+-record(state, {extent_1 = [], extent_2 = [], extent_3 = []}).
 
 %% gen_server functions export
 -export([init/1,
@@ -53,7 +52,7 @@ get_data(Met, Minutes, Interval) ->
                 ?INTERVAL_1 -> metric_name(Met, "/1");
                 ?INTERVAL_2 -> metric_name(Met, "/2");
                 ?INTERVAL_3 -> metric_name(Met, "/3");
-                5 * 1000    -> Met
+                ?REPORT_INTERVAL -> Met
              end,
     
     open_table(Metric),
@@ -76,7 +75,7 @@ get_data(Met, Minutes, Interval) ->
     L = [[{x, Ts}, {y, V}] || {Ts, V} <- Rows, Ts >= Start],
     case L of
         [[{x, Ts}, {y, _V}]|_T] ->
-            if  (Ts - Start) >= 60 * 60 ->
+            if  (Ts - Start) >= 30 * 60 ->
                     {Met, [[{x, Start}, {y, 0}]] ++ L};
                 true -> {Met, L}
             end;
@@ -108,28 +107,28 @@ handle_call({save_data, Ts, Value, Metric}, _From, State) ->
     close_table(Metric),
     
     % Do a data merge.
-    #state{interval_1 = I1, interval_2 = I2, interval_3 = I3} = State,
+    #state{extent_1 = Extent1, extent_2 = Extent2, extent_3 = Extent3} = State,
     Met1 = metric_name(Metric, "/1"),
-    State1 = merge_data(Met1, Ts, Value, ?INTERVAL_1, I1, State),
+    State1 = merge_data(Met1, Ts, Value, ?INTERVAL_1, Extent1, State),
     Met2 = metric_name(Metric, "/2"),
-    State2 = merge_data(Met2, Ts, Value, ?INTERVAL_2, I2, State1),
+    State2 = merge_data(Met2, Ts, Value, ?INTERVAL_2, Extent2, State1),
     Met3 = metric_name(Metric, "/3"),
-    State3 = merge_data(Met3, Ts, Value, ?INTERVAL_3, I3, State2),
+    State3 = merge_data(Met3, Ts, Value, ?INTERVAL_3, Extent3, State2),
 
     {reply, ok, State3}.
 
-merge_data(Met, Ts, Value, Interval, I, State) ->
+merge_data(Met, Ts, Value, Interval, Extent, State) ->
     open_table(Met),
-    case data_extent(Ts, Interval) of
-        [Start, _End] = I     ->
+    case time_extent(Ts, Interval) of
+        [Start, _End] = Extent ->
             update_met(Met, Start, Value),
             State;
-        [Start, _End] = Other ->
+        [Start, _End] = Other  ->
             update_met(Met, Start, Value),
             case Interval of
-                ?INTERVAL_1 -> State#state{interval_1 = Other};
-                ?INTERVAL_2 -> State#state{interval_2 = Other};
-                ?INTERVAL_3 -> State#state{interval_3 = Other}
+                ?INTERVAL_1 -> State#state{extent_1 = Other};
+                ?INTERVAL_2 -> State#state{extent_2 = Other};
+                ?INTERVAL_3 -> State#state{extent_3 = Other}
             end
     end.
 
@@ -183,7 +182,7 @@ filename_replace(Src) when is_list(Src) ->
     Des ++ ?Suffix.
 
 %% @doc To get the data points in the time interval.
-data_extent(Ts, Interval) ->
+time_extent(Ts, Interval) ->
     {{Year, Month, Day}, {Hour, Minite, Second}} = timestamp_to_datetime(Ts),
     case Interval of
         ?INTERVAL_1 -> 
