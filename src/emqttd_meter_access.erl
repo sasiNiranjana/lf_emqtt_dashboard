@@ -129,11 +129,11 @@ code_change(_OldVsn, State, _Extra) ->
 metric_name(Met, Interval) ->
     case Interval of
         ?INTERVAL_1 ->
-            list_to_atom(atom_to_list(Met) ++ "/1");
+            met_name_join(Met, "/1");
         ?INTERVAL_2 ->
-            list_to_atom(atom_to_list(Met) ++ "/2");
+            met_name_join(Met, "/2");
         ?INTERVAL_3 ->
-            list_to_atom(atom_to_list(Met) ++ "/3");
+            met_name_join(Met, "/3");
         ?REPORT_INTERVAL -> Met
     end.
 
@@ -231,7 +231,7 @@ metrics_gc() ->
         gc_batch(Metric, MaxSize, Total),
         close_table(Metric)
     end,
-    lists:foreach(Fun, ?METRICS_TABS).
+    lists:foreach(Fun, metrics_tabs()).
 
 gc_batch(_Table, Max, Total)  when Max >= Total ->
     ignore;
@@ -244,6 +244,15 @@ gc_batch(Table, Max, Total)  ->
     lists:foreach(fun({Key, _V}) ->
                     dets:delete(Table, Key)
                   end, Rows).
+
+met_name_join(Name, Index) ->
+    list_to_atom(atom_to_list(Name) ++ Index).
+
+metrics_tabs() ->
+    [{Name, (7 * 24 * 60 * 60 * 1000) div ?REPORT_INTERVAL} || Name <- ?METRICS] ++
+    [{met_name_join(Name, "/1"), (60 * 60 * 1000) div ?INTERVAL_1} || Name <- ?METRICS] ++
+    [{met_name_join(Name, "/2"), (24 * 60 * 60 * 1000) div ?INTERVAL_2} || Name <- ?METRICS] ++
+    [{met_name_join(Name, "/3"), (7  * 24 * 60 * 60 * 1000) div ?INTERVAL_3} || Name <- ?METRICS].
 
 timestamp() ->
     {MegaSecs, Secs, _MicroSecs} = os:timestamp(),

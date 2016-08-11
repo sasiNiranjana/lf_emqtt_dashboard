@@ -39,9 +39,3 @@
 -define(INTERVAL_2, 60 * 1000 * 15). %% 15 minutes interval, data merging
 -define(INTERVAL_3, 60 * 1000 * 60). %% 60 minutes interval, data merging
 
--define(NAME_JOIN(Name, Index), list_to_atom(atom_to_list(Name) ++ Index)).
--define(METRICS_TABS, [{Name, (7 * 24 * 60 * 60 * 1000) div ?REPORT_INTERVAL} || Name <- ?METRICS_DEF] ++
-          [{?NAME_JOIN(Name, "/1"), (60 * 60 * 1000) div ?INTERVAL_1} || Name <- ?METRICS_DEF] ++
-          [{?NAME_JOIN(Name, "/2"), (24 * 60 * 60 * 1000) div ?INTERVAL_1} || Name <- ?METRICS_DEF] ++
-          [{?NAME_JOIN(Name, "/3"), (7  * 24 * 60 * 60 * 1000) div ?INTERVAL_1} || Name <- ?METRICS_DEF]).
-
