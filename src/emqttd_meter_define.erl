@@ -59,7 +59,7 @@ handle_info(reporter, #state{metrics_data = MetsData} = State) ->
     TS = timestamp(),
     Data = emqttd_metrics:all(),
     %% Update metrics values
-    Fun = fun({_, Met}) ->
+    Fun = fun(Met) ->
             case proplists:get_value(Met, Data) of
                 undefined -> ignore;
                 Value     ->
@@ -67,13 +67,13 @@ handle_info(reporter, #state{metrics_data = MetsData} = State) ->
                     folsom_metrics:notify({Met, Value - V})
             end
           end,
-    lists:foreach(Fun, ?METRICS_DEF),
+    lists:foreach(Fun, ?METRICS),
 
-    lists:foreach(fun({_, Met}) ->
+    lists:foreach(fun(Met) ->
                     V = folsom_metrics:get_metric_value(Met),
                     emqttd_meter_access:save_data(Met, TS, V)
                     %io:format("Metric, ~p ~p ~p~n", [Met, TS, V])
-                  end, ?METRICS_DEF),
+                  end, ?METRICS),
 
     set_timer(reporter, ?REPORT_INTERVAL),
     {noreply, State#state{metrics_data = Data}}.

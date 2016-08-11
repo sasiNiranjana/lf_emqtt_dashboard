@@ -25,7 +25,6 @@
 -define(Suffix, ".dets").
 -define(SERVER, ?MODULE).
 -define(GC_INTERVAL, 1000 * 60 * 30).
--define(MAXSIZE, (7 * 60 * 60 * 24 * 1000) div (60 * 1000)).
 
 -record(state, {extent_1 = [], extent_2 = [], extent_3 = []}).
 
@@ -226,10 +225,10 @@ timestamp_to_datetime(Timestamp) ->
 
 metrics_gc() ->
     Fun =
-    fun(Metric) ->
+    fun({Metric, MaxSize}) ->
         open_table(Metric),
         Total = dets:info(Metric, size),
-        gc_batch(Metric, ?MAXSIZE, Total),
+        gc_batch(Metric, MaxSize, Total),
         close_table(Metric)
     end,
     lists:foreach(Fun, ?METRICS_TABS).
