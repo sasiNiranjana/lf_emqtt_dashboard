@@ -528,9 +528,9 @@
             if (ms == 60) {
                 return (new Date(d)).format('hh:mm');
             } else if (ms == 60 * 24) {
-                return (new Date(d)).format('hh');
+                return (new Date(d)).format('MM/dd,hh:mm');
             } else if (ms == 60 * 24 * 7) {
-                return (new Date(d)).format('MM/dd');
+                return (new Date(d)).format('MM/dd,hh:mm');
             }
         });
         nv.utils.windowResize(function() {

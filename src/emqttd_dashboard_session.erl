@@ -42,9 +42,9 @@ list(ClientId, PageNo, PageSize) ->
     emqttd_dashboard:lookup_table(Fun, PageNo, PageSize, fun row/1).
 
 tables() ->
-    [mqtt_transient_session, mqtt_persistent_session].
+    [mqtt_local_session].
 
-row({{ClientId, _Pid}, Session}) ->
+row({ClientId, _Pid, _Persistent, Session}) ->
     InfoKeys = [clean_sess, max_inflight, inflight_queue, message_queue,
                 message_dropped, awaiting_rel, awaiting_ack, awaiting_comp, created_at],
      [{clientId, ClientId} | [{Key, format(Key, get_value(Key, Session))} || Key <- InfoKeys]].
