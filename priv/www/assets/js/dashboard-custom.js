@@ -1098,6 +1098,7 @@ function showWebsocket() {
 		} else {
 		    options.cleanSession = false;
 		}
+		options.useSSL = $('#use_ssl').prop('checked');
 		client.connect(options);
 	};
 	
