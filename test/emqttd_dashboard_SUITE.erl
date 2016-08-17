@@ -4,13 +4,17 @@
 
 -include_lib("eunit/include/eunit.hrl").
 
+-define(CONTENT_TYPE, "application/x-www-form-urlencoded").
+
 all() -> 
-    [{group, overview}
+    [{group, overview},
+     {group, clients}
      ].
 
 groups() ->
     [{overview, [sequence], [brokers, stats, ptype, memory, 
-                            cpu, nodes, metrics, listeners, bnode]}
+                            cpu, nodes, metrics, listeners, bnode]},
+     {clients, [sequence], [clients, clients_query]}
     ].
 
 init_per_suite(Config) ->
@@ -30,35 +34,52 @@ end_per_suite(_Config) ->
     emqttd_mnesia:ensure_stopped().
  
 brokers(_) ->
-    ?_assertEqual(true, connect_dashbaord_(get, "api/brokers")).
+    ?assert(connect_dashbaord_(get, "api/brokers")).
 
 stats(_) ->
-    ?_assertEqual(true, connect_dashbaord_(get, "api/stats")).
+    ?assert(connect_dashbaord_(get, "api/stats")).
 
 ptype(_) ->
-    ?_assertEqual(true, connect_dashbaord_(get, "api/ptype")).
+    ?assert(connect_dashbaord_(get, "api/ptype")).
 
 memory(_) ->
-    ?_assertEqual(true, connect_dashbaord_(get, "api/memory")).
+    ?assert(connect_dashbaord_(get, "api/memory")).
 
 cpu(_) ->
-    ?_assertEqual(true, connect_dashbaord_(get, "api/cpu")).
+    ?assert(connect_dashbaord_(get, "api/cpu")).
 
 nodes(_) ->
-    ?_assertEqual(true, connect_dashbaord_(get, "api/nodes")).
+    ?assert(connect_dashbaord_(get, "api/nodes")).
 
 metrics(_) ->
-    ?_assertEqual(true, connect_dashbaord_(get, "api/metrics")).
+    ?assert(connect_dashbaord_(get, "api/metrics")).
 
 listeners(_) ->
-    ?_assertEqual(true, connect_dashbaord_(get, "api/listeners")).
+    ?assert(connect_dashbaord_(get, "api/listeners")).
 
 bnode(_) ->
-    ?_assertEqual(true, connect_dashbaord_(get, "api/bnode")).
+    ?assert(connect_dashbaord_(get, "api/bnode")).
+
+clients(_) ->
+    ?assert(connect_dashbaord_(post, "api/clients", "page_size=100&curr_page=1")).
+   
+clients_query(_) ->
+    Sock = client_connect_(<<16,12,0,4,77,81,84,84,4,0,0,90,0,0>>, 4),
+    {ok, Entry} = emqttd_dashboard_client:list(<<>>, 1, 100),
+    Client = proplists:get_value(result, Entry),
+    ClientId = proplists:get_value(clientId, Client), 
+    ?assertEqual({ok, Entry}, emqttd_dashboard_client:list(ClientId, 1, 100)),
+    gen_tcp:close(Sock).
+
+client_connect_(Packet, RecvSize) ->
+    {ok, Sock} = gen_tcp:connect({127,0,0,1}, 1883, [binary, {packet, raw}, {active, false}]),
+    gen_tcp:send(Sock, Packet),
+    gen_tcp:recv(Sock, RecvSize, 3000),
+    Sock.
 
 connect_dashbaord_(Method, Api) ->
     Url = "http://127.0.0.1:18083/" ++ Api,
-    Auth = auth_header_("admin", "public11"),
+    Auth = auth_header_("admin", "public"),
     case httpc:request(Method, {Url, [Auth]}, [], []) of
       {error, socket_closed_remotely} ->
           false;
@@ -73,3 +94,17 @@ connect_dashbaord_(Method, Api) ->
 auth_header_(User, Pass) ->
     Encoded = base64:encode_to_string(lists:append([User,":",Pass])),
     {"Authorization","Basic " ++ Encoded}.
+
+connect_dashbaord_(Method, Api, Params) ->
+    Url = "http://127.0.0.1:18083/" ++ Api,
+    Auth = auth_header_("admin", "public"),
+    case httpc:request(Method, {Url, [Auth], ?CONTENT_TYPE, Params}, [], []) of
+    {error, socket_closed_remotely} ->
+        false;
+    {ok, {{"HTTP/1.1", 200, "OK"}, _, _Return} }  ->
+        true;
+    {ok, {{"HTTP/1.1", 400, "Bad Request"}, _, []}} ->
+        false;
+    {ok, {{"HTTP/1.1", 404, "Object Not Found"}, _, []}} ->
+        false
+    end.
