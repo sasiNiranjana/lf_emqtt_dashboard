@@ -8,13 +8,15 @@
 
 all() -> 
     [{group, overview},
-     {group, clients}
+     {group, clients},
+     {group, sessions}
      ].
 
 groups() ->
     [{overview, [sequence], [brokers, stats, ptype, memory, 
                             cpu, nodes, metrics, listeners, bnode]},
-     {clients, [sequence], [clients, clients_query]}
+     {clients, [sequence], [clients, clients_query]},
+     {sessions, [sequence], [session_query]}
     ].
 
 init_per_suite(Config) ->
@@ -69,6 +71,14 @@ clients_query(_) ->
     Client = proplists:get_value(result, Entry),
     ClientId = proplists:get_value(clientId, Client), 
     ?assertEqual({ok, Entry}, emqttd_dashboard_client:list(ClientId, 1, 100)),
+    gen_tcp:close(Sock).
+
+session_query(_) ->
+    Sock = client_connect_(<<16,12,0,4,77,81,84,84,4,0,0,90,0,0>>, 4),
+    {ok, Entry} = emqttd_dashboard_session:list(<<>>, 1, 100),
+    Session= proplists:get_value(result, Entry),
+    ClientId = proplists:get_value(clientId, Session), 
+    ?assertEqual({ok, Entry}, emqttd_dashboard_session:list(ClientId, 1, 100)),
     gen_tcp:close(Sock).
 
 client_connect_(Packet, RecvSize) ->
