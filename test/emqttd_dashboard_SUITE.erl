@@ -11,7 +11,8 @@ all() ->
      {group, clients},
      {group, sessions},
      {group, routes},
-     {group, subscriptions}
+     {group, subscriptions},
+     {group, admins}
      ].
 
 groups() ->
@@ -20,7 +21,8 @@ groups() ->
      {clients, [sequence], [clients, clients_query]},
      {sessions, [sequence], [session_query]},
      {routes, [sequence], [route_query]},
-     {subscriptions, [sequence], [subscribe_query]}
+     {subscriptions, [sequence], [subscribe_query]},
+     {admins, [sequence], [admins_add_delete]}
     ].
 
 init_per_suite(Config) ->
@@ -40,34 +42,34 @@ end_per_suite(_Config) ->
     emqttd_mnesia:ensure_stopped().
  
 brokers(_) ->
-    ?assert(connect_dashbaord_(get, "api/brokers")).
+    ?assert(connect_dashbaord_(get, "api/brokers", auth_header_())).
 
 stats(_) ->
-    ?assert(connect_dashbaord_(get, "api/stats")).
+    ?assert(connect_dashbaord_(get, "api/stats", auth_header_())).
 
 ptype(_) ->
-    ?assert(connect_dashbaord_(get, "api/ptype")).
+    ?assert(connect_dashbaord_(get, "api/ptype", auth_header_())).
 
 memory(_) ->
-    ?assert(connect_dashbaord_(get, "api/memory")).
+    ?assert(connect_dashbaord_(get, "api/memory", auth_header_())).
 
 cpu(_) ->
-    ?assert(connect_dashbaord_(get, "api/cpu")).
+    ?assert(connect_dashbaord_(get, "api/cpu", auth_header_())).
 
 nodes(_) ->
-    ?assert(connect_dashbaord_(get, "api/nodes")).
+    ?assert(connect_dashbaord_(get, "api/nodes", auth_header_())).
 
 metrics(_) ->
-    ?assert(connect_dashbaord_(get, "api/metrics")).
+    ?assert(connect_dashbaord_(get, "api/metrics", auth_header_())).
 
 listeners(_) ->
-    ?assert(connect_dashbaord_(get, "api/listeners")).
+    ?assert(connect_dashbaord_(get, "api/listeners", auth_header_())).
 
 bnode(_) ->
-    ?assert(connect_dashbaord_(get, "api/bnode")).
+    ?assert(connect_dashbaord_(get, "api/bnode", auth_header_())).
 
 clients(_) ->
-    ?assert(connect_dashbaord_(post, "api/clients", "page_size=100&curr_page=1")).
+    ?assert(connect_dashbaord_(post, "api/clients", "page_size=100&curr_page=1", auth_header_())).
    
 clients_query(_) ->
     Sock = client_connect_(<<16,12,0,4,77,81,84,84,4,0,0,90,0,0>>, 4),
@@ -100,15 +102,32 @@ subscribe_query(_) ->
     ?assertEqual({ok, Entry}, emqttd_dashboard_subscription:list(ClientId, 1, 100)),
     gen_tcp:close(Sock).
 
+admins_add_delete(_) ->
+    emqttd_dashboard_user:add(<<"username">>, <<"password">>, <<"tag">>),
+    emqttd_dashboard_user:add(<<"username1">>, <<"password1">>, <<"tag1">>),
+    {ok, Admins} = emqttd_dashboard_user:users(),
+    ?assertEqual([[{name, <<"username">>}, {tag, <<"tag">>}],
+                  [{name, <<"username1">>}, {tag, <<"tag1">>}],
+                  [{name, <<"admin">>}, {tag, <<"administrator">>}]],
+                Admins),
+    emqttd_dashboard_user:remover(<<"username1">>),
+    ?assertEqual({ok, [[{name, <<"username">>}, {tag, <<"tag">>}],
+                       [{name, <<"admin">>}, {tag, <<"administrator">>}]]}, 
+                emqttd_dashboard_user:users()),
+    emqttd_dashboard_user:update(<<"username">>, <<"pwd">>, <<"login">>),
+    timer:sleep(10),
+    ?assert(connect_dashbaord_(get, "api/brokers", auth_header_("username", "pwd"))),
+    emqttd_dashboard_user:remover(<<"username">>),
+    ?assertEqual(false, connect_dashbaord_(get, "api/brokers", auth_header_("username", "pwd"))).
+
 client_connect_(Packet, RecvSize) ->
     {ok, Sock} = gen_tcp:connect({127,0,0,1}, 1883, [binary, {packet, raw}, {active, false}]),
     gen_tcp:send(Sock, Packet),
     gen_tcp:recv(Sock, RecvSize, 3000),
     Sock.
 
-connect_dashbaord_(Method, Api) ->
+connect_dashbaord_(Method, Api, Auth) ->
     Url = "http://127.0.0.1:18083/" ++ Api,
-    Auth = auth_header_("admin", "public"),
     case httpc:request(Method, {Url, [Auth]}, [], []) of
       {error, socket_closed_remotely} ->
           false;
@@ -120,13 +139,15 @@ connect_dashbaord_(Method, Api) ->
           false
     end.
 
+auth_header_() ->
+    auth_header_("admin", "public").
+
 auth_header_(User, Pass) ->
     Encoded = base64:encode_to_string(lists:append([User,":",Pass])),
     {"Authorization","Basic " ++ Encoded}.
 
-connect_dashbaord_(Method, Api, Params) ->
+connect_dashbaord_(Method, Api, Params, Auth) ->
     Url = "http://127.0.0.1:18083/" ++ Api,
-    Auth = auth_header_("admin", "public"),
     case httpc:request(Method, {Url, [Auth], ?CONTENT_TYPE, Params}, [], []) of
     {error, socket_closed_remotely} ->
         false;
