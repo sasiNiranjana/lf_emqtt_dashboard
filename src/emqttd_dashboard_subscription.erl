@@ -37,7 +37,11 @@ list(ClientId, PageNo, PageSize) when ?EMPTY_KEY(ClientId) ->
     emqttd_dashboard:query_table(Qh, PageNo, PageSize, TotalNum, fun row/1);
 
 list(ClientId, PageNo, PageSize) ->
-    Fun = fun() -> ets:lookup(?TAB, ClientId) end,
+    Keys = ets:lookup(mqtt_subscription, ClientId),
+    Fun = fun() ->lists:map(fun({S, T}) ->
+                            [R] = ets:lookup(?TAB, {T, S}), R 
+                            end, Keys)
+          end,
     emqttd_dashboard:lookup_table(Fun, PageNo, PageSize, fun row/1).
 
 row({{Topic, ClientId}, Qos}) ->
