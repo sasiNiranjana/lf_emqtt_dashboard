@@ -94,7 +94,8 @@ handle_request("/api/logout", Req, _State) ->
     respond(Req, 401, []);
 
 handle_request("/api/" ++ Name, Req, #state{dispatch = Dispatch}) ->
-    Dispatch(Req, Name, Req:parse_post());
+    Params = params(Req),
+    Dispatch(Req, Name, Params);
 
 handle_request("/" ++ Rest, Req, #state{docroot = DocRoot}) ->
     mochiweb_request:serve_file(Rest, DocRoot, Req).
@@ -187,3 +188,8 @@ bin(S) when is_list(S)   -> list_to_binary(S);
 bin(A) when is_atom(A)   -> bin(atom_to_list(A));
 bin(B) when is_binary(B) -> B.
 
+params(Req) ->
+    case Req:get(method) of
+        'GET'  -> Req:parse_qs();
+        'POST' -> Req:parse_post()
+    end.
