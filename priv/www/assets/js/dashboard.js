@@ -157,6 +157,12 @@
             this._ajax('api/current_user', null, callback);
         },
 
+        // node_curr
+        node_curr : function(callback) {
+            this._ajax('api/bnode', null, callback);
+        },
+
+
         // user_update
         user_update : function(user, callback) {
             this._ajax('api/update_user', user, callback);
@@ -1408,6 +1414,17 @@
             }
         });
     };
+
+    var showCurrNode= function() {
+        dashboard.webapi.node_curr(function(ret, err) {
+            if (ret) {
+                $('#current_node', sog.mainContent.$html)
+                .text(ret.node);
+            }
+        });
+    };
+
+
     var clearAuth = function() {
         dashboard.webapi.logout(function(ret, err) {
             if (ret) {
@@ -1539,6 +1556,7 @@
         });
 
         showCurrUser();
+        showCurrNode();
         // Register menu event.
         registerEvent();
         // Show main center content.
