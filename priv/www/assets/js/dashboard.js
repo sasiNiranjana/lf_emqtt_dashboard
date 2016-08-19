@@ -137,6 +137,12 @@
             this._ajax('api/subscriptions', params, callback);
         },
 
+        // alarms 
+        alarms: function(callback) {
+            this._ajax('api/alarms', null, callback);
+        },
+
+
         // users
         users : function(callback) {
             this._ajax('api/users', null, callback);
@@ -1042,6 +1048,43 @@
             }
         });
     };
+    
+    // Alarms-------------------------------------
+
+    var Alarms= function() {
+        this.modName = 'alarms';
+        this.$html = $('#dashboard_alarms',
+                sog.mainCenter.$html);
+        this._init();
+    };
+    Alarms.prototype._init = function() {
+        var _this = this;
+        loading('alarms.html', function() {
+            _this.vmAlarms = new Vue({
+                el  : $('#alarms_list', _this.$html)[0],
+                data: {
+                    alarms: []
+                },
+            });
+            
+            _this.list();
+        }, _this.$html);
+    };
+    Alarms.prototype.show = function() {
+        this.$html.show();
+    };
+    Alarms.prototype.hide = function() {
+        this.$html.hide();
+    };
+    Alarms.prototype.list = function() {
+        var _this = this;
+        dashboard.webapi.alarms(function(ret, err) {
+            if (ret) {
+                _this.vmAlarms.alarms= ret;
+            }
+        });
+    };
+
 
     // Websocket----------------------------------------
 
@@ -1491,6 +1534,15 @@
             }
             modules.subscriptions.show();
             break;
+     case 'alarms':
+            if (!modules.alarms) {
+                modules.alarms= new Alarms();
+            } else {
+                modules.alarms.list();
+            }
+            modules.alarms.show();
+            break;
+
         case 'websocket':
             if (!modules.websocket) {
                 modules.websocket = new Websocket();
