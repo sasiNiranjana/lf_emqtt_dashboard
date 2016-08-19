@@ -36,59 +36,81 @@
 				<thead>
 					<tr>
 						<th>GET</th>
+						<th>POST</th>
 						<th>Path</th>
 						<th>Description</th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr>
-						<td>X</td>
+						<td>Y</td>
+						<td>Y</td>
 						<td><a href="/api/stats">/api/stats </a></td>
 						<td>The Statistics of Clients, Sessions, Topics and Subscriptions</td>
 					</tr>
 					<tr>
-						<td>X</td>
+						<td>Y</td>
+						<td>Y</td>
 						<td><a href="/api/nodes">/api/nodes</a></td>
 						<td>List of clustered nodes</td>
 					</tr>
 					<tr>
-						<td>X</td>
+						<td>Y</td>
+						<td>Y</td>
 						<td><a href="/api/metrics">/api/metrics</a></td>
 						<td>The broker metrics</td>
 					</tr>
 					<tr>
-						<td>X</td>
+						<td>Y</td>
+						<td>Y</td>
 						<td><a href="/api/listeners">/api/listeners</a></td>
 						<td>List of all TCP listeners</td>
 					</tr>
 					<tr>
-						<td>X</td>
+						<td>Y</td>
+						<td>Y</td>
 						<td><a href="/api/clients">/api/clients</a></td>
-						<td>List of all connected clients</td>
+                        <td>List of all connected clients.
+                            support GET request like this:</br>
+                            http://localhost:18083/api/clients?currentPage=1&pageSize=100&client_key=Key
+                        </td>
 					</tr>
 					<tr>
-						<td>X</td>
+						<td>Y</td>
+						<td>Y</td>
 						<td><a href="/api/sessions">/api/sessions</a></td>
-						<td>List of all sessions</td>
+                        <td>List of all sessions.
+                            support GET request like this:</br>
+                            http://localhost:18083/api/sessions?currentPage=1&pageSize=100&client_key=Key
+                        </td>
 					</tr>
 					<tr>
-						<td>X</td>
+						<td>Y</td>
+						<td>Y</td>
 						<td><a href="/api/topics">/api/topics</a></td>
 						<td>List of all Topics</td>
                     </tr>
 	            	<tr>
-						<td>X</td>
+						<td>Y</td>
+						<td>Y</td>
 						<td><a href="/api/routes">/api/routes</a></td>
-						<td>List of all routes</td>
+                        <td>List of all routes.
+                            support GET request like this:</br>
+                            http://localhost:18083/api/routes?currentPage=1&pageSize=100&topic=Topic
+                        </td>
 					</tr>
 					<tr>
-						<td>X</td>
+						<td>Y</td>
+						<td>Y</td>
 						<td><a href="/api/subscriptions">/api/subscriptions</a></td>
-						<td>List of all Subscriptions</td>
+                        <td>List of all Subscriptions.support GET request like this:</br>
+                            http://localhost:18083/api/subscriptions?currentPage=1&pageSize=100&client_key=Key
+                        </td>
 					</tr>
 
 					<tr>
-						<td>X</td>
+						<td>Y</td>
+						<td>Y</td>
 						<td><a href="/api/users">/api/users</a></td>
 						<td>List of all admins</td>
 					</tr>
