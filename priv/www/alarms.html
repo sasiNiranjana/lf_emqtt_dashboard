@@ -18,7 +18,6 @@
                 <table class="table table-hover">
                     <thead>
                         <tr>
-                            <th>AlarmId</th>
                             <th>Severity</th>
                             <th>Title</th>
                             <th>Summary</th>
@@ -28,8 +27,13 @@
 
                     <tbody>
                         <tr v-for="alarm in alarms">
-                        <td>{{ alarm.id}}</td>
-                        <td>{{ alarm.severity}}</td>
+                        <td>
+                        <span v-show="alarm.severity == 'credential'" class="badge badge-danger">{{ alarm.severity}}</span>
+
+                        <span v-show="alarm.severity == 'warning'" class="badge badge-warning"> {{ alarm.severity}}</span>
+                        
+                        <span v-show="alarm.severity == 'error'" class="badge badge-info">{{ alarm.severity}}</span>
+                        </td>
                         <td>{{ alarm.title}}</td>
                         <td>{{ alarm.summary}}</td>
                         <td>{{ alarm.occurred_at}}</td>
