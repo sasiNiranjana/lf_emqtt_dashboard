@@ -1,8 +1,14 @@
 
-2.0-beta (2016-06-30)
+2.0-beta (2016-08-19)
 -----------------------
 
 gen_conf
+
+JS Code Review
+
+API Support Post/Get
+
+Add Emqttd Alarms
 
 1.1.2-beta (2016-06-30)
 -----------------------
