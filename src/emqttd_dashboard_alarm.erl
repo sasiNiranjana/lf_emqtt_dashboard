@@ -18,9 +18,23 @@
 
 -module(emqttd_dashboard_alarm).
 
+-include_lib("emqttd/include/emqttd.hrl").
+
 -export([alarms/0]).
 
 -http_api({"alarms",  alarms,   []}).
 
 alarms() ->
-    {ok, emqttd_alarm:get_alarms()}.
+    Alarms = lists:map(fun alarm/1, emqttd_alarm:get_alarms()),
+    {ok, Alarms}.
+
+alarm(#mqtt_alarm{id        = AlarmId,
+                  severity  = Severity,
+                  title     = Title,
+                  summary   = Summary,
+                  timestamp = Timestamp}) ->
+    [{id, AlarmId},
+     {severity, Severity},
+     {title, list_to_binary(Title)},
+     {summary, list_to_binary(Summary)},
+     {occurred_at, list_to_binary(emqttd_dashboard:strftime(Timestamp))}].
