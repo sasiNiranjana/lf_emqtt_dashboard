@@ -4,10 +4,13 @@
 
 -include_lib("eunit/include/eunit.hrl").
 
+-include_lib("emqttd/include/emqttd.hrl").
+
 -define(CONTENT_TYPE, "application/x-www-form-urlencoded").
 
 all() -> 
     [{group, overview},
+     {group, alarms},
      {group, clients},
      {group, sessions},
      {group, routes},
@@ -18,6 +21,7 @@ all() ->
 groups() ->
     [{overview, [sequence], [brokers, stats, ptype, memory, 
                             cpu, nodes, metrics, listeners, bnode]},
+     {alarms, [sequence], [get_alarms]},
      {clients, [sequence], [clients, clients_query]},
      {sessions, [sequence], [session_query]},
      {routes, [sequence], [route_query]},
@@ -67,6 +71,12 @@ listeners(_) ->
 
 bnode(_) ->
     ?assert(connect_dashbaord_(get, "api/bnode", auth_header_())).
+
+get_alarms(_) ->
+    AlarmTest = #mqtt_alarm{id = <<"1">>, severity = error, title="alarm title", summary="alarm summary"},
+    emqttd_alarm:set_alarm(AlarmTest),
+    {ok, [Alarm]} = emqttd_dashboard_alarm:alarms(),
+    ?assertEqual(error, proplists:get_value(severity, Alarm)).
 
 clients(_) ->
     ?assert(connect_dashbaord_(post, "api/clients", "page_size=100&curr_page=1", auth_header_())).
