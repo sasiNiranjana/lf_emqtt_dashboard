@@ -120,3 +120,16 @@ a {
 .sidebar-menu .main-menu li.active > a .dash-icon-metrics {
   background-image: url(../imgs/metrics_h.png);
 }
+
+.user-info-navbar .user-info-menu .glyphicon-headle {
+    padding-left: 23px;
+}
+
+.user-info-navbar .user-info-menu .headle {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+  transform: translateY(-50%);
+  font-size: 20px;
+}
