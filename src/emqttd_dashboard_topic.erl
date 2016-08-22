@@ -19,6 +19,8 @@
 
 -include("emqttd_dashboard.hrl").
 
+-include_lib("emqttd/include/emqttd.hrl").
+
 -include_lib("stdlib/include/qlc.hrl").
 
 -export([list/3]).
@@ -36,6 +38,6 @@ list(Topic, PageNo, PageSize) ->
     Fun = fun() -> mnesia:dirty_read(topic, Topic) end,
     emqttd_dashboard:lookup_table(Fun, PageNo, PageSize, fun row/1).
 
-row({topic = Topic,flags= Flags}) ->
+row(#mqtt_topic{topic = Topic,flags= Flags}) ->
     [{topic, Topic}, {flags, Flags}].
 
