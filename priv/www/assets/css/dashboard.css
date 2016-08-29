@@ -31,6 +31,9 @@ a {
 .dash-icon-overview {
   background-image: url(../imgs/overview_d.png);
 }
+.dash-icon-alarms {
+  background-image: url(../imgs/alarms_d.png);
+}
 .dash-icon-clients {
   background-image: url(../imgs/clients_d.png);
 }
