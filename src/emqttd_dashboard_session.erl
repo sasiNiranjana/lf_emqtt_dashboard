@@ -37,7 +37,7 @@ list(ClientId, PageNo, PageSize) when ?EMPTY_KEY(ClientId) ->
     emqttd_dashboard:query_table(Qh, PageNo, PageSize, TotalNum, fun row/1);
 
 list(ClientId, PageNo, PageSize) ->
-    MP = {{ClientId, '_'}, '_'},
+    MP = {ClientId, '_', '_', '_'},
     Fun = fun() -> lists:append([ets:match_object(Tab, MP) || Tab <- tables()]) end,
     emqttd_dashboard:lookup_table(Fun, PageNo, PageSize, fun row/1).
 
