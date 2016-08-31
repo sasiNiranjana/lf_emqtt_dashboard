@@ -762,6 +762,11 @@
             _this.list();
         }, _this.$html);
     };
+    Clients.prototype.clear = function(){
+        var _this = this;
+        _this.pageInfo = new PageInfo(1, 100, 0);
+        _this.vmClients.clientKey = null;
+    };
     Clients.prototype.show = function() {
         this.$html.show();
     };
@@ -826,6 +831,11 @@
             
             _this.list();
         }, _this.$html);
+    };
+    Sessions.prototype.clear = function(){
+        var _this = this;
+        _this.pageInfo = new PageInfo(1, 100, 0);
+        _this.vmSessions.clientKey = null;
     };
     Sessions.prototype.show = function() {
         this.$html.show();
@@ -892,6 +902,11 @@
             _this.list();
         }, _this.$html);
     };
+    Topics.prototype.clear = function(){
+        var _this = this;
+        _this.pageInfo = new PageInfo(1, 100, 0);
+        _this.vmTopics.topic = null;
+    };
     Topics.prototype.show = function() {
         this.$html.show();
     };
@@ -957,6 +972,11 @@
             _this.list();
         }, _this.$html);
     };
+    Routes.prototype.clear = function() {
+        var _this = this;
+        _this.pageInfo = new PageInfo(1, 100, 0);
+        _this.vmRoutes.topic = null;
+    };
     Routes.prototype.show = function() {
         this.$html.show();
     };
@@ -1021,6 +1041,11 @@
             
             _this.list();
         }, _this.$html);
+    };
+    Subscriptions.prototype.clear = function(){
+        var _this = this;
+        _this.pageInfo = new PageInfo(1, 100, 0);
+        _this.vmSubs.clientKey = null;
     };
     Subscriptions.prototype.show = function() {
         this.$html.show();
@@ -1498,6 +1523,7 @@
             if (!modules.clients) {
                 modules.clients = new Clients();
             } else {
+                modules.clients.clear();
                 modules.clients.list();
             }
             modules.clients.show();
@@ -1506,6 +1532,7 @@
             if (!modules.sessions) {
                 modules.sessions = new Sessions();
             } else {
+                modules.sessions.clear();
                 modules.sessions.list();
             }
             modules.sessions.show();
@@ -1514,6 +1541,7 @@
             if (!modules.topics) {
                 modules.topics = new Topics();
             } else {
+                modules.topics.clear();
                 modules.topics.list();
             }
             modules.topics.show();
@@ -1522,6 +1550,7 @@
             if (!modules.routes) {
                 modules.routes = new Routes();
             } else {
+                modules.routes.clear();
                 modules.routes.list();
             }
             modules.routes.show();
@@ -1530,6 +1559,7 @@
             if (!modules.subscriptions) {
                 modules.subscriptions = new Subscriptions();
             } else {
+                modules.subscriptions.clear();
                 modules.subscriptions.list();
             }
             modules.subscriptions.show();
