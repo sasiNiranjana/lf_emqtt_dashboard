@@ -19,7 +19,7 @@
 
 -include("emqttd_dashboard.hrl").
 
--include("../../../include/emqttd.hrl").
+-include_lib("emqttd/include/emqttd.hrl").
 
 -export([users/0, update/3, remover/1, add/3]).
 

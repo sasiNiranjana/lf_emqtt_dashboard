@@ -19,7 +19,7 @@
 
 -include("emqttd_dashboard.hrl").
 
--include("../../../include/emqttd.hrl").
+-include_lib("emqttd/include/emqttd.hrl").
 
 -include_lib("stdlib/include/qlc.hrl").
 
@@ -37,14 +37,14 @@ list(ClientId, PageNo, PageSize) when ?EMPTY_KEY(ClientId) ->
     emqttd_dashboard:query_table(Qh, PageNo, PageSize, TotalNum, fun row/1);
 
 list(ClientId, PageNo, PageSize) ->
-    MP = {{ClientId, '_'}, '_'},
+    MP = {ClientId, '_', '_', '_'},
     Fun = fun() -> lists:append([ets:match_object(Tab, MP) || Tab <- tables()]) end,
     emqttd_dashboard:lookup_table(Fun, PageNo, PageSize, fun row/1).
 
 tables() ->
-    [mqtt_transient_session, mqtt_persistent_session].
+    [mqtt_local_session].
 
-row({{ClientId, _Pid}, Session}) ->
+row({ClientId, _Pid, _Persistent, Session}) ->
     InfoKeys = [clean_sess, max_inflight, inflight_queue, message_queue,
                 message_dropped, awaiting_rel, awaiting_ack, awaiting_comp, created_at],
      [{clientId, ClientId} | [{Key, format(Key, get_value(Key, Session))} || Key <- InfoKeys]].

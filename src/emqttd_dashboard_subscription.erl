@@ -19,9 +19,11 @@
 
 -include("emqttd_dashboard.hrl").
 
--include("../../../include/emqttd.hrl").
+-include_lib("emqttd/include/emqttd.hrl").
 
 -include_lib("stdlib/include/qlc.hrl").
+
+-define(TAB, mqtt_subproperty).
 
 -export([list/3]).
 
@@ -30,14 +32,18 @@
                                    {"page_size",  int, 100}]}).
 
 list(ClientId, PageNo, PageSize) when ?EMPTY_KEY(ClientId) ->
-    TotalNum = ets:info(subscription, size),
-    Qh = qlc:q([E || E <- ets:table(subscription)]),
+    TotalNum = ets:info(?TAB, size),
+    Qh = qlc:q([E || E <- ets:table(?TAB)]),
     emqttd_dashboard:query_table(Qh, PageNo, PageSize, TotalNum, fun row/1);
 
 list(ClientId, PageNo, PageSize) ->
-    Fun = fun() -> ets:lookup(subscription, ClientId) end,
+    Keys = ets:lookup(mqtt_subscription, ClientId),
+    Fun = fun() ->lists:map(fun({S, T}) ->
+                            [R] = ets:lookup(?TAB, {T, S}), R 
+                            end, Keys)
+          end,
     emqttd_dashboard:lookup_table(Fun, PageNo, PageSize, fun row/1).
 
-row(#mqtt_subscription{subid = ClientId, topic = Topic, qos = Qos}) ->
-    [{clientid, ClientId}, {topic, Topic}, {qos, Qos}].
+row({{Topic, ClientId}, Qos}) ->
+    [{clientid, ClientId}, {topic, Topic} | Qos].
 

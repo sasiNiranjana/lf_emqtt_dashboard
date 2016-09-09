@@ -19,9 +19,11 @@
 
 -include("emqttd_dashboard.hrl").
 
--include("../../../include/emqttd.hrl").
+-include_lib("emqttd/include/emqttd.hrl").
 
 -include_lib("stdlib/include/qlc.hrl").
+
+-define(ROUTE, mqtt_route).
 
 -http_api({"routes", list, [{"topic",     binary},
                             {"curr_page", int, 1},
@@ -30,13 +32,13 @@
 -export([list/3]).
 
 list(Topic, PageNo, PageSize) when ?EMPTY_KEY(Topic) ->
-    TotalNum = mnesia:table_info(route, size),
-    Qh = qlc:q([R || R <- mnesia:table(route)]),
+    TotalNum = mnesia:table_info(?ROUTE, size),
+    Qh = qlc:q([R || R <- mnesia:table(?ROUTE)]),
     mnesia:async_dirty(fun emqttd_dashboard:query_table/5,
                        [Qh, PageNo, PageSize, TotalNum, fun row/1]);
 
 list(Topic, PageNo, PageSize) ->
-    Fun = fun() -> mnesia:dirty_read(route, Topic) end,
+    Fun = fun() -> mnesia:dirty_read(?ROUTE, Topic) end,
     emqttd_dashboard:lookup_table(Fun, PageNo, PageSize, fun row/1).
 
 row(#mqtt_route{topic = Topic, node= Node}) ->

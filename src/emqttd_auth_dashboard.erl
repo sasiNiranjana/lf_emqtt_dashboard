@@ -17,7 +17,7 @@
 %% @doc Dashboard authentication module
 -module(emqttd_auth_dashboard).
 
--include("../../../include/emqttd.hrl").
+-include_lib("emqttd/include/emqttd.hrl").
 
 -behaviour(emqttd_auth_mod).
 

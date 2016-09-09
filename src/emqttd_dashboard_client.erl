@@ -19,7 +19,7 @@
 
 -include("emqttd_dashboard.hrl").
 
--include("../../../include/emqttd.hrl").
+-include_lib("emqttd/include/emqttd.hrl").
 
 -include_lib("stdlib/include/qlc.hrl").
 

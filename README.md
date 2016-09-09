@@ -1,19 +1,16 @@
 
-## Overview
+emqttd_dashboard
+================
 
 Dashboard for emqttd broker.
 
-## Build
+Build
+------
 
-In emqttd project:
+make && make ct
 
-```
-git submodule add https://github.com/emqtt/emqttd_dashboard.git plugins/emqttd_dashboard 
-
-make
-```
-
-## Configure
+Configurtion
+------------
 
 ```
 [
@@ -26,18 +23,19 @@ make
 ].
 ```
 
-## Load Plugin
+Load Plugin
+-----------
 
 ```
 ./bin/emqttd_ctl plugins load emqttd_dashboard
 ```
 
-## Login
+Login
+-----
 
 URL: http://host:18083
 
 Username: admin
 
-Password: public (admin before 0.10.4)
-
+Password: public
 
