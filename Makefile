@@ -9,7 +9,7 @@ dep_gen_conf = git https://github.com/emqtt/gen_conf
 LOCAL_DEPS = mnesia
 
 BUILD_DEPS = emqttd
-dep_emqttd = git https://github.com/emqtt/emqttd emq20
+dep_emqttd = git https://github.com/emqtt/emqttd master
 
 ERLC_OPTS += +'{parse_transform, lager_transform}'
 
