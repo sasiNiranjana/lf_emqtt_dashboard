@@ -1,14 +1,15 @@
 PROJECT = emqttd_dashboard
-PROJECT_DESCRIPTION = emqttd web dashboard
+PROJECT_DESCRIPTION = emqttd Web Dashboard
 PROJECT_VERSION = 2.0
 
-//DEPS = gen_conf lager folsom emqttd
-DEPS = gen_conf lager emqttd
+DEPS = lager gen_conf
+dep_lager    = git https://github.com/basho/lager
+dep_gen_conf = git https://github.com/emqtt/gen_conf
+
 LOCAL_DEPS = mnesia
 
-dep_gen_conf = git https://github.com/emqtt/gen_conf
-dep_emqttd   = git https://github.com/emqtt/emqttd plus
-//dep_folsom 	 = git https://github.com/boundary/folsom.git 0.8.2
+BUILD_DEPS = emqttd
+dep_emqttd = git https://github.com/emqtt/emqttd emq20
 
 ERLC_OPTS += +'{parse_transform, lager_transform}'
 
@@ -17,3 +18,4 @@ COVER = true
 include erlang.mk
 
 app:: rebar.config
+
