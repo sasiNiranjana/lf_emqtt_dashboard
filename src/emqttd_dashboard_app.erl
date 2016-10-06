@@ -14,7 +14,6 @@
 %% limitations under the License.
 %%--------------------------------------------------------------------
 
-%% @doc emqttd web dashboard application.
 -module(emqttd_dashboard_app).
 
 -behaviour(application).
@@ -25,9 +24,8 @@
 -define(APP, emqttd_dashboard).
 
 start(_StartType, _StartArgs) ->
-    gen_conf:init(?APP),
     {ok, Sup} = emqttd_dashboard_sup:start_link(),
-    {ok, Listener} = gen_conf:value(?APP, listener),
+    {ok, Listener} = application:get_env(?APP, listener),
     ok = emqttd_access_control:register_mod(auth, emqttd_auth_dashboard, [Listener], 9999),
     start_listener(Listener),
     emqttd_dashboard_cli:load(),

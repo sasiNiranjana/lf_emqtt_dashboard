@@ -19,3 +19,5 @@ include erlang.mk
 
 app:: rebar.config
 
+app.config::
+	cuttlefish -l info -e etc/ -c etc/emqttd_dashboard.conf -i priv/emqttd_dashboard.schema -d data

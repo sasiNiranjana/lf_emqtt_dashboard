@@ -14,7 +14,6 @@
 %% limitations under the License.
 %%--------------------------------------------------------------------
 
-%% @doc emqttd dashboard supervisor.
 -module(emqttd_dashboard_sup).
 
 -behaviour(supervisor).
