@@ -14,10 +14,9 @@
 %% limitations under the License.
 %%--------------------------------------------------------------------
 
-%% @doc Overview API.
--module(emqttd_dashboard_overview).
+-module(emq_dashboard_overview).
 
--include("emqttd_dashboard.hrl").
+-include("emq_dashboard.hrl").
 
 -include_lib("emqttd/include/emqttd.hrl").
 

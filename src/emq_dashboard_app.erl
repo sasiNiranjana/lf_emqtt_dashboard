@@ -14,30 +14,30 @@
 %% limitations under the License.
 %%--------------------------------------------------------------------
 
--module(emqttd_dashboard_app).
+-module(emq_dashboard_app).
 
 -behaviour(application).
 
 %% Application callbacks
 -export([start/2, stop/1]).
 
--define(APP, emqttd_dashboard).
+-define(APP, emq_dashboard).
 
 start(_StartType, _StartArgs) ->
-    {ok, Sup} = emqttd_dashboard_sup:start_link(),
+    {ok, Sup} = emq_dashboard_sup:start_link(),
     {ok, Listener} = application:get_env(?APP, listener),
-    ok = emqttd_access_control:register_mod(auth, emqttd_auth_dashboard, [Listener], 9999),
+    ok = emqttd_access_control:register_mod(auth, emq_auth_dashboard, [Listener], 9999),
     start_listener(Listener),
-    emqttd_dashboard_cli:load(),
+    emq_dashboard_cli:load(),
     {ok, Sup}.
 
 stop(_State) ->
-    emqttd_dashboard_cli:unload(),
-    emqttd_access_control:unregister_mod(auth, emqttd_auth_dashboard),
-    {ok, {_Proto, Port, _Opts}} = application:get_env(emqttd_dashboard, listener),
+    emq_dashboard_cli:unload(),
+    emqttd_access_control:unregister_mod(auth, emq_auth_dashboard),
+    {ok, {_Proto, Port, _Opts}} = application:get_env(?APP, listener),
     mochiweb:stop_http(Port).
 
 %% start http listener
 start_listener({Name, Port, Options}) ->
-    mochiweb:start_http(Name, Port, Options, emqttd_dashboard:http_handler()).
+    mochiweb:start_http(Name, Port, Options, emq_dashboard:http_handler()).
 

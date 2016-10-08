@@ -14,10 +14,9 @@
 %% limitations under the License.
 %%--------------------------------------------------------------------
 
-%% @doc User API.
--module(emqttd_dashboard_user).
+-module(emq_dashboard_user).
 
--include("emqttd_dashboard.hrl").
+-include("emq_dashboard.hrl").
 
 -include_lib("emqttd/include/emqttd.hrl").
 
@@ -46,19 +45,19 @@ add(Username, Password, _Tag) when ?EMPTY(Username) orelse ?EMPTY(Password) ->
     code({error, "Username or password undefined"});
  
 add(Username, Password, Tag) ->
-    {ok, code(emqttd_dashboard_admin:add_user(Username, Password, Tag))}.
+    {ok, code(emq_dashboard_admin:add_user(Username, Password, Tag))}.
 
 update(Username, Password, _Tag) when ?EMPTY(Username) orelse ?EMPTY(Password) ->
     code({error, "Username or password undefined"});
  
 update(Username, Password, Tag) ->
-    {ok, code(emqttd_dashboard_admin:update_user(Username, Password, Tag))}.
+    {ok, code(emq_dashboard_admin:update_user(Username, Password, Tag))}.
 
 remover(<<"admin">>) ->
     {ok, [{status, failure},{reason, list_to_binary("admin cannot be deleted")}]};
 
 remover(Username) ->
-    {ok, code(emqttd_dashboard_admin:remove_user(Username))}.
+    {ok, code(emq_dashboard_admin:remove_user(Username))}.
  
 code(ok)              -> [{status, success}];
 code({error, Reason}) -> [{status, failure}, {reason, list_to_binary(Reason)}].

@@ -16,11 +16,11 @@
 
 %% @doc Creation and definition of various indicators.
 
--module(emqttd_meter_define).
+-module(emq_meter_define).
 
 -behaviour(gen_server).
 
--include("emqttd_dashboard_meter.hrl").
+-include("emq_dashboard_meter.hrl").
 
 -define(SERVER, ?MODULE).
 
@@ -71,7 +71,7 @@ handle_info(reporter, #state{metrics_data = MetsData} = State) ->
 
     lists:foreach(fun(Met) ->
                     V = folsom_metrics:get_metric_value(Met),
-                    emqttd_meter_access:save_data(Met, TS, V)
+                    emq_meter_access:save_data(Met, TS, V)
                     %io:format("Metric, ~p ~p ~p~n", [Met, TS, V])
                   end, ?METRICS),
 

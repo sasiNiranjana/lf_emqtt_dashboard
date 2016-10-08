@@ -16,7 +16,7 @@
 
 %% @doc emqttd alarms API.
 
--module(emqttd_dashboard_alarm).
+-module(emq_dashboard_alarm).
 
 -include_lib("emqttd/include/emqttd.hrl").
 
@@ -37,4 +37,5 @@ alarm(#mqtt_alarm{id        = AlarmId,
      {severity, Severity},
      {title, list_to_binary(Title)},
      {summary, list_to_binary(Summary)},
-     {occurred_at, list_to_binary(emqttd_dashboard:strftime(Timestamp))}].
+     {occurred_at, list_to_binary(emq_dashboard:strftime(Timestamp))}].
+

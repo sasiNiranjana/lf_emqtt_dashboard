@@ -16,11 +16,11 @@
 
 %% @doc The number of indicators of persistence.
 
--module(emqttd_meter_access).
+-module(emq_meter_access).
 
 -behaviour(gen_server).
 
--include("emqttd_dashboard_meter.hrl").
+-include("emq_dashboard_meter.hrl").
 
 -define(Suffix, ".dets").
 -define(SERVER, ?MODULE).

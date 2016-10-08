@@ -15,9 +15,9 @@
 %%--------------------------------------------------------------------
 
 %% @doc Route API.
--module(emqttd_dashboard_route).
+-module(emq_dashboard_route).
 
--include("emqttd_dashboard.hrl").
+-include("emq_dashboard.hrl").
 
 -include_lib("emqttd/include/emqttd.hrl").
 
@@ -34,12 +34,12 @@
 list(Topic, PageNo, PageSize) when ?EMPTY_KEY(Topic) ->
     TotalNum = mnesia:table_info(?ROUTE, size),
     Qh = qlc:q([R || R <- mnesia:table(?ROUTE)]),
-    mnesia:async_dirty(fun emqttd_dashboard:query_table/5,
+    mnesia:async_dirty(fun emq_dashboard:query_table/5,
                        [Qh, PageNo, PageSize, TotalNum, fun row/1]);
 
 list(Topic, PageNo, PageSize) ->
     Fun = fun() -> mnesia:dirty_read(?ROUTE, Topic) end,
-    emqttd_dashboard:lookup_table(Fun, PageNo, PageSize, fun row/1).
+    emq_dashboard:lookup_table(Fun, PageNo, PageSize, fun row/1).
 
 row(#mqtt_route{topic = Topic, node= Node}) ->
     [{topic, Topic}, {node, Node}].

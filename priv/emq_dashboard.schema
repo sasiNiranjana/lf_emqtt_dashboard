@@ -1,19 +1,19 @@
 
-{mapping, "dashboard.listener", "emqttd_dashboard.listener", [
-  {datatype, ip}
+{mapping, "dashboard.listener", "emq_dashboard.listener", [
+  {datatype, [integer, ip]}
 ]}.
 
-{mapping, "dashboard.listener.acceptors", "emqttd_dashboard.listener", [
+{mapping, "dashboard.listener.acceptors", "emq_dashboard.listener", [
   {default, 4},
   {datatype, integer}
 ]}.
 
-{mapping, "dashboard.listener.max_clients", "emqttd_dashboard.listener", [
+{mapping, "dashboard.listener.max_clients", "emq_dashboard.listener", [
   {default, 512},
   {datatype, integer}
 ]}.
 
-{translation, "emqttd_dashboard.listener", fun(Conf) ->
+{translation, "emq_dashboard.listener", fun(Conf) ->
   {dashboard, cuttlefish:conf_get("dashboard.listener", Conf), [
     {acceptors, cuttlefish:conf_get("dashboard.listener.acceptors", Conf)},
     {max_clients, cuttlefish:conf_get("dashboard.listener.max_clients", Conf)}

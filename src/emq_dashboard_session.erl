@@ -15,9 +15,9 @@
 %%--------------------------------------------------------------------
 
 %% @doc Session API.
--module(emqttd_dashboard_session).
+-module(emq_dashboard_session).
 
--include("emqttd_dashboard.hrl").
+-include("emq_dashboard.hrl").
 
 -include_lib("emqttd/include/emqttd.hrl").
 
@@ -34,12 +34,12 @@
 list(ClientId, PageNo, PageSize) when ?EMPTY_KEY(ClientId) ->
     TotalNum = lists:sum([ets:info(Tab, size) || Tab <- tables()]),
     Qh = qlc:append([qlc:q([E || E <- ets:table(Tab)]) || Tab <- tables()]),
-    emqttd_dashboard:query_table(Qh, PageNo, PageSize, TotalNum, fun row/1);
+    emq_dashboard:query_table(Qh, PageNo, PageSize, TotalNum, fun row/1);
 
 list(ClientId, PageNo, PageSize) ->
     MP = {ClientId, '_', '_', '_'},
     Fun = fun() -> lists:append([ets:match_object(Tab, MP) || Tab <- tables()]) end,
-    emqttd_dashboard:lookup_table(Fun, PageNo, PageSize, fun row/1).
+    emq_dashboard:lookup_table(Fun, PageNo, PageSize, fun row/1).
 
 tables() ->
     [mqtt_local_session].
@@ -50,7 +50,7 @@ row({ClientId, _Pid, _Persistent, Session}) ->
      [{clientId, ClientId} | [{Key, format(Key, get_value(Key, Session))} || Key <- InfoKeys]].
 
 format(created_at, Val) ->
-    list_to_binary(emqttd_dashboard:strftime(Val));
+    list_to_binary(emq_dashboard:strftime(Val));
 format(_, Val) ->
     Val.
 

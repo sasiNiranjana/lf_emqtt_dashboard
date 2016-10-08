@@ -14,8 +14,7 @@
 %% limitations under the License.
 %%--------------------------------------------------------------------
 
-%% @doc Dashboard authentication module
--module(emqttd_auth_dashboard).
+-module(emq_auth_dashboard).
 
 -include_lib("emqttd/include/emqttd.hrl").
 
