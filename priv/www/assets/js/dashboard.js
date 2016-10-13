@@ -1181,7 +1181,8 @@
                         userName : null,
                         password : null,
                         keepAlive: null,
-                        cleanSession : true
+                        cleanSession : true,
+                        useSSL : true
                     },
                     subInfo : {
                         topic : '/world',
@@ -1260,6 +1261,7 @@
         var password = _this.vmWS.cInfo.password;
         var keepAlive = _this.vmWS.cInfo.keepAlive;
         var cleanSession = _this.vmWS.cInfo.cleanSession;
+        var useSSL = _this.vmWS.cInfo.useSSL;
         if (userName) {
             options.userName = userName;
         }
@@ -1270,6 +1272,7 @@
             options.keepAliveInterval = Number(keepAlive);
         }
         options.cleanSession = cleanSession;
+        options.useSSL= useSSL;
         _this.client.connect(options);
     };
     Websocket.prototype.disconnect = function() {
