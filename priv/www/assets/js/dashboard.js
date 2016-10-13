@@ -142,6 +142,11 @@
             this._ajax('api/alarms', null, callback);
         },
 
+         // plugins 
+        plugins: function(callback) {
+            this._ajax('api/plugins', null, callback);
+        },
+
 
         // users
         users : function(callback) {
@@ -1110,7 +1115,49 @@
         });
     };
 
+    // Plugins-------------------------------------
 
+    var Plugins = function() {
+        this.modName = 'plugins';
+        this.$html = $('#dashboard_plugins',
+                sog.mainCenter.$html);
+        this._init();
+    };
+    Plugins.prototype._init = function() {
+        var _this = this;
+        loading('plugins.html', function() {
+            _this.vmPlugins = new Vue({
+                el  : $('#plugins_list', _this.$html)[0],
+                data: {
+                    plugins: []
+                },
+         //       methods : {
+         //           update_btn: function() {
+         //               _this.update_btn();
+         //           }
+         //       }
+            });
+            
+            _this.list();
+        }, _this.$html);
+    };
+    Plugins.prototype.show = function() {
+        this.$html.show();
+    };
+    Plugins.prototype.hide = function() {
+        this.$html.hide();
+    };
+    Plugins.prototype.list = function() {
+        var _this = this;
+        dashboard.webapi.plugins(function(ret, err) {
+            if (ret) {
+                _this.vmPlugins.plugins= ret;
+            }
+        });
+    };
+  //  Plugins.prototype.update_btn = function() {
+  //      var _this = this;
+  //  };
     // Websocket----------------------------------------
 
     var Websocket = function() {
@@ -1564,7 +1611,7 @@
             }
             modules.subscriptions.show();
             break;
-     case 'alarms':
+        case 'alarms':
             if (!modules.alarms) {
                 modules.alarms= new Alarms();
             } else {
@@ -1572,7 +1619,14 @@
             }
             modules.alarms.show();
             break;
-
+        case 'plugins':
+            if (!modules.plugins) {
+                modules.plugins= new Plugins();
+            } else {
+                modules.plugins.list();
+            }
+            modules.plugins.show();
+            break;
         case 'websocket':
             if (!modules.websocket) {
                 modules.websocket = new Websocket();
