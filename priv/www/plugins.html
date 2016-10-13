@@ -28,12 +28,12 @@
 
                     <tbody>
                         <tr v-for="plugin in plugins">
-                        <td v-model ="pluginName" >{{ plugin.name}}</td>
+                        <td>{{ plugin.name}}</td>
                         <td>{{ plugin.version}}</td>
                         <td>{{ plugin.description}}</td>
                         <td>{{ plugin.active}}</td>
                         <td>
-                        <button type="button" class="btn btn-success btn-single" id="load_btn" @click="isload">Load</button>
+                        <button type="button" class="btn btn-success btn-single" @click="update(plugin)">Load</button>
                         </td>
                         </tr>
                     </tbody>

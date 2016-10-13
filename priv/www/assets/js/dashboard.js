@@ -1131,11 +1131,11 @@
                 data: {
                     plugins: []
                 },
-         //       methods : {
-         //           update_btn: function() {
-         //               _this.update_btn();
-         //           }
-         //       }
+                methods : {
+                    update: function(plugin) {
+                        _this.update(plugin);
+                    }
+                }
             });
             
             _this.list();
@@ -1155,9 +1155,15 @@
             }
         });
     };
-  //  Plugins.prototype.update_btn = function() {
-  //      var _this = this;
-  //  };
+   Plugins.prototype.update = function(plugin) {
+       var _this = this;
+       alert("current active:" + plugin.active);
+       if (plugin.active) {
+           plugin.active = false;
+       }else{
+            plugin.active = true; 
+       }
+   };
     // Websocket----------------------------------------
 
     var Websocket = function() {
