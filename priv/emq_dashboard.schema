@@ -1,4 +1,5 @@
-
+%%-*- mode: erlang -*-
+%% emq_dashboard config mapping
 {mapping, "dashboard.listener", "emq_dashboard.listener", [
   {datatype, [integer, ip]}
 ]}.

@@ -1,11 +1,11 @@
 
-emqttd_dashboard
-================
+emq_dashboard
+=============
 
-Dashboard for emqttd broker.
+Dashboard for EMQ Broker.
 
 Build
-------
+-----
 
 make && make ct
 
@@ -13,19 +13,18 @@ Configurtion
 ------------
 
 ```
-{listener,
-  {dashboard, 18083, [
-    {acceptors, 4},
-    {max_clients, 512}
-  ]}
-}.
+dashboard.listener = 18083
+
+dashboard.listener.acceptors = 2
+
+dashboard.listener.max_clients = 512
 ```
 
 Load Plugin
 -----------
 
 ```
-./bin/emqttd_ctl plugins load emqttd_dashboard
+./bin/emqttd_ctl plugins load emq_dashboard
 ```
 
 Login
