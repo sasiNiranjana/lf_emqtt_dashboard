@@ -1,5 +1,5 @@
 PROJECT = emq_dashboard
-PROJECT_DESCRIPTION = Web Dashboard for EMQ 3.0
+PROJECT_DESCRIPTION = EMQ Dashboard
 PROJECT_VERSION = 3.0
 
 DEPS = lager
