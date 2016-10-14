@@ -7,8 +7,10 @@ dep_lager  = git https://github.com/basho/lager
 
 LOCAL_DEPS = mnesia
 
-BUILD_DEPS = emqttd cuttlefish
+BUILD_DEPS = emqttd
 dep_emqttd = git https://github.com/emqtt/emqttd emq30
+
+TEST_DEPS = cuttlefish
 dep_cuttlefish = git https://github.com/basho/cuttlefish master
 
 ERLC_OPTS += +'{parse_transform, lager_transform}'
