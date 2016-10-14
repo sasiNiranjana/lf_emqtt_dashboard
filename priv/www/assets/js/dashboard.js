@@ -146,8 +146,14 @@
         plugins: function(callback) {
             this._ajax('api/plugins', null, callback);
         },
-
-
+        // plugins enable 
+        enable: function(name, callback) {
+            this._ajax('api/enable', {plugin_name : name}, callback);
+        },
+        // plugins disable 
+        disable: function(name, callback) {
+            this._ajax('api/disable', {plugin_name : name}, callback);
+        },
         // users
         users : function(callback) {
             this._ajax('api/users', null, callback);
@@ -1132,8 +1138,8 @@
                     plugins: []
                 },
                 methods : {
-                    update: function(plugin) {
-                        _this.update(plugin);
+                    update: function(plugin, el) {
+                        _this.update(plugin, el);
                     }
                 }
             });
@@ -1155,16 +1161,25 @@
             }
         });
     };
-   Plugins.prototype.update = function(plugin) {
+   Plugins.prototype.update = function(plugin, el) {
        var _this = this;
-       alert("current active:" + plugin.active);
+       var $btn = $(el);
+       plugin.runing = true;
+
        if (plugin.active) {
-           plugin.active = false;
-       }else{
-            plugin.active = true; 
-       }
-   };
-    // Websocket----------------------------------------
+           dashboard.webapi.disable(plugin.name, function(ret, err) {
+           plugin.runing = false;
+           if (ret) {
+                plugin.active = false;}});
+       } else {
+            dashboard.webapi.enable(plugin.name, function(ret, err) {
+            plugin.runing = false;
+            if (ret) {
+                plugin.active = true;}
+            });}
+        };
+
+   // Websocket----------------------------------------
 
     var Websocket = function() {
         this.modName = 'websocket';

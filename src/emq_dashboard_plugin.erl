@@ -20,16 +20,39 @@
 
 -include_lib("emqttd/include/emqttd.hrl").
 
--export([plugins/0]).
+-export([plugins/0,
+         enable/1,
+         disable/1]).
 
 -http_api({"plugins",  plugins,   []}).
+
+-http_api({"enable",  enable,   [{"plugin_name", atom}]}).
+
+-http_api({"disable",  disable,   [{"plugin_name", atom}]}).
 
 plugins() ->
     Plugins = lists:map(fun plugin/1, emqttd_plugins:list()),
     {ok, Plugins}.
 
-plugin(#mqtt_plugin{name = Name, version = Ver, descr = Descr, active = Active}) ->
+plugin(#mqtt_plugin{name = Name, version = Ver, descr = Descr,
+                    active = Active}) ->
     [{name, Name},
      {version, iolist_to_binary(Ver)},
      {description, iolist_to_binary(Descr)},
      {active, Active}].
+
+enable(PluginName) ->
+    case emqttd_plugins:load(PluginName) of
+        {ok, StartedApp} ->
+            {ok, success};
+        {error, _Reason} ->
+            {ok, fail}
+    end.
+
+disable(PluginName) ->
+    case emqttd_plugins:unload(PluginName) of
+        ok ->
+            {ok, success};
+        {error, _Reason} ->
+            {ok, fail}
+    end.

@@ -21,7 +21,7 @@
                             <th>Name</th>
                             <th>Version</th>
                             <th>Description</th>
-                            <th>status</th>
+                            <!-- <th>is_running</th> -->
                             <th>Operation</th>
                         </tr>
                     </thead>
@@ -31,9 +31,12 @@
                         <td>{{ plugin.name}}</td>
                         <td>{{ plugin.version}}</td>
                         <td>{{ plugin.description}}</td>
-                        <td>{{ plugin.active}}</td>
+                        <!-- <td>{{ plugin.active}}</td> -->
                         <td>
-                        <button type="button" class="btn btn-success btn-single" @click="update(plugin)">Load</button>
+                            <button type="button" class="btn btn-success btn-single"
+                                @click="update(plugin, this)" v-if="plugin.active==true">Enable</button>
+                            <button type="button" class="btn btn-gray btn-single"
+                                @click="update(plugin, this)" v-else>Disable</button>
                         </td>
                         </tr>
                     </tbody>

@@ -181,6 +181,7 @@ to_json([])   -> <<"[]">>;
 to_json(Data) -> iolist_to_binary(mochijson2:encode(Data)).
 
 format(string, S) -> S;
+format(atom, S) -> list_to_atom(S);
 format(binary, S) -> list_to_binary(S);
 format(int, S)    -> list_to_integer(S).
 
