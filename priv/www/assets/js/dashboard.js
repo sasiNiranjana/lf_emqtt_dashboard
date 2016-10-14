@@ -1164,18 +1164,27 @@
    Plugins.prototype.update = function(plugin, el) {
        var _this = this;
        var $btn = $(el);
+       if (plugin.runing) {
+            return;
+       }
        plugin.runing = true;
 
        if (plugin.active) {
            dashboard.webapi.disable(plugin.name, function(ret, err) {
            plugin.runing = false;
            if (ret && ret == "success") {
-                plugin.active = false;}});
+                plugin.active = false;
+           } else {
+               alert("Disable Fail, Please check background log!!");  
+           }});
        } else {
             dashboard.webapi.enable(plugin.name, function(ret, err) {
             plugin.runing = false;
             if (ret && ret == "success") {
-                plugin.active = true;}
+                plugin.active = true;
+            } else {
+               alert("Enable Fail, Please check background log!!");  
+            }
             });}
         };
 
