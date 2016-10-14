@@ -1169,12 +1169,12 @@
        if (plugin.active) {
            dashboard.webapi.disable(plugin.name, function(ret, err) {
            plugin.runing = false;
-           if (ret) {
+           if (ret && ret == "success") {
                 plugin.active = false;}});
        } else {
             dashboard.webapi.enable(plugin.name, function(ret, err) {
             plugin.runing = false;
-            if (ret) {
+            if (ret && ret == "success") {
                 plugin.active = true;}
             });}
         };
