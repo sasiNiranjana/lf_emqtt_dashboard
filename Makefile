@@ -2,9 +2,6 @@ PROJECT = emq_dashboard
 PROJECT_DESCRIPTION = EMQ Dashboard
 PROJECT_VERSION = 3.0
 
-DEPS = lager
-dep_lager  = git https://github.com/basho/lager
-
 LOCAL_DEPS = mnesia
 
 BUILD_DEPS = emqttd
