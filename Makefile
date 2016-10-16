@@ -1,11 +1,11 @@
 PROJECT = emq_dashboard
-PROJECT_DESCRIPTION = EMQ Dashboard
-PROJECT_VERSION = 3.0
+PROJECT_DESCRIPTION = Dashboard
+PROJECT_VERSION = 2.0
 
 LOCAL_DEPS = mnesia
 
 BUILD_DEPS = emqttd
-dep_emqttd = git https://github.com/emqtt/emqttd emq30
+dep_emqttd = git https://github.com/emqtt/emqttd emq20
 
 TEST_DEPS = cuttlefish
 dep_cuttlefish = git https://github.com/emqtt/cuttlefish

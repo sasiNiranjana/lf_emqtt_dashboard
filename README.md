@@ -2,7 +2,7 @@
 emq_dashboard
 =============
 
-Dashboard for EMQ Broker.
+Dashboard for the EMQ Broker.
 
 Build
 -----
@@ -36,3 +36,7 @@ Username: admin
 
 Password: public
 
+License
+-------
+
+Apache License Version 2.0
