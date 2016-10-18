@@ -15,9 +15,9 @@
 %%--------------------------------------------------------------------
 
 %% @doc Clients API.
--module(emqttd_dashboard_client).
+-module(emq_dashboard_client).
 
--include("emqttd_dashboard.hrl").
+-include("emq_dashboard.hrl").
 
 -include_lib("emqttd/include/emqttd.hrl").
 
@@ -32,11 +32,11 @@
 list(ClientId, PageNo, PageSize) when ?EMPTY_KEY(ClientId) ->
     TotalNum = ets:info(mqtt_client, size),
     Qh = qlc:q([R || R <- ets:table(mqtt_client)]),
-    emqttd_dashboard:query_table(Qh, PageNo, PageSize, TotalNum, fun row/1);
+    emq_dashboard:query_table(Qh, PageNo, PageSize, TotalNum, fun row/1);
 
 list(ClientId, PageNo, PageSize) ->
     Fun = fun() -> ets:lookup(mqtt_client, ClientId) end,
-    emqttd_dashboard:lookup_table(Fun, PageNo, PageSize, fun row/1).
+    emq_dashboard:lookup_table(Fun, PageNo, PageSize, fun row/1).
 
 row(#mqtt_client{client_id = ClientId,
                  peername = {IpAddr, Port},
@@ -52,5 +52,5 @@ row(#mqtt_client{client_id = ClientId,
      {clean_sess, CleanSess},
      {proto_ver, ProtoVer},
      {keepalive, KeepAlvie},
-     {connected_at, list_to_binary(emqttd_dashboard:strftime(ConnectedAt))}].
+     {connected_at, list_to_binary(emq_dashboard:strftime(ConnectedAt))}].
 

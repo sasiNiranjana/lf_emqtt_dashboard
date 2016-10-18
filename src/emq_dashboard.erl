@@ -14,7 +14,7 @@
 %% limitations under the License.
 %%--------------------------------------------------------------------
 
--module(emqttd_dashboard).
+-module(emq_dashboard).
 
 -import(proplists, [get_value/2]).
 
@@ -70,7 +70,7 @@ parse_arg({Arg, Type, Def}, Params) ->
     end.
 
 respond(Req, 401, Data) ->
-    Req:respond({401, [{"WWW-Authenticate", "Basic Realm=\"emqttd dashboard\""}], Data});
+    Req:respond({401, [{"WWW-Authenticate", "Basic Realm=\"emq dashboard\""}], Data});
 respond(Req, 404, Data) ->
     Req:respond({404, [{"Content-Type", "text/plain"}], Data});
 respond(Req, 200, Data) ->
@@ -163,7 +163,7 @@ authorized(Req) ->
     case Req:get_header_value("Authorization") of
         "Basic " ++ BasicAuth ->
             {Username, Password} = user_passwd(BasicAuth),
-            case emqttd_dashboard_admin:check(bin(Username), bin(Password)) of
+            case emq_dashboard_admin:check(bin(Username), bin(Password)) of
                 ok -> true;
                 {error, Reason} ->
                     lager:error("HTTP Auth failure: username=~s, reason=~p",
@@ -181,6 +181,7 @@ to_json([])   -> <<"[]">>;
 to_json(Data) -> iolist_to_binary(mochijson2:encode(Data)).
 
 format(string, S) -> S;
+format(atom, S) -> list_to_atom(S);
 format(binary, S) -> list_to_binary(S);
 format(int, S)    -> list_to_integer(S).
 

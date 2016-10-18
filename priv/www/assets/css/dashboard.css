@@ -34,6 +34,9 @@ a {
 .dash-icon-alarms {
   background-image: url(../imgs/alarms_d.png);
 }
+.dash-icon-plugins {
+  background-image: url(../imgs/plugins_d.png);
+}
 .dash-icon-clients {
   background-image: url(../imgs/clients_d.png);
 }
@@ -68,6 +71,9 @@ a {
 .sidebar-menu .main-menu a:hover .dash-icon-alarms{
   background-image: url(../imgs/alarms_h.png);
 }
+.sidebar-menu .main-menu a:hover .dash-icon-plugins{
+  background-image: url(../imgs/plugins_h.png);
+}
 .sidebar-menu .main-menu a:hover .dash-icon-clients {
   background-image: url(../imgs/clients_h.png);
 }
@@ -101,6 +107,9 @@ a {
 }
 .sidebar-menu .main-menu li.active > a .dash-icon-alarms {
   background-image: url(../imgs/alarms_h.png);
+}
+.sidebar-menu .main-menu li.active > a .dash-icon-plugins{
+  background-image: url(../imgs/plugins_h.png);
 }
 .sidebar-menu .main-menu li.active > a .dash-icon-clients {
   background-image: url(../imgs/clients_h.png);

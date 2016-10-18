@@ -15,9 +15,9 @@
 %%--------------------------------------------------------------------
 
 %% @doc Subscriptions API.
--module(emqttd_dashboard_subscription).
+-module(emq_dashboard_subscription).
 
--include("emqttd_dashboard.hrl").
+-include("emq_dashboard.hrl").
 
 -include_lib("emqttd/include/emqttd.hrl").
 
@@ -34,7 +34,7 @@
 list(ClientId, PageNo, PageSize) when ?EMPTY_KEY(ClientId) ->
     TotalNum = ets:info(?TAB, size),
     Qh = qlc:q([E || E <- ets:table(?TAB)]),
-    emqttd_dashboard:query_table(Qh, PageNo, PageSize, TotalNum, fun row/1);
+    emq_dashboard:query_table(Qh, PageNo, PageSize, TotalNum, fun row/1);
 
 list(ClientId, PageNo, PageSize) ->
     Keys = ets:lookup(mqtt_subscription, ClientId),
@@ -42,7 +42,7 @@ list(ClientId, PageNo, PageSize) ->
                             [R] = ets:lookup(?TAB, {T, S}), R 
                             end, Keys)
           end,
-    emqttd_dashboard:lookup_table(Fun, PageNo, PageSize, fun row/1).
+    emq_dashboard:lookup_table(Fun, PageNo, PageSize, fun row/1).
 
 row({{Topic, ClientId}, Qos}) ->
     [{clientid, ClientId}, {topic, Topic} | Qos].

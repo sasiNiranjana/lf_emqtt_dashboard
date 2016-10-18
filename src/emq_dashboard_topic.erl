@@ -15,9 +15,9 @@
 %%--------------------------------------------------------------------
 
 %% @doc Topic API.
--module(emqttd_dashboard_topic).
+-module(emq_dashboard_topic).
 
--include("emqttd_dashboard.hrl").
+-include("emq_dashboard.hrl").
 
 -include_lib("emqttd/include/emqttd.hrl").
 
@@ -32,11 +32,11 @@
 list(Topic, PageNo, PageSize) when ?EMPTY_KEY(Topic) ->
     TotalNum = mnesia:table_info(mqtt_topic, size),
     Qh = qlc:q([R || R <- mnesia:table(mqtt_topic)]),
-    mnesia:async_dirty(fun emqttd_dashboard:query_table/5, [Qh, PageNo, PageSize, TotalNum, fun row/1]);
+    mnesia:async_dirty(fun emq_dashboard:query_table/5, [Qh, PageNo, PageSize, TotalNum, fun row/1]);
 
 list(Topic, PageNo, PageSize) ->
     Fun = fun() -> mnesia:dirty_read(mqtt_topic, Topic) end,
-    emqttd_dashboard:lookup_table(Fun, PageNo, PageSize, fun row/1).
+    emq_dashboard:lookup_table(Fun, PageNo, PageSize, fun row/1).
 
 row(#mqtt_topic{topic = Topic,flags= Flags}) ->
     [{topic, Topic}, {flags, Flags}].

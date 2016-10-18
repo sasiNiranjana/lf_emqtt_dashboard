@@ -9,7 +9,8 @@ rel/example_project
 .concrete/DEV_MODE
 .rebar
 .erlang.mk/
-emqttd_dashboard.d
+emq_dashboard.d
 ct.coverdata
 logs/
 test/ct.cover.spec
+data/

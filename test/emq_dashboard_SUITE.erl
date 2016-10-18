@@ -1,4 +1,4 @@
--module(emqttd_dashboard_SUITE).
+-module(emq_dashboard_SUITE).
 
 -compile(export_all).
 
@@ -32,14 +32,12 @@ groups() ->
 init_per_suite(Config) ->
     DataDir = proplists:get_value(data_dir, Config),
     application:start(lager),
-    application:set_env(emqttd, conf, filename:join([DataDir, "emqttd.conf"])),
-    application:ensure_all_started(emqttd),
-    application:set_env(emqttd_dashboard, conf, filename:join([DataDir, "emqttd_dashboard.conf"])),
-    application:ensure_all_started(emqttd_dashboard),
+    peg_com(DataDir),
+    [start_apps(App, DataDir) || App <- [emqttd, emq_dashboard]],
     Config.
  
 end_per_suite(_Config) ->
-    application:stop(emqttd_dashboard),
+    application:stop(emq_dashboard),
     application:stop(emqttd),
     application:stop(esockd),
     application:stop(gproc),
@@ -75,7 +73,7 @@ bnode(_) ->
 get_alarms(_) ->
     AlarmTest = #mqtt_alarm{id = <<"1">>, severity = error, title="alarm title", summary="alarm summary"},
     emqttd_alarm:set_alarm(AlarmTest),
-    {ok, [Alarm]} = emqttd_dashboard_alarm:alarms(),
+    {ok, [Alarm]} = emq_dashboard_alarm:alarms(),
     ?assertEqual(error, proplists:get_value(severity, Alarm)).
 
 clients(_) ->
@@ -83,51 +81,51 @@ clients(_) ->
    
 clients_query(_) ->
     Sock = client_connect_(<<16,12,0,4,77,81,84,84,4,0,0,90,0,0>>, 4),
-    {ok, Entry} = emqttd_dashboard_client:list(<<>>, 1, 100),
+    {ok, Entry} = emq_dashboard_client:list(<<>>, 1, 100),
     Client = proplists:get_value(result, Entry),
     ClientId = proplists:get_value(clientId, Client), 
-    ?assertEqual({ok, Entry}, emqttd_dashboard_client:list(ClientId, 1, 100)),
+    ?assertEqual({ok, Entry}, emq_dashboard_client:list(ClientId, 1, 100)),
     gen_tcp:close(Sock).
 
 session_query(_) ->
     Sock = client_connect_(<<16,12,0,4,77,81,84,84,4,0,0,90,0,0>>, 4),
-    {ok, Entry} = emqttd_dashboard_session:list(<<>>, 1, 100),
+    {ok, Entry} = emq_dashboard_session:list(<<>>, 1, 100),
     Session= proplists:get_value(result, Entry),
     ClientId = proplists:get_value(clientId, Session), 
-    ?assertEqual({ok, Entry}, emqttd_dashboard_session:list(ClientId, 1, 100)),
+    ?assertEqual({ok, Entry}, emq_dashboard_session:list(ClientId, 1, 100)),
     gen_tcp:close(Sock).
 
 route_query(_) ->
     ok = emqttd:subscribe(<<"topic">>),
     timer:sleep(10),
-    {ok, Routes} = emqttd_dashboard_route:list(<<>>, 1, 100),
-    ?assertEqual({ok, Routes}, emqttd_dashboard_route:list(<<"topic">>, 1, 100)),
+    {ok, Routes} = emq_dashboard_route:list(<<>>, 1, 100),
+    ?assertEqual({ok, Routes}, emq_dashboard_route:list(<<"topic">>, 1, 100)),
     ok = emqttd:unsubscribe(<<"topic">>).
 
 subscribe_query(_) ->
     Sock = client_connect_(<<16,12,0,4,77,81,84,84,4,0,0,90,0,0>>, 4),
-    {ok, Entry} = emqttd_dashboard_subscription:list(<<>>, 1, 100),
+    {ok, Entry} = emq_dashboard_subscription:list(<<>>, 1, 100),
     Sub = proplists:get_value(result, Entry),
     ClientId = proplists:get_value(clientId, Sub), 
-    ?assertEqual({ok, Entry}, emqttd_dashboard_subscription:list(ClientId, 1, 100)),
+    ?assertEqual({ok, Entry}, emq_dashboard_subscription:list(ClientId, 1, 100)),
     gen_tcp:close(Sock).
 
 admins_add_delete(_) ->
-    emqttd_dashboard_user:add(<<"username">>, <<"password">>, <<"tag">>),
-    emqttd_dashboard_user:add(<<"username1">>, <<"password1">>, <<"tag1">>),
-    {ok, Admins} = emqttd_dashboard_user:users(),
+    emq_dashboard_user:add(<<"username">>, <<"password">>, <<"tag">>),
+    emq_dashboard_user:add(<<"username1">>, <<"password1">>, <<"tag1">>),
+    {ok, Admins} = emq_dashboard_user:users(),
     ?assertEqual([[{name, <<"username">>}, {tag, <<"tag">>}],
                   [{name, <<"username1">>}, {tag, <<"tag1">>}],
                   [{name, <<"admin">>}, {tag, <<"administrator">>}]],
                 Admins),
-    emqttd_dashboard_user:remover(<<"username1">>),
+    emq_dashboard_user:remover(<<"username1">>),
     ?assertEqual({ok, [[{name, <<"username">>}, {tag, <<"tag">>}],
                        [{name, <<"admin">>}, {tag, <<"administrator">>}]]}, 
-                emqttd_dashboard_user:users()),
-    emqttd_dashboard_user:update(<<"username">>, <<"pwd">>, <<"login">>),
+                emq_dashboard_user:users()),
+    emq_dashboard_user:update(<<"username">>, <<"pwd">>, <<"login">>),
     timer:sleep(10),
     ?assert(connect_dashbaord_(get, "api/brokers", auth_header_("username", "pwd"))),
-    emqttd_dashboard_user:remover(<<"username">>),
+    emq_dashboard_user:remover(<<"username">>),
     ?assertEqual(false, connect_dashbaord_(get, "api/brokers", auth_header_("username", "pwd"))).
 
 client_connect_(Packet, RecvSize) ->
@@ -168,3 +166,32 @@ connect_dashbaord_(Method, Api, Params, Auth) ->
     {ok, {{"HTTP/1.1", 404, "Object Not Found"}, _, []}} ->
         false
     end.
+
+start_apps(App, DataDir) ->
+    Schema = cuttlefish_schema:files([filename:join([DataDir, atom_to_list(App) ++ ".schema"])]),
+    Conf = conf_parse:file(filename:join([DataDir, atom_to_list(App) ++ ".conf"])),
+    NewConfig = cuttlefish_generator:map(Schema, Conf),
+    Vals = proplists:get_value(App, NewConfig),
+    [application:set_env(App, Par, Value) || {Par, Value} <- Vals],
+    application:ensure_all_started(App).
+
+peg_com(DataDir) ->
+    ParsePeg = file2(3, DataDir, "conf_parse.peg"),
+    neotoma:file(ParsePeg),
+    ParseErl = file2(3, DataDir, "conf_parse.erl"),
+    compile:file(ParseErl, []),
+
+    DurationPeg = file2(3, DataDir, "cuttlefish_duration_parse.peg"),
+    neotoma:file(DurationPeg),
+    DurationErl = file2(3, DataDir, "cuttlefish_duration_parse.erl"),
+    compile:file(DurationErl, []).
+    
+
+file2(Times, Dir, FileName) when Times < 1 ->
+    filename:join([Dir, "deps", "cuttlefish","src", FileName]);
+
+file2(Times, Dir, FileName) ->
+    Dir1 = filename:dirname(Dir),
+    file2(Times - 1, Dir1, FileName).
+
+

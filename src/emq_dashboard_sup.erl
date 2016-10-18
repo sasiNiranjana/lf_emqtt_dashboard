@@ -14,8 +14,7 @@
 %% limitations under the License.
 %%--------------------------------------------------------------------
 
-%% @doc emqttd dashboard supervisor.
--module(emqttd_dashboard_sup).
+-module(emq_dashboard_sup).
 
 -behaviour(supervisor).
 
@@ -32,9 +31,9 @@ start_link() ->
 
 init([]) ->
     {ok, { {one_for_all, 10, 100},
-           [?CHILD(emqttd_dashboard_admin)
-%%           ?CHILD(emqttd_meter_access),
-%%           ?CHILD(emqttd_meter_define)
+           [?CHILD(emq_dashboard_admin)
+%%           ?CHILD(emq_meter_access),
+%%           ?CHILD(emq_meter_define)
            ]
          } }.
 

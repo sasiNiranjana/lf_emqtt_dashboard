@@ -1,4 +1,4 @@
--module(emqttd_dashboard_cli_SUITE).
+-module(emq_dashboard_cli_SUITE).
 
 -include_lib("eunit/include/eunit.hrl").
 

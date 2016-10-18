@@ -142,7 +142,18 @@
             this._ajax('api/alarms', null, callback);
         },
 
-
+         // plugins 
+        plugins: function(callback) {
+            this._ajax('api/plugins', null, callback);
+        },
+        // plugins enable 
+        enable: function(name, callback) {
+            this._ajax('api/enable', {plugin_name : name}, callback);
+        },
+        // plugins disable 
+        disable: function(name, callback) {
+            this._ajax('api/disable', {plugin_name : name}, callback);
+        },
         // users
         users : function(callback) {
             this._ajax('api/users', null, callback);
@@ -1110,6 +1121,74 @@
         });
     };
 
+    // Plugins-------------------------------------
+
+    var Plugins = function() {
+        this.modName = 'plugins';
+        this.$html = $('#dashboard_plugins',
+                sog.mainCenter.$html);
+        this._init();
+    };
+    Plugins.prototype._init = function() {
+        var _this = this;
+        loading('plugins.html', function() {
+            _this.vmPlugins = new Vue({
+                el  : $('#plugins_list', _this.$html)[0],
+                data: {
+                    plugins: []
+                },
+                methods : {
+                    update: function(plugin, el) {
+                        _this.update(plugin, el);
+                    }
+                }
+            });
+            
+            _this.list();
+        }, _this.$html);
+    };
+    Plugins.prototype.show = function() {
+        this.$html.show();
+    };
+    Plugins.prototype.hide = function() {
+        this.$html.hide();
+    };
+    Plugins.prototype.list = function() {
+        var _this = this;
+        dashboard.webapi.plugins(function(ret, err) {
+            if (ret) {
+                _this.vmPlugins.plugins= ret;
+            }
+        });
+    };
+    Plugins.prototype.update = function(plugin, el) {
+        var _this = this;
+        var $btn = $(el);
+        if (plugin.runing) {
+            return;
+        }
+        plugin.runing = true;
+
+        if (plugin.active) {
+            dashboard.webapi.disable(plugin.name, function(ret, err) {
+                 plugin.runing = false;
+                 if (ret && ret.active == true) {
+                     plugin.active = false;
+                 } else {
+                     alert("Stop Fail, Please check background log!!");  
+                 }
+            });
+        } else {
+             dashboard.webapi.enable(plugin.name, function(ret, err) {
+                 plugin.runing = false;
+                 if (ret && ret.active == true) {
+                     plugin.active = true;
+                 } else {
+                     alert("Start Fail, Please check background log!!");                
+                 }
+             });
+        }
+    };
 
     // Websocket----------------------------------------
 
@@ -1135,7 +1214,7 @@
                         password : null,
                         keepAlive: null,
                         cleanSession : true,
-                        useSSL : true
+                        useSSL : false 
                     },
                     subInfo : {
                         topic : '/world',
@@ -1169,6 +1248,9 @@
         }, _this.$html);
     };
     Websocket.prototype.show = function() {
+        if (this.client && !this.client.isConnected()) {
+            this.disconnect();
+        }
         this.$html.show();
     };
     Websocket.prototype.hide = function() {
@@ -1192,6 +1274,7 @@
             if (responseObject.errorCode !== 0) {
                 console.log("onConnectionLost: " + responseObject.errorMessage);
             }
+            _this.disconnect();
         }
         // called when a message arrives
         _this.client.onMessageArrived = function(message) {
@@ -1230,7 +1313,10 @@
     };
     Websocket.prototype.disconnect = function() {
         var _this = this;
-        _this.client.disconnect();
+        if (_this.client && _this.client.isConnected()) {
+            _this.client.disconnect();
+            _this.client = null;
+        }
         console.log("The client disconnect success.");
         _this.vmWS.connState = false;
     };
@@ -1567,7 +1653,7 @@
             }
             modules.subscriptions.show();
             break;
-     case 'alarms':
+        case 'alarms':
             if (!modules.alarms) {
                 modules.alarms= new Alarms();
             } else {
@@ -1575,7 +1661,14 @@
             }
             modules.alarms.show();
             break;
-
+        case 'plugins':
+            if (!modules.plugins) {
+                modules.plugins= new Plugins();
+            } else {
+                modules.plugins.list();
+            }
+            modules.plugins.show();
+            break;
         case 'websocket':
             if (!modules.websocket) {
                 modules.websocket = new Websocket();
@@ -1585,6 +1678,8 @@
         case 'users':
             if (!modules.users) {
                 modules.users = new Users();
+            } else {
+                modules.users.list();
             }
             modules.users.show();
             break;

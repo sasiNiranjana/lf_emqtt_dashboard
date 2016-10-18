@@ -1,15 +1,14 @@
-PROJECT = emqttd_dashboard
-PROJECT_DESCRIPTION = emqttd Web Dashboard
+PROJECT = emq_dashboard
+PROJECT_DESCRIPTION = Dashboard
 PROJECT_VERSION = 2.0
-
-DEPS = lager gen_conf
-dep_lager    = git https://github.com/basho/lager
-dep_gen_conf = git https://github.com/emqtt/gen_conf
 
 LOCAL_DEPS = mnesia
 
 BUILD_DEPS = emqttd
-dep_emqttd = git https://github.com/emqtt/emqttd master
+dep_emqttd = git https://github.com/emqtt/emqttd emq20
+
+TEST_DEPS = cuttlefish
+dep_cuttlefish = git https://github.com/emqtt/cuttlefish
 
 ERLC_OPTS += +'{parse_transform, lager_transform}'
 
@@ -19,3 +18,5 @@ include erlang.mk
 
 app:: rebar.config
 
+app.config::
+	cuttlefish -l info -e etc/ -c etc/emq_dashboard.conf -i priv/emq_dashboard.schema -d data

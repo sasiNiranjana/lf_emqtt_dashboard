@@ -13,9 +13,8 @@
 %% See the License for the specific language governing permissions and
 %% limitations under the License.
 %%--------------------------------------------------------------------
-%% @doc emqttd_dashboard user Command
 
--module(emqttd_dashboard_cli).
+-module(emq_dashboard_cli).
 
 -include_lib("emqttd/include/emqttd_cli.hrl").
 
@@ -28,7 +27,7 @@ admins(["add", Username, Password]) ->
     admins(["add", Username, Password, ""]);
 
 admins(["add", Username, Password, Tag]) ->
-    case emqttd_dashboard_admin:add_user(bin(Username), bin(Password), bin(Tag)) of
+    case emq_dashboard_admin:add_user(bin(Username), bin(Password), bin(Tag)) of
         ok ->
             ?PRINT_MSG("ok~n");
         {error, already_existed} ->
@@ -38,11 +37,11 @@ admins(["add", Username, Password, Tag]) ->
     end;
 
 admins(["passwd", Username, Password]) ->
-    Status  = emqttd_dashboard_admin:change_password(bin(Username), bin(Password)),
+    Status  = emq_dashboard_admin:change_password(bin(Username), bin(Password)),
     ?PRINT("~p~n", [Status]);
 
 admins(["del", Username]) ->
-    Status  = emqttd_dashboard_admin:remove_user(bin(Username)),
+    Status  = emq_dashboard_admin:remove_user(bin(Username)),
     ?PRINT("~p~n", [Status]);
 
 admins(_) ->

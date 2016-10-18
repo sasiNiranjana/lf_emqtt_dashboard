@@ -28,7 +28,7 @@
                     <tbody>
                         <tr v-for="alarm in alarms">
                         <td>
-                        <span v-show="alarm.severity == 'credential'" class="badge badge-danger">{{ alarm.severity}}</span>
+                        <span v-show="alarm.severity == 'critical'" class="badge badge-danger">{{ alarm.severity}}</span>
 
                         <span v-show="alarm.severity == 'warning'" class="badge badge-warning"> {{ alarm.severity}}</span>
                         

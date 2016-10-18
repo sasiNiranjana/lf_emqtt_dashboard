@@ -15,11 +15,11 @@
 %%--------------------------------------------------------------------
 
 %% @doc Web dashboard admin authentication with username and password.
--module(emqttd_dashboard_admin).
+-module(emq_dashboard_admin).
 
 -behaviour(gen_server).
 
--include("emqttd_dashboard.hrl").
+-include("emq_dashboard.hrl").
 
 %% API Function Exports
 -export([start_link/0]).
