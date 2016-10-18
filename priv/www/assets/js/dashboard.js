@@ -1172,19 +1172,19 @@
         if (plugin.active) {
             dashboard.webapi.disable(plugin.name, function(ret, err) {
                  plugin.runing = false;
-                 if (ret && ret == "success") {
+                 if (ret && ret.active == true) {
                      plugin.active = false;
                  } else {
-                     alert("Disable Fail, Please check background log!!");  
+                     alert("Stop Fail, Please check background log!!");  
                  }
             });
         } else {
              dashboard.webapi.enable(plugin.name, function(ret, err) {
                  plugin.runing = false;
-                 if (ret && ret == "success") {
+                 if (ret && ret.active == true) {
                      plugin.active = true;
                  } else {
-                     alert("Enable Fail, Please check background log!!");                
+                     alert("Start Fail, Please check background log!!");                
                  }
              });
         }

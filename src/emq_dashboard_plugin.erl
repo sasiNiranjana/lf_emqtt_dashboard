@@ -44,15 +44,15 @@ plugin(#mqtt_plugin{name = Name, version = Ver, descr = Descr,
 enable(PluginName) ->
     case emqttd_plugins:load(PluginName) of
         {ok, StartedApp} ->
-            {ok, success};
-        {error, _Reason} ->
-            {ok, fail}
+            {ok, [{active, true}]};
+        {error, Reason} ->
+            {ok, [{active, false}]}
     end.
 
 disable(PluginName) ->
     case emqttd_plugins:unload(PluginName) of
         ok ->
-            {ok, success};
-        {error, _Reason} ->
-            {ok, fail}
+            {ok, [{active, true}]};
+        {error, Reason} ->
+            {ok, [{active, false}]}
     end.

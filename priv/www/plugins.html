@@ -21,8 +21,8 @@
                             <th>Name</th>
                             <th>Version</th>
                             <th>Description</th>
-                            <!-- <th>is_running</th> -->
                             <th>Operation</th>
+                            <th>status</th>
                         </tr>
                     </thead>
 
@@ -31,12 +31,19 @@
                         <td>{{ plugin.name}}</td>
                         <td>{{ plugin.version}}</td>
                         <td>{{ plugin.description}}</td>
-                        <!-- <td>{{ plugin.active}}</td> -->
                         <td>
-                            <button type="button" class="btn btn-single" v-bind:class="{'btn-success': plugin.active ? true : false, 'btn-gray': plugin.active ? false : true}" @click="update(plugin, this)" v-bind:disabled="plugin.name == 'emq_dashboard'">                                       <template v-if="plugin.active==true">Enable</template>
-                             <template v-else>Disable</template>
+                            <button type="button" class="btn btn-single btn-gray" @click="update(plugin, this)" v-bind:disabled="plugin.name == 'emq_dashboard'"> 
+                            <template v-if="plugin.active==true">Stop</template>
+                            <template v-else>Start</template>
                             </button>
-                            </td>
+                           <!-- <button type="button" class="btn btn-single" v-bind:class="{'btn-success': plugin.active ? true : false, 'btn-gray': plugin.active ? false : true}" @click="update(plugin, this)" v-bind:disabled="plugin.name == 'emq_dashboard'">                                       <template v-if="plugin.active==true">Enable</template>
+                             <template v-else>Disable</template>
+                         </button> -->
+                        </td>
+                        <td>
+                            <span v-show="plugin.active == true" class="badge badge-success">Running</span>
+                            <span v-show="plugin.active == false">Stoped</span>
+                        </td>
                         </tr>
                     </tbody>
                 </table>
