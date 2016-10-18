@@ -1161,34 +1161,36 @@
             }
         });
     };
-   Plugins.prototype.update = function(plugin, el) {
-       var _this = this;
-       var $btn = $(el);
-       if (plugin.runing) {
+    Plugins.prototype.update = function(plugin, el) {
+        var _this = this;
+        var $btn = $(el);
+        if (plugin.runing) {
             return;
-       }
-       plugin.runing = true;
+        }
+        plugin.runing = true;
 
-       if (plugin.active) {
-           dashboard.webapi.disable(plugin.name, function(ret, err) {
-           plugin.runing = false;
-           if (ret && ret == "success") {
-                plugin.active = false;
-           } else {
-               alert("Disable Fail, Please check background log!!");  
-           }});
-       } else {
-            dashboard.webapi.enable(plugin.name, function(ret, err) {
-            plugin.runing = false;
-            if (ret && ret == "success") {
-                plugin.active = true;
-            } else {
-               alert("Enable Fail, Please check background log!!");  
-            }
-            });}
-        };
+        if (plugin.active) {
+            dashboard.webapi.disable(plugin.name, function(ret, err) {
+                 plugin.runing = false;
+                 if (ret && ret == "success") {
+                     plugin.active = false;
+                 } else {
+                     alert("Disable Fail, Please check background log!!");  
+                 }
+            });
+        } else {
+             dashboard.webapi.enable(plugin.name, function(ret, err) {
+                 plugin.runing = false;
+                 if (ret && ret == "success") {
+                     plugin.active = true;
+                 } else {
+                     alert("Enable Fail, Please check background log!!");                
+                 }
+             });
+        }
+    };
 
-   // Websocket----------------------------------------
+    // Websocket----------------------------------------
 
     var Websocket = function() {
         this.modName = 'websocket';
@@ -1212,7 +1214,7 @@
                         password : null,
                         keepAlive: null,
                         cleanSession : true,
-                        useSSL : true
+                        useSSL : false 
                     },
                     subInfo : {
                         topic : '/world',
@@ -1246,6 +1248,9 @@
         }, _this.$html);
     };
     Websocket.prototype.show = function() {
+        if (this.client && !this.client.isConnected()) {
+            this.disconnect();
+        }
         this.$html.show();
     };
     Websocket.prototype.hide = function() {
@@ -1269,6 +1274,7 @@
             if (responseObject.errorCode !== 0) {
                 console.log("onConnectionLost: " + responseObject.errorMessage);
             }
+            _this.disconnect();
         }
         // called when a message arrives
         _this.client.onMessageArrived = function(message) {
@@ -1307,7 +1313,10 @@
     };
     Websocket.prototype.disconnect = function() {
         var _this = this;
-        _this.client.disconnect();
+        if (_this.client && _this.client.isConnected()) {
+            _this.client.disconnect();
+            _this.client = null;
+        }
         console.log("The client disconnect success.");
         _this.vmWS.connState = false;
     };

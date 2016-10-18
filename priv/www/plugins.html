@@ -33,14 +33,10 @@
                         <td>{{ plugin.description}}</td>
                         <!-- <td>{{ plugin.active}}</td> -->
                         <td>
-                            <button type="button" class="btn btn-single" v-bind:class="{'btn-success': plugin.active ? true : false, 'btn-gry': plugin.active ? false : true}" @click="update(plugin, this)" v-bind:disabled="plugin.name == 'emq_dashboard'">                                       <template v-if="plugin.active==true">Enable</template>
+                            <button type="button" class="btn btn-single" v-bind:class="{'btn-success': plugin.active ? true : false, 'btn-gray': plugin.active ? false : true}" @click="update(plugin, this)" v-bind:disabled="plugin.name == 'emq_dashboard'">                                       <template v-if="plugin.active==true">Enable</template>
                              <template v-else>Disable</template>
                             </button>
-                            <!-- <button type="button" class="btn btn-success btn-single"
-                                @click="update(plugin, this)" v-if="plugin.active==true">Enable</button>
-                            <button type="button" class="btn btn-gray btn-single"
-                                @click="update(plugin, this)" v-else>Disable</button> -->
-                        </td>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
