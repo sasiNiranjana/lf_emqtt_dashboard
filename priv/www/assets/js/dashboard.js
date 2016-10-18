@@ -1678,6 +1678,8 @@
         case 'users':
             if (!modules.users) {
                 modules.users = new Users();
+            } else {
+                modules.users.list();
             }
             modules.users.show();
             break;
