@@ -44,6 +44,7 @@ list(ClientId, PageNo, PageSize) ->
           end,
     emq_dashboard:lookup_table(Fun, PageNo, PageSize, fun row/1).
 
-row({{Topic, ClientId}, Qos}) ->
-    [{clientid, ClientId}, {topic, Topic} | Qos].
+row({{Topic, ClientId}, Option}) ->
+    Qos = proplists:get_value(qos, Option),
+    [{clientid, ClientId}, {topic, Topic}, {qos, Qos}].
 
