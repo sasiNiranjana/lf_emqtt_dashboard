@@ -44,6 +44,9 @@ list(ClientId, PageNo, PageSize) ->
           end,
     emq_dashboard:lookup_table(Fun, PageNo, PageSize, fun row/1).
 
+row({{Topic, ClientId}, [Qos, local]}) ->
+    [{clientid, ClientId}, {topic, Topic}, Qos];
+
 row({{Topic, ClientId}, Qos}) ->
     [{clientid, ClientId}, {topic, Topic} | Qos].
 
