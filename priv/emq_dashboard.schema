@@ -67,8 +67,8 @@
                         {keyfile,    cuttlefish:conf_get(Prefix ++ ".keyfile", Conf, undefined)},
                         {certfile,   cuttlefish:conf_get(Prefix ++ ".certfile", Conf, undefined)},
                         {cacertfile, cuttlefish:conf_get(Prefix ++ ".cacertfile", Conf, undefined)},
-                        {verify,     cuttlefish:conf_get(Prefix ++ ".verify_peer", Conf, undefined)},
-                        {fail_if_no_peer_cert, cuttlefish:conf_get(Prefix ++ "fail_if_no_peer_cert", Conf, undefined)}])
+                        {verify,     cuttlefish:conf_get(Prefix ++ ".verify", Conf, undefined)},
+                        {fail_if_no_peer_cert, cuttlefish:conf_get(Prefix ++ ".fail_if_no_peer_cert", Conf, undefined)}])
               end,
   lists:append([
       case cuttlefish:conf_get("dashboard.listener.http", Conf, undefined) of
