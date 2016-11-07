@@ -39,6 +39,7 @@
 						<th>ClientId</th>
 						<th>CleanSess</th>
 						<th>MaxInflight</th>
+						<th>InflightQueue</th>
 						<th>MessageQueue</th>
 						<th>MessageDropped</th>
 						<th>AwaitingRel</th>
@@ -53,6 +54,7 @@
                     <td>{{ session.clientId }}</td>
                     <td>{{ session.clean_sess }}</td>
                     <td>{{ session.max_inflight }}</td>
+	            <td>{{ session.inflight_queue }}</td>
                     <td>{{ session.message_queue }}</td>
                     <td>{{ session.message_dropped }}</td>
                     <td>{{ session.awaiting_rel }}</td>
