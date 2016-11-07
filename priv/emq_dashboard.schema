@@ -52,7 +52,7 @@
   {datatype, string}
 ]}.
 
-{mapping, "dashboard.listener.https.failed_if_no_peer_cert", "emq_dashboard.listeners", [
+{mapping, "dashboard.listener.https.fail_if_no_peer_cert", "emq_dashboard.listeners", [
   {datatype, {enum, [true, false]}}
 ]}.
 
@@ -63,12 +63,12 @@
                      {max_clients, cuttlefish:conf_get(Prefix ++ ".max_clients", Conf)}])
          end,
   SslOpts = fun(Prefix) ->
-                Filter([{handshake_timeout, cuttlefish:conf_get(Prefix ++ ".handshake_timeout", Conf)},
+                Filter([{handshake_timeout, cuttlefish:conf_get(Prefix ++ ".handshake_timeout", Conf) * 1000},
                         {keyfile,    cuttlefish:conf_get(Prefix ++ ".keyfile", Conf, undefined)},
                         {certfile,   cuttlefish:conf_get(Prefix ++ ".certfile", Conf, undefined)},
                         {cacertfile, cuttlefish:conf_get(Prefix ++ ".cacertfile", Conf, undefined)},
-                        {verify,     cuttlefish:conf_get(Prefix ++ ".verify_peer", Conf, undefined)},
-                        {failed_if_no_peer_cert, cuttlefish:conf_get(Prefix ++ "failed_if_no_peer_cert", Conf, undefined)}])
+                        {verify,     cuttlefish:conf_get(Prefix ++ ".verify", Conf, undefined)},
+                        {fail_if_no_peer_cert, cuttlefish:conf_get(Prefix ++ ".fail_if_no_peer_cert", Conf, undefined)}])
               end,
   lists:append([
       case cuttlefish:conf_get("dashboard.listener.http", Conf, undefined) of
