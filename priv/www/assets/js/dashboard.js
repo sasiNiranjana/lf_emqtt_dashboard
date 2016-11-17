@@ -1242,6 +1242,9 @@
                     },
                     send : function() {
                         _this.sendMessage();
+                    },
+                    sslPort :function() {
+                        _this.sslPort();
                     }
                 }
             });
@@ -1261,6 +1264,14 @@
                 this.vmWS.cInfo.host,
                 Number(this.vmWS.cInfo.port),
                 this.vmWS.cInfo.clientId);
+    };
+    Websocket.prototype.sslPort = function() {
+        var useSSL = this.vmWS.cInfo.useSSL;
+        if (useSSL) {
+            this.vmWS.cInfo.port = 8084
+        } else {
+            this.vmWS.cInfo.port = 8083
+        }
     };
     Websocket.prototype.connect = function() {
         var _this = this;
