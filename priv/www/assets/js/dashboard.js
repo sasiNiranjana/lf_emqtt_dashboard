@@ -1288,8 +1288,11 @@
                 console.log("The client connect success.");
                 _this.vmWS.connState = true;
             },
-            onFailure : function() {
-                console.log("The client connect failure.");
+            onFailure : function(err) {
+                alert("The client connect failure " + err.errorMessage);  
+               // console.log("==========." + err.errorMessage);
+               // console.log("==========." + JSON.stringify(err));
+               //console.log("The client connect failure.");
                 _this.vmWS.connState = false;
             }
         };
