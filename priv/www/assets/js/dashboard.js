@@ -1352,6 +1352,10 @@
     Websocket.prototype.sendMessage = function() {
         var _this = this;
         var text = _this.vmWS.sendInfo.text;
+        if (!_this.client || !_this.client.isConnected()) {
+            alert('The client does not connect to the broker');
+            return;
+        }
         if (!_this.vmWS.sendInfo.topic) {
             alert('Please fill in the message topic.');
             return;
