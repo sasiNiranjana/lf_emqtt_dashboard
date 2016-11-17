@@ -1325,17 +1325,30 @@
     };
     Websocket.prototype.subscribe = function() {
         var _this = this;
+        if (!_this.client || !_this.client.isConnected()) {
+            alert('The client does not connect to the broker');
+            return;
+        }
         if (!_this.vmWS.subInfo.topic) {
             alert('Please subscribe to the topic.');
             return;
         }
         this.client.subscribe(_this.vmWS.subInfo.topic, {
-            qos : Number(_this.vmWS.subInfo.qos)
+            qos : Number(_this.vmWS.subInfo.qos),
+            onSuccess : function(msg) {
+                console.log(JSON.stringify(msg));
+                _this.vmWS.subInfo.time = (new Date()).format("yyyy-MM-dd hh:mm:ss");
+                _this.vmWS.subscriptions.push(_this.vmWS.subInfo);
+                _this.vmWS.subInfo = {qos : _this.vmWS.subInfo.qos};
+            },
+            onFailure : function(err) {
+                if (err.errorCode[0] == 128) {
+                    alert('The topic cannot SUBSCRIBE for ACL Deny');
+                    console.log(JSON.stringify(err));
+                }
+            }
         });
-        this.vmWS.subInfo.time = (new Date()).format("yyyy-MM-dd hh:mm:ss");
-        this.vmWS.subscriptions.push(this.vmWS.subInfo);
-        this.vmWS.subInfo = {qos : _this.vmWS.subInfo.qos};
-    };
+           };
     Websocket.prototype.sendMessage = function() {
         var _this = this;
         var text = _this.vmWS.sendInfo.text;
