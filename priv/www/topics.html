@@ -35,14 +35,14 @@
                     <thead>
                         <tr>
                             <th>Topic</th>
-                            <th>Flags</th>
+                            <th>SubTopicCount</th>
                         </tr>
                     </thead>
 
                     <tbody>
                         <tr v-for="topic in topics">
                         <td>{{ topic.topic }}</td>
-                        <td>{{ topic.flags }}</td>
+                        <td> <a @click="topic_sub(topic.topic)">{{ topic.count }}</a></td>
                         </tr>
                     </tbody>
                 </table>
@@ -51,9 +51,9 @@
         
         <div class="row">
             <div class="col-sm-6">showing 
-                <span id="topics_count_start">{{ pageInfo.offsetting() }}</span> - 
-                <span id="topics_count_end">{{ pageInfo.endNum() }}</span> of 
-                <span id="topics_count_all">{{ pageInfo.totalNum }}</span> records
+                <span>{{ pageInfo.offsetting() }}</span> - 
+                <span>{{ pageInfo.endNum() }}</span> of 
+                <span>{{ pageInfo.totalNum }}</span> records
             </div>
             <div class="col-sm-6">
                 <div class="pull-right" id="pagination">
@@ -94,3 +94,4 @@
 
     </div>
 </div>
+

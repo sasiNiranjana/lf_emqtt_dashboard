@@ -895,6 +895,9 @@
                     topics : []
                 },
                 methods : {
+                    topic_sub: function(topic) {
+                        openModule('subscriptions', topic);
+                    },
                     search : function() {
                         _this.list();
                     },
@@ -1017,20 +1020,20 @@
 
     // Subscriptions-------------------------------------
 
-    var Subscriptions = function() {
+    var Subscriptions = function(keyword) {
         this.modName = 'subscriptions';
         this.$html = $('#dashboard_subscriptions',
                 sog.mainCenter.$html);
         this.pageInfo = new PageInfo(1, 100, 0);
-        this._init();
+        this._init(keyword);
     };
-    Subscriptions.prototype._init = function() {
+    Subscriptions.prototype._init = function(keyword) {
         var _this = this;
         loading('subscriptions.html', function() {
             _this.vmSubs = new Vue({
                 el  : $('#subscriptions_list', _this.$html)[0],
                 data: {
-                    clientKey : null,
+                    clientKey : keyword,
                     pageInfo : _this.pageInfo,
                     subscriptions : []
                 },
@@ -1053,10 +1056,10 @@
             _this.list();
         }, _this.$html);
     };
-    Subscriptions.prototype.clear = function(){
+    Subscriptions.prototype.clear = function(keyword){
         var _this = this;
         _this.pageInfo = new PageInfo(1, 100, 0);
-        _this.vmSubs.clientKey = null;
+        _this.vmSubs.clientKey = keyword;
     };
     Subscriptions.prototype.show = function() {
         this.$html.show();
@@ -1622,7 +1625,7 @@
             }
         });
     };
-    var openModule = function(modName) {
+    var openModule = function(modName, keyword) {
         hideAllMods();
         activeMenu(modName);
 
@@ -1677,9 +1680,9 @@
             break;
         case 'subscriptions':
             if (!modules.subscriptions) {
-                modules.subscriptions = new Subscriptions();
+                modules.subscriptions = new Subscriptions(keyword);
             } else {
-                modules.subscriptions.clear();
+                modules.subscriptions.clear(keyword);
                 modules.subscriptions.list();
             }
             modules.subscriptions.show();
