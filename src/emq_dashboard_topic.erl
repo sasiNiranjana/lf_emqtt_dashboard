@@ -38,6 +38,11 @@ list(Topic, PageNo, PageSize) ->
     Fun = fun() -> mnesia:dirty_read(mqtt_topic, Topic) end,
     emq_dashboard:lookup_table(Fun, PageNo, PageSize, fun row/1).
 
-row(#mqtt_topic{topic = Topic,flags= Flags}) ->
-    [{topic, Topic}, {flags, Flags}].
+row(#mqtt_topic{topic = Topic, flags= _Flags}) ->
+    Count = topic_subCount(Topic),
+    [{topic, Topic}, {count, length(Count)}].
+
+topic_subCount(Topic) ->
+    MP = {{Topic, '_'}, '_'},
+    ets:match_object(mqtt_subproperty, MP).
 

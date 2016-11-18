@@ -31,17 +31,24 @@
                                    {"curr_page",  int, 1},
                                    {"page_size",  int, 100}]}).
 
-list(ClientId, PageNo, PageSize) when ?EMPTY_KEY(ClientId) ->
+list(Key, PageNo, PageSize) when ?EMPTY_KEY(Key) ->
     TotalNum = ets:info(?TAB, size),
     Qh = qlc:q([E || E <- ets:table(?TAB)]),
     emq_dashboard:query_table(Qh, PageNo, PageSize, TotalNum, fun row/1);
 
-list(ClientId, PageNo, PageSize) ->
-    Keys = ets:lookup(mqtt_subscription, ClientId),
-    Fun = fun() ->lists:map(fun({S, T}) ->
-                            [R] = ets:lookup(?TAB, {T, S}), R 
-                            end, Keys)
-          end,
+list(Key, PageNo, PageSize) ->
+    Keys = ets:lookup(mqtt_subscription, Key),
+    Fun = 
+    case length(Keys) == 0 of
+    true ->
+        MP = {{Key, '_'}, '_'},
+        fun() -> ets:match_object(mqtt_subproperty, MP) end;
+    false ->
+        fun() ->
+        lists:map(fun({S, T}) ->[R] = ets:lookup(?TAB, {T, S}), R 
+                  end, Keys)
+        end
+    end,
     emq_dashboard:lookup_table(Fun, PageNo, PageSize, fun row/1).
 
 row({{Topic, ClientId}, Option}) ->
