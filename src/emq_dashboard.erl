@@ -126,7 +126,7 @@ total_page(TotalNum, PageSize) ->
 %%TODO: refactor later...
 lookup_table(LookupFun, PageNo, PageSize, RowFun) ->
     Rows = LookupFun(), TotalNum = length(Rows),
-    io:format("~p\n",[Rows]),
+  %  io:format("~p\n",[Rows]),
     {ok, [{currentPage, PageNo}, {pageSize, PageSize},
           {totalNum, TotalNum},
           {totalPage, total_page(TotalNum, PageSize)},
