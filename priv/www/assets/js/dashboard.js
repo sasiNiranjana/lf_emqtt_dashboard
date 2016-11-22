@@ -56,6 +56,9 @@
             dataType : options.dataType,
             cache    : options.cache,
             success  : function(ret) {
+                if (!callback) {
+                    return;
+                }
                 if ((path == 'api/remove_user'
                     || path == 'api/add_user')
                         && typeof ret == 'object'
@@ -187,12 +190,11 @@
 
         // logout
         logout : function(callback) {
-            this._ajax('api/current_user', null, callback, {
+            this._ajax('api/logout', null, callback, {
                 headers: {
-                    "Authorization": "Lougout 123456789"
+                    "Authorization": "Logout 123456789"
                 }
             });
-            // clearAuthenticate();
         },
 
         // routes
@@ -1617,13 +1619,15 @@
 
 
     var clearAuth = function() {
+        if (modules.overview) {
+            window.clearInterval(modules.overview.timertask);
+        }
         dashboard.webapi.logout(function(ret, err) {
-            if (ret) {
-                window.location.href = '/';
-            } else {
-                window.location.href = '/';
-            }
+            window.location.href = '/';
         });
+        window.setTimeout(function() {
+            window.location.href = '/';
+        }, 800);
     };
     var openModule = function(modName, keyword) {
         hideAllMods();
