@@ -83,15 +83,18 @@ respond(Req, Code, Data) ->
 %%--------------------------------------------------------------------
 
 handle_request(Req, State) ->
-    if_authorized(Req, fun() -> Path = Req:get(path), handle_request(Path, Req, State) end).
-
+    Path = Req:get(path), 
+    case Path of
+        "/api/logout" ->
+            respond(Req, 401, []);
+        _ -> 
+            if_authorized(Req, fun() -> handle_request(Path, Req, State) end)
+    end.
+    
 handle_request("/api/current_user", Req, _State) ->
     "Basic " ++ BasicAuth =  Req:get_header_value("Authorization"),
     {Username, _Password} = user_passwd(BasicAuth),
     respond(Req, 200, [{username, bin(Username)}]);
-
-handle_request("/api/logout", Req, _State) ->
-    respond(Req, 401, []);
 
 handle_request("/api/" ++ Name, Req, #state{dispatch = Dispatch}) ->
     Params = params(Req),
