@@ -48,7 +48,8 @@ mnesia(boot) ->
                 {attributes, record_info(fields, mqtt_admin)}]);
 mnesia(copy) ->
     emqttd_mnesia:copy_table(mqtt_admin),
-    mnesia:change_table_copy_type(mqtt_admin, node(), disc_copies).
+    mnesia:change_table_copy_type(mqtt_admin, node(), disc_copies),
+    mnesia:clear_table(mqtt_admin).
 
 
 -spec(start_link() -> {ok, pid()} | ignore | {error, any()}).
