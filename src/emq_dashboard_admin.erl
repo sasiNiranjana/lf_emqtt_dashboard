@@ -134,7 +134,7 @@ init([]) ->
                 {disc_copies, [node()]},
                 {record_name, mqtt_admin},
                 {attributes, record_info(fields, mqtt_admin)}]),
-    ok = emqttd_mnesia:copy_table(mqtt_admin, disc_copies),
+    ok = emqttd_mnesia:copy_table(mqtt_admin),
     %% Wait???
     %% mnesia:wait_for_tables([mqtt_admin], 5000),
     % Init mqtt_admin table
