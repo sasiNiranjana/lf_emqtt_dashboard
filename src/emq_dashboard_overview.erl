@@ -67,7 +67,11 @@ cpu() ->
     {ok, emqttd_vm:loads()}.
 
 nodes_info() ->
-    {ok, [rpc:call(Node, ?MODULE, node_info, []) || Node <- [node() | nodes()]]}.
+    Running = mnesia:system_info(running_db_nodes),
+    Stopped = mnesia:system_info(db_nodes) -- Running,
+    DownNodes = lists:map(fun netsplit/1, Stopped),
+    {ok, [rpc:call(Node, ?MODULE, node_info, []) || Node <- Running] 
+         ++ DownNodes}.
 
 node_info() ->
     CpuInfo = [{K, list_to_binary(V)} || {K, V} <- emqttd_vm:loads()],
@@ -79,7 +83,8 @@ node_info() ->
      {used_memory,  kmg(get_value(used, Memory))},
      {process_available, erlang:system_info(process_limit)},
      {process_used, erlang:system_info(process_count)},
-     {max_fds, get_value(max_fds, erlang:system_info(check_io))} | CpuInfo].
+     {max_fds, get_value(max_fds, erlang:system_info(check_io))},
+     {cluster_status, 'Running'} | CpuInfo].
 
 metrics() ->
     {ok, emqttd_metrics:all()}.
@@ -109,3 +114,10 @@ kmg(Byte) ->
 float(F, S) ->
     iolist_to_binary(io_lib:format("~.2f~s", [F, S])).
 
+netsplit(Node) ->
+    case mnesia_recover:has_mnesia_down(Node) of
+    true ->
+        [{name, Node}, {cluster_status, 'Netsplit'}];
+    false ->
+        [{name, Node}, {cluster_status, 'Stopped'}]
+    end.
