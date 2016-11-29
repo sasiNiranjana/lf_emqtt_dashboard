@@ -46,16 +46,22 @@
                             <th>CPU Info<br />(1load/5load/15load)</th>
                             <th>Memory Info<br />(used/total)</th>
                             <th>MaxFds</th>
+                            <th>ClusterStatus</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr v-for="node in nodes">
                             <td>{{ node['name'] }}</td>
                             <td>{{ node['otp_release'] }}</td>
-                            <td>{{ node['process_used'] }}</td>
+                            <td>{{ node['process_used'] }} / {{ node['process_available'] }}</td>
                             <td>{{ node['load1'] }} / {{ node['load5'] }} / {{ node['load15'] }}</td>
                             <td>{{ node['used_memory'] }} / {{ node['total_memory'] }}</td>
                             <td>{{ node['max_fds'] }}</td>
+                            <td>
+                            <span v-show="node['cluster_status'] == 'Running'" class="badge badge-success">{{ node['cluster_status']}}</span>
+                            <span v-show="node['cluster_status'] == 'Stopped'" class="badge badge-danger"> {{ node['cluster_status']}}</span>
+                            <span v-show="node['cluster_status']  == 'Unknown'"> {{ node['cluster_status']}}</span>
+                            </td>
                         </tr>
                     </tbody>
                 </table>

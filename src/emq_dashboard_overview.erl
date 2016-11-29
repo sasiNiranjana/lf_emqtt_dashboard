@@ -79,7 +79,8 @@ node_info() ->
      {used_memory,  kmg(get_value(used, Memory))},
      {process_available, erlang:system_info(process_limit)},
      {process_used, erlang:system_info(process_count)},
-     {max_fds, get_value(max_fds, erlang:system_info(check_io))} | CpuInfo].
+     {max_fds, get_value(max_fds, erlang:system_info(check_io))},
+     cluster_status(node()) | CpuInfo].
 
 metrics() ->
     {ok, emqttd_metrics:all()}.
@@ -109,3 +110,14 @@ kmg(Byte) ->
 float(F, S) ->
     iolist_to_binary(io_lib:format("~.2f~s", [F, S])).
 
+cluster_status(Node) ->
+    Running = mnesia:system_info(running_db_nodes),
+    Stopped = mnesia:system_info(db_nodes) -- Running,
+    case lists:member(Node, Running) of
+    true -> {cluster_status, 'Running'};
+    false ->
+        case  lists:member(Node, Stopped) of
+        true -> {cluster_status, 'Stopped'};
+        false -> {cluster_status, 'Unknown'}
+        end
+    end.
