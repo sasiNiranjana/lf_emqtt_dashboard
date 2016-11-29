@@ -42,7 +42,7 @@
                     <tbody>
                         <tr v-for="topic in topics">
                         <td>{{ topic.topic }}</td>
-                        <td> <a @click="topic_sub(topic.topic)">{{ topic.count }}</a></td>
+                        <td> <a href="/#/subscriptions" @click="topic_sub(topic.topic)">{{ topic.count }}</a></td>
                         </tr>
                     </tbody>
                 </table>
