@@ -1622,6 +1622,14 @@
         if (modules.overview) {
             window.clearInterval(modules.overview.timertask);
         }
+        var f = false;
+            try {
+                f = document.execCommand('ClearAuthenticationCache');
+            } catch (e) {}
+            if (f) {
+               window.location.href = '/';
+               return;
+           }
         dashboard.webapi.logout(function(ret, err) {
             window.location.href = '/';
         });
