@@ -32,15 +32,20 @@
 -export([list/3]).
 
 list(Topic, PageNo, PageSize) when ?EMPTY_KEY(Topic) ->
-    TotalNum = mnesia:table_info(?ROUTE, size),
-    Qh = qlc:q([R || R <- mnesia:table(?ROUTE)]),
-    mnesia:async_dirty(fun emq_dashboard:query_table/5,
-                       [Qh, PageNo, PageSize, TotalNum, fun row/1]);
+    TotalNum = lists:sum([ets:info(Tab, size) || Tab <- tables()]),
+    Qh = qlc:append([qlc:q([E || E <- ets:table(Tab)]) || Tab <- tables()]),
+    emq_dashboard:query_table(Qh, PageNo, PageSize, TotalNum, fun row/1);
 
 list(Topic, PageNo, PageSize) ->
-    Fun = fun() -> mnesia:dirty_read(?ROUTE, Topic) end,
+    Fun = fun() -> lists:append([ets:lookup(Tab, Topic) || Tab <- tables()]) end,
     emq_dashboard:lookup_table(Fun, PageNo, PageSize, fun row/1).
 
-row(#mqtt_route{topic = Topic, node= Node}) ->
+tables() ->
+    [mqtt_route, mqtt_local_route].
+
+row(Route) when is_record(Route, mqtt_route) ->
+    [{topic, Route#mqtt_route.topic}, {node, Route#mqtt_route.node}];
+
+row({Topic, Node}) ->
     [{topic, Topic}, {node, Node}].
 
