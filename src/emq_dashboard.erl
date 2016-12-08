@@ -65,7 +65,7 @@ parse_arg({Arg, Type}, Params) ->
     parse_arg({Arg, Type, undefined}, Params);
 parse_arg({Arg, Type, Def}, Params) ->
     case get_value(Arg, Params) of
-        undefined -> Def;
+        undefined -> def_format(Def);
         Val       -> format(Type, Val)
     end.
 
@@ -187,6 +187,20 @@ format(string, S) -> S;
 format(atom, S) -> list_to_atom(S);
 format(binary, S) -> list_to_binary(S);
 format(int, S)    -> list_to_integer(S).
+
+def_format({ets_size, TName}) -> 
+    TotalNum = ets:info(TName, size),
+    case TotalNum of
+    0 -> 1;
+    _ -> TotalNum
+    end;
+def_format({mnesia_size, TName}) -> 
+    TotalNum = mnesia:table_info(TName, size),
+    case TotalNum of
+    0 -> 1;
+    _ -> TotalNum
+    end;
+def_format(Def) -> Def. 
 
 bin(S) when is_list(S)   -> list_to_binary(S);
 bin(A) when is_atom(A)   -> bin(atom_to_list(A));

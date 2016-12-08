@@ -27,7 +27,7 @@
 
 -http_api({"clients", list, [{"client_key", binary},
                              {"curr_page",  int, 1},
-                             {"page_size",  int, 100}]}).
+                             {"page_size",  int, {ets_size, mqtt_client}}]}).
 
 list(ClientId, PageNo, PageSize) when ?EMPTY_KEY(ClientId) ->
     TotalNum = ets:info(mqtt_client, size),
