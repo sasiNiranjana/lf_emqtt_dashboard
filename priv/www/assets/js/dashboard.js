@@ -1222,12 +1222,12 @@
                         useSSL : false 
                     },
                     subInfo : {
-                        topic : '/world',
+                        topic : 'world',
                         qos : 0
                     },
                     subscriptions : [],
                     sendInfo : {
-                        topic : '/world',
+                        topic : 'world',
                         text : 'Hello world!',
                         qos : 0,
                         retained : true
