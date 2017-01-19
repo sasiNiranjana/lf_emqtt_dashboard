@@ -122,7 +122,7 @@
             </div>
             <div class="panel-body" style="overflow: auto;max-height: 300px;">
                 <div v-for="message in receiveMsgs">
-                    <cite>{{ message.time }}</cite>
+                    <cite>{{ message.arrived_at}}</cite>
                     --(Q{{message.qos}},
                     <template v-if="message.retained">R1</template><template v-else>R0</template>, 
                     <template v-if="message.duplicate">D1</template><template v-else>D0</template>, 

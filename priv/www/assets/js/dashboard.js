@@ -1295,7 +1295,7 @@
         // called when a message arrives
         _this.client.onMessageArrived = function(message) {
          // console.log("onMessageArrived: " + message.payloadString);
-            message.time = (new Date()).format("yyyy-MM-dd hh:mm:ss");
+            message.arrived_at = (new Date()).format("yyyy-MM-dd hh:mm:ss");
             try {
                 message.msgString = message.payloadString;
             } catch (e) {
