@@ -1,6 +1,6 @@
 PROJECT = emq_dashboard
 PROJECT_DESCRIPTION = Dashboard
-PROJECT_VERSION = 2.0.5
+PROJECT_VERSION = 2.0.7
 
 LOCAL_DEPS = mnesia
 
