@@ -1,5 +1,5 @@
 %%--------------------------------------------------------------------
-%% Copyright (c) 2015-2017 Feng Lee <feng@emqtt.io>.
+%% Copyright (c) 2013-2017 EMQ Enterprise, Inc. (http://emqtt.io)
 %%
 %% Licensed under the Apache License, Version 2.0 (the "License");
 %% you may not use this file except in compliance with the License.
@@ -44,13 +44,19 @@ list(ClientId, PageNo, PageSize) ->
 tables() ->
     [mqtt_local_session].
 
-row({ClientId, _Pid, _Persistent, Session}) ->
-    InfoKeys = [clean_sess, max_inflight, inflight_queue, message_queue,
-                message_dropped, awaiting_rel, awaiting_ack, awaiting_comp, created_at],
-     [{clientId, ClientId} | [{Key, format(Key, get_value(Key, Session))} || Key <- InfoKeys]].
+row({ClientId, _Pid, _Persistent, SessInfo}) ->
+    SessStats = emqttd_stats:get_session_stats(ClientId),
+    [{clientId,         ClientId},
+     {clean_sess,       get_value(clean_sess, SessInfo)},
+     {max_inflight,     get_value(max_inflight, SessStats)},
+     {inflight_len,     get_value(inflight_len, SessStats)},
+     {mqueue_len,       get_value(mqueue_len, SessStats)},
+     {mqueue_dropped,   get_value(mqueue_dropped, SessStats)},
+     {awaiting_rel_len, get_value(awaiting_rel_len, SessStats)},
+     {deliver_msg,      get_value(deliver_msg, SessStats)},
+     {enqueue_msg,      get_value(enqueue_msg, SessStats)},
+     {created_at,       strftime(get_value(created_at, SessInfo))}].
 
-format(created_at, Val) ->
-    list_to_binary(emq_dashboard:strftime(Val));
-format(_, Val) ->
-    Val.
+strftime(Ts) ->
+    iolist_to_binary(emqx_dashboard:strftime(Ts)).
 
