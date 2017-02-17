@@ -32,8 +32,6 @@ start_link() ->
 init([]) ->
     {ok, { {one_for_all, 10, 100},
            [?CHILD(emq_dashboard_admin)
-%%           ?CHILD(emq_meter_access),
-%%           ?CHILD(emq_meter_define)
            ]
          } }.
 

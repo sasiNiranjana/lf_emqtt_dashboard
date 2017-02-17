@@ -1,5 +1,5 @@
 %%--------------------------------------------------------------------
-%% Copyright (c) 2015-2017 Feng Lee <feng@emqtt.io>.
+%% Copyright (c) 2013-2017 EMQ Enterprise, Inc. (http://emqtt.io)
 %%
 %% Licensed under the Apache License, Version 2.0 (the "License");
 %% you may not use this file except in compliance with the License.
@@ -38,13 +38,14 @@ list(ClientId, PageNo, PageSize) ->
     Fun = fun() -> ets:lookup(mqtt_client, ClientId) end,
     emq_dashboard:lookup_table(Fun, PageNo, PageSize, fun row/1).
 
-row(#mqtt_client{client_id = ClientId,
-                 peername = {IpAddr, Port},
-                 username = Username,
-                 clean_sess = CleanSess,
-                 proto_ver = ProtoVer,
-                 keepalive = KeepAlvie,
+row(#mqtt_client{client_id    = ClientId,
+                 peername     = {IpAddr, Port},
+                 username     = Username,
+                 clean_sess   = CleanSess,
+                 proto_ver    = ProtoVer,
+                 keepalive    = KeepAlvie,
                  connected_at = ConnectedAt}) ->
+    Stats = emqttd_stats:get_client_stats(ClientId),
     [{clientId, ClientId},
      {username, Username},
      {ipaddress, list_to_binary(emqttd_net:ntoa(IpAddr))},
@@ -52,5 +53,7 @@ row(#mqtt_client{client_id = ClientId,
      {clean_sess, CleanSess},
      {proto_ver, ProtoVer},
      {keepalive, KeepAlvie},
+     {send_msg, proplists:get_value(send_msg, Stats)},
+     {recv_msg, proplists:get_value(recv_msg, Stats)},
      {connected_at, list_to_binary(emq_dashboard:strftime(ConnectedAt))}].
 

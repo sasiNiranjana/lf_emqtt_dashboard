@@ -39,12 +39,12 @@
 						<th>ClientId</th>
 						<th>CleanSess</th>
 						<th>MaxInflight</th>
-						<th>InflightQueue</th>
-						<th>MessageQueue</th>
-						<th>MessageDropped</th>
+						<th>Inflight</th>
+						<th>MQueueLen</th>
+						<th>MQueueDropped</th>
 						<th>AwaitingRel</th>
-						<th>AwaitingAck</th>
-						<th>AwaitingComp</th>
+						<th>DeliverMsg</th>
+						<th>EnqueueMsg</th>
 						<th>CreatedAt</th>
 					</tr>
 				</thead>
@@ -54,12 +54,12 @@
                     <td>{{ session.clientId }}</td>
                     <td>{{ session.clean_sess }}</td>
                     <td>{{ session.max_inflight }}</td>
-		    <td>{{ session.inflight_queue }}</td>
-                    <td>{{ session.message_queue }}</td>
-                    <td>{{ session.message_dropped }}</td>
-                    <td>{{ session.awaiting_rel }}</td>
-                    <td>{{ session.awaiting_ack }}</td>
-                    <td>{{ session.awaiting_comp }}</td>
+                    <td>{{ session.inflight_len }}</td>
+                    <td>{{ session.mqueue_len }}</td>
+                    <td>{{ session.mqueue_dropped }}</td>
+                    <td>{{ session.awaiting_rel_len }}</td>
+                    <td>{{ session.deliver_msg }}</td>
+                    <td>{{ session.enqueue_msg }}</td>
                     <td>{{ session.created_at }}</td>
                     </tr>
 				</tbody>

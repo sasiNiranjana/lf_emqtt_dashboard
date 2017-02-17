@@ -187,6 +187,10 @@
                                 <td>puback/sent</td>
                                 <td class="ta-right" id="packets_puback_sent">0</td>
                             </tr>
+                            <tr>
+                                <td>puback/missed</td>
+                                <td class="ta-right" id="packets_puback_missed">0</td>
+                            </tr>
                             <!-- pubcomp/sent|received -->
                             <tr>
                                 <td>pubcomp/received</td>
@@ -196,7 +200,10 @@
                                 <td>pubcomp/sent</td>
                                 <td class="ta-right" id="packets_pubcomp_sent">0</td>
                             </tr>
-
+                            <tr>
+                                <td>pubcomp/missed</td>
+                                <td class="ta-right" id="packets_pubcomp_missed">0</td>
+                            </tr>
                             <!-- pubrec/sent|received -->
                             <tr>
                                 <td>pubrec/received</td>
@@ -206,7 +213,10 @@
                                 <td>pubrec/sent</td>
                                 <td class="ta-right" id="packets_pubrec_sent">0</td>
                             </tr>
-
+                            <tr>
+                                <td>pubrec/missed</td>
+                                <td class="ta-right" id="packets_pubrec_missed">0</td>
+                            </tr>
                             <!-- pubrel/sent|received -->
                             <tr>
                                 <td>pubrel/received</td>
@@ -215,6 +225,10 @@
                             <tr>
                                 <td>pubrel/sent</td>
                                 <td class="ta-right" id="packets_pubrel_sent">0</td>
+                            </tr>
+                            <tr>
+                                <td>pubrel/missed</td>
+                                <td class="ta-right" id="packets_pubrel_missed">0</td>
                             </tr>
                             <!-- subscribe, suback -->
                             <tr>
@@ -257,6 +271,11 @@
                                 <td>dropped</td>
                                 <td class="ta-right" id="messages_dropped">0</td>
                             </tr>
+                            <!-- retained -->
+                            <tr>
+                                <td>retained</td>
+                                <td class="ta-right" id="messages_retained">0</td>
+                            </tr>
                             <!-- qos0 received/sent -->
                             <tr>
                                 <td>qos0/received</td>
@@ -284,10 +303,9 @@
                                 <td>qos2/sent</td>
                                 <td class="ta-right" id="messages_qos2_sent">0</td>
                             </tr>
-                            <!-- retained -->
                             <tr>
-                                <td>retained</td>
-                                <td class="ta-right" id="messages_retained">0</td>
+                                <td>qos2/dropped</td>
+                                <td class="ta-right" id="messages_qos2_dropped">0</td>
                             </tr>
                         </tbody>
                         </table>

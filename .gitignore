@@ -14,3 +14,5 @@ ct.coverdata
 logs/
 test/ct.cover.spec
 data/
+cover/
+eunit.coverdata
