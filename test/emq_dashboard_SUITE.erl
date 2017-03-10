@@ -31,16 +31,12 @@ groups() ->
 
 init_per_suite(Config) ->
     DataDir = proplists:get_value(data_dir, Config),
-    application:start(lager),
-    peg_com(DataDir),
     [start_apps(App, DataDir) || App <- [emqttd, emq_dashboard]],
     Config.
  
 end_per_suite(_Config) ->
     application:stop(emq_dashboard),
     application:stop(emqttd),
-    application:stop(esockd),
-    application:stop(gproc),
     emqttd_mnesia:ensure_stopped().
  
 brokers(_) ->
@@ -114,14 +110,10 @@ admins_add_delete(_) ->
     emq_dashboard_user:add(<<"username">>, <<"password">>, <<"tag">>),
     emq_dashboard_user:add(<<"username1">>, <<"password1">>, <<"tag1">>),
     {ok, Admins} = emq_dashboard_user:users(),
-    ?assertEqual([[{name, <<"username">>}, {tag, <<"tag">>}],
-                  [{name, <<"username1">>}, {tag, <<"tag1">>}],
-                  [{name, <<"admin">>}, {tag, <<"administrator">>}]],
-                Admins),
+    ?assertEqual(3, length(Admins)),
     emq_dashboard_user:remover(<<"username1">>),
-    ?assertEqual({ok, [[{name, <<"username">>}, {tag, <<"tag">>}],
-                       [{name, <<"admin">>}, {tag, <<"administrator">>}]]}, 
-                emq_dashboard_user:users()),
+    {ok, Users} = emq_dashboard_user:users(),
+    ?assertEqual(2, length(Users)),
     emq_dashboard_user:update(<<"username">>, <<"pwd">>, <<"login">>),
     timer:sleep(10),
     ?assert(connect_dashbaord_(get, "api/brokers", auth_header_("username", "pwd"))),
@@ -174,24 +166,4 @@ start_apps(App, DataDir) ->
     Vals = proplists:get_value(App, NewConfig),
     [application:set_env(App, Par, Value) || {Par, Value} <- Vals],
     application:ensure_all_started(App).
-
-peg_com(DataDir) ->
-    ParsePeg = file2(3, DataDir, "conf_parse.peg"),
-    neotoma:file(ParsePeg),
-    ParseErl = file2(3, DataDir, "conf_parse.erl"),
-    compile:file(ParseErl, []),
-
-    DurationPeg = file2(3, DataDir, "cuttlefish_duration_parse.peg"),
-    neotoma:file(DurationPeg),
-    DurationErl = file2(3, DataDir, "cuttlefish_duration_parse.erl"),
-    compile:file(DurationErl, []).
-    
-
-file2(Times, Dir, FileName) when Times < 1 ->
-    filename:join([Dir, "deps", "cuttlefish","src", FileName]);
-
-file2(Times, Dir, FileName) ->
-    Dir1 = filename:dirname(Dir),
-    file2(Times - 1, Dir1, FileName).
-
 
