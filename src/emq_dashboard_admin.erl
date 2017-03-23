@@ -131,6 +131,7 @@ init([]) ->
     % Create mqtt_admin table
     ok = emqttd_mnesia:create_table(mqtt_admin, [
                 {type, set},
+                {local_content, true}, %% local_content to avoid blocking on mnesia:wait_for_tables/2
                 {disc_copies, [node()]},
                 {record_name, mqtt_admin},
                 {attributes, record_info(fields, mqtt_admin)}]),
