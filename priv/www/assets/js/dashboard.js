@@ -1,7 +1,7 @@
 /*!
  * 
  * dashboard.js v1.0 
- * Copyright 2016, Feng Lee <feng@emqtt.io>
+ * Copyright (c) 2016-2017 EMQ Enterprise, Inc. (http://emqtt.io).
  * 
  */
 
@@ -108,11 +108,6 @@
         // metrics
         metrics : function(callback) {
             this._ajax('api/metrics', null, callback);
-        },
-
-        // m_chart
-        m_chart : function(minutes, callback) {
-            this._ajax('api/m_chart', {minutes : minutes}, callback);
         },
 
         // listeners
@@ -1259,7 +1254,7 @@
             }
             modules.overview.show();
             break;
-       case 'clients':
+        case 'clients':
             if (!modules.clients) {
                 modules.clients = new Clients();
             } else {

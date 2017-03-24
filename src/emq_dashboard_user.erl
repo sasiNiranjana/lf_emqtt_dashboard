@@ -1,5 +1,5 @@
 %%--------------------------------------------------------------------
-%% Copyright (c) 2015-2017 Feng Lee <feng@emqtt.io>.
+%% Copyright (c) 2015-2017 EMQ Enterprise, Inc. (http://emqtt.io).
 %%
 %% Licensed under the Apache License, Version 2.0 (the "License");
 %% you may not use this file except in compliance with the License.
@@ -42,13 +42,13 @@ row(#mqtt_admin{username = Username, tags = Tags}) ->
     [{name, Username}, {tag, Tags}].
 
 add(Username, Password, _Tag) when ?EMPTY(Username) orelse ?EMPTY(Password) ->
-    code({error, "Username or password undefined"});
+    {ok, code({error, "Username or password undefined"})};
  
 add(Username, Password, Tag) ->
     {ok, code(emq_dashboard_admin:add_user(Username, Password, Tag))}.
 
 update(Username, Password, _Tag) when ?EMPTY(Username) orelse ?EMPTY(Password) ->
-    code({error, "Username or password undefined"});
+    {ok, code({error, "Username or password undefined"})};
  
 update(Username, Password, Tag) ->
     {ok, code(emq_dashboard_admin:update_user(Username, Password, Tag))}.
