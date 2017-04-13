@@ -51,6 +51,8 @@ list(Key, PageNo, PageSize) ->
     end,
     emq_dashboard:lookup_table(Fun, PageNo, PageSize, fun row/1).
 
+row({{Topic, ClientId}, Option}) when is_pid(ClientId)->
+    row({{Topic, list_to_binary(pid_to_list(ClientId))},Option});
 row({{Topic, ClientId}, Option}) ->
     Qos = proplists:get_value(qos, Option),
     [{clientid, ClientId}, {topic, Topic}, {qos, Qos}].
