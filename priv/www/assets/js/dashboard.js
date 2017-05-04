@@ -846,6 +846,9 @@
                     sub : function() {
                         _this.subscribe();
                     },
+                    unsub : function() {
+                        _this.unsubscribe(); 
+                    },
                     send : function() {
                         _this.sendMessage();
                     },
@@ -895,7 +898,7 @@
         }
         // called when a message arrives
         _this.client.onMessageArrived = function(message) {
-         // console.log("onMessageArrived: " + message.payloadString);
+            // console.log("onMessageArrived: " + message.payloadString);
             message.arrived_at = (new Date()).format("yyyy-MM-dd hh:mm:ss");
             try {
                 message.msgString = message.payloadString;
@@ -914,7 +917,7 @@
                 alert("The client connect failure " + err.errorMessage);  
                // console.log("==========." + err.errorMessage);
                // console.log("==========." + JSON.stringify(err));
-               //console.log("The client connect failure.");
+               // console.log("The client connect failure.");
                 _this.vmWS.connState = false;
             }
         };
@@ -970,7 +973,28 @@
                 }
             }
         });
-           };
+     };
+    Websocket.prototype.unsubscribe = function() {
+        var _this = this;
+        if (!_this.client || !_this.client.isConnected()) {
+            alert('The client does not connect to the broker');
+            return;
+        }
+        if (!_this.vmWS.subInfo.topic) {
+            alert('Please unsubscribe to the topic.');
+            return;
+        }
+        this.client.unsubscribe(_this.vmWS.subInfo.topic, {
+            onSuccess : function(msg) {
+                console.log(JSON.stringify(msg));
+                alert('The topic unsubscribe success.');
+                _this.vmWS.subInfo = {qos : _this.vmWS.subInfo.qos};
+            },
+            onFailure : function(err) {
+                console.log(JSON.stringify(err));
+            }
+        });
+    };
     Websocket.prototype.sendMessage = function() {
         var _this = this;
         var text = _this.vmWS.sendInfo.text;
