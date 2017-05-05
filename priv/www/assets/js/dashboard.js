@@ -955,7 +955,7 @@
             return;
         }
         if (!_this.vmWS.subInfo.topic) {
-            alert('Please subscribe to the topic.');
+            alert('Please fill in the topic.');
             return;
         }
         this.client.subscribe(_this.vmWS.subInfo.topic, {
@@ -981,13 +981,12 @@
             return;
         }
         if (!_this.vmWS.subInfo.topic) {
-            alert('Please unsubscribe to the topic.');
+            alert('Please fill in the topic.');
             return;
         }
         this.client.unsubscribe(_this.vmWS.subInfo.topic, {
             onSuccess : function(msg) {
                 console.log(JSON.stringify(msg));
-                alert('The topic unsubscribe success.');
                 _this.vmWS.subInfo = {qos : _this.vmWS.subInfo.qos};
             },
             onFailure : function(err) {
