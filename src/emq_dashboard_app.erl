@@ -29,10 +29,12 @@ start(_StartType, _StartArgs) ->
     ok = emqttd_access_control:register_mod(auth, emq_auth_dashboard, [Listeners], 9999),
     lists:foreach(fun(Listener) -> start_listener(Listener) end, Listeners),
     emq_dashboard_cli:load(),
+    emq_dashboard_cli2:register_cli(),
     {ok, Sup}.
 
 stop(_State) ->
     emq_dashboard_cli:unload(),
+    emq_dashboard_cli2:unregister_cli(),
     emqttd_access_control:unregister_mod(auth, emq_auth_dashboard),
     {ok, Listeners} = application:get_env(?APP, listeners),
     lists:foreach(fun(Listener) -> stop_listener(Listener) end, Listeners).
