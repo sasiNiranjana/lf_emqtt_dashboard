@@ -22,6 +22,8 @@
 
 -export([run/1]).
 
+-import(proplists, [get_value/2]).
+
 -behaviour(clique_handler).
 
 register_cli() ->
@@ -29,6 +31,11 @@ register_cli() ->
     clique:register_node_finder(F),
     clique:register_usage(["admins"], admins_usage()),
     register_cmd().
+
+run([]) ->
+    io:format("--------------------------------------------------------------------------------~n"),
+    io:format("admins ~ts", [clique_usage:find(["admins"])]),
+    io:format("--------------------------------------------------------------------------------~n");
 
 run(Cmd) ->
     clique:run(Cmd).
@@ -53,14 +60,24 @@ admins_add() ->
                 {'tag',      [{typecast, fun(Tag) -> list_to_binary(Tag) end}]}],
     FlagSpecs = [],
     Callback =
-        fun (_, [{_, Username}, {_, Password}, {_, Tag}], _) ->
-            Text = case emq_dashboard_admin:add_user(Username, Password, Tag) of
-                ok ->
-                    io_lib:format(" ~p add successfully~n", [Username]);
-                {error, already_existed} ->
-                    io_lib:format("Error:  ~p already existed~n", [Username]);
-                {error, Reason} ->
-                    io_lib:format("Error: ~p~n", [Reason])
+        fun (_, Params, _) ->
+            Username = get_value('username', Params),
+            Password = get_value('password', Params),
+            Tag = get_value('tag', Params),
+            Text = case {Username, Password, Tag} of
+                {undefined, _, _} ->
+                           admins_usage();
+                {_, undefined, _} ->
+                           admins_usage();
+                {_, _, _} ->
+                    case emq_dashboard_admin:add_user(Username, Password, Tag) of
+                    ok ->
+                        io_lib:format(" ~p add successfully~n", [Username]);
+                    {error, already_existed} ->
+                        io_lib:format("Error:  ~p already existed~n", [Username]);
+                    {error, Reason} ->
+                        io_lib:format("Error: ~p~n", [Reason])
+                   end
                    end,
             [clique_status:text(Text)]
         end,
@@ -73,12 +90,21 @@ admins_passwd() ->
                 {'password', [{typecast, fun(Password) -> list_to_binary(Password) end}]}],
     FlagSpecs = [],
     Callback =
-        fun (_, [{_, Username}, {_, Password}], _) ->
-            Text = case emq_dashboard_admin:change_password(Username, Password) of
-                ok ->
-                    io_lib:format(" ~p password update is successfully~n", [Username]);
-                {error, Reason} ->
-                    io_lib:format("Error: ~p~n", [Reason])
+        fun (_, Params, _) ->
+            Username = get_value('username', Params),
+            Password = get_value('password', Params),
+            Text = case {Username, Password} of
+                    {undefined, _} ->
+                        admins_usage();
+                    {_, undefined} ->
+                        admins_usage();
+                    {_, _} ->
+                        case emq_dashboard_admin:change_password(Username, Password) of
+                        ok ->
+                            io_lib:format(" ~p password update is successfully~n", [Username]);
+                        {error, Reason} ->
+                            io_lib:format("Error: ~p~n", [Reason])
+                        end
                    end,
             [clique_status:text(Text)]
         end,
@@ -89,18 +115,24 @@ admins_del() ->
     KeySpecs = [{'username', [{typecast, fun(Username) -> list_to_binary(Username) end}]}],
     FlagSpecs = [],
     Callback =
-        fun (_, [{_, Username}], _) ->
-            Text = case emq_dashboard_admin:remove_user(Username) of
-                ok ->
-                    io_lib:format(" ~p deleted successfully~n", [Username]);
-                {error, Reason} ->
-                    io_lib:format("Error: ~p~n", [Reason])
-                   end,
+        fun (_, Params, _) ->
+            Username = get_value('username', Params),
+            Text = case {Username} of
+                    {undefined} ->
+                        admins_usage();
+                    {_} ->
+                        case emq_dashboard_admin:remove_user(Username) of
+                        ok ->
+                            io_lib:format(" ~p deleted successfully~n", [Username]);
+                        {error, Reason} ->
+                            io_lib:format("Error: ~p~n", [Reason])
+                        end
+                    end,
             [clique_status:text(Text)]
         end,
     clique:register_command(Cmd, KeySpecs, FlagSpecs, Callback).
 
 admins_usage() ->
-    ["\nadmins add <Username> <Password> <Tags>     Add dashboard user\n",
-     "  admins passwd <Username> <Password>         Reset dashboard user password\n",
-     "  admins del <Username>                       Delete dashboard user\n"].
+    ["\n  admins add username=<Username> password=<Password> tag=<Tags>   Add dashboard user\n",
+     "  admins passwd username=<Username> password=<Password>           Reset dashboard user password\n",
+     "  admins del username=<Username>                                  Delete dashboard user\n"].
