@@ -259,7 +259,7 @@
                 }
             });
             _this.vmLiss = new Vue({
-                el  : $('#voerview_listeners', _this.$html)[0],
+                el  : $('#overview_listeners', _this.$html)[0],
                 data: {
                     listeners: []
                 }
