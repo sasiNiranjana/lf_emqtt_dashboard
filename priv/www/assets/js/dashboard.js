@@ -836,6 +836,11 @@
                     sendMsgs : [],
                     receiveMsgs : []
                 },
+                filters: {
+                    reverse: function( arr ) {
+                        return arr.reverse();
+                    }
+                },
                 methods : {
                     connect : function() {
                         _this.connect();
