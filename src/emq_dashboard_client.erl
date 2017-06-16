@@ -45,7 +45,7 @@ findKeys(Table,Key,List) -> findKeys(Table,ets:next(Table,Key),[Key|List]).
 
 filterParameterSize(Parameter,Key) -> string:len(string:to_lower(binary_to_list(Parameter))) =< string:len(string:to_lower(binary_to_list(Key))).
 
-filterParameterLetters(Parameter,Key) -> string:to_lower(binary_to_list(Parameter)) =:= string:substr(string:to_lower(binary_to_list(Key)),1,string:len(Parameter)).
+filterParameterLetters(Parameter,Key) -> string:to_lower(binary_to_list(Parameter)) =:= string:substr(string:to_lower(binary_to_list(Key)),1,string:len(string:to_lower(binary_to_list(Parameter)))).
 
 row(#mqtt_client{client_id    = ClientId,
                  peername     = {IpAddr, Port},
