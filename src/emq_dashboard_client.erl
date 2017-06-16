@@ -36,7 +36,7 @@ list(ClientId, PageNo, PageSize) when ?EMPTY_KEY(ClientId) ->
 
 list(ClientId, PageNo, PageSize) ->
     AllClients=findKeys(mqtt_client,ets:first(mqtt_client),[]),
-    FilterdClients=[X||X<-AllClients,filterParameterSize(ClientId,X),filterParameterLetters(ClientId,X)].
+    FilterdClients=[X||X<-AllClients,filterParameterSize(ClientId,X),filterParameterLetters(ClientId,X)],
     Fun = fun() -> [Z||[Z]<-[ets:lookup(mqtt_client, Y)||Y<-FilterdClients]] end,
     emq_dashboard:lookup_table(Fun, PageNo, PageSize, fun row/1).
 
