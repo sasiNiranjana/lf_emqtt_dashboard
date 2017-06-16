@@ -36,16 +36,16 @@ list(ClientId, PageNo, PageSize) when ?EMPTY_KEY(ClientId) ->
 
 list(ClientId, PageNo, PageSize) ->
     AllClients=findKeys(mqtt_client,ets:first(mqtt_client),[]),
-    FilterdClients=[X||X<-List,filterParameterSize(ClientId,X),filterParameterLetters(ClientId,X)].
+    FilterdClients=[X||X<-AllClients,filterParameterSize(ClientId,X),filterParameterLetters(ClientId,X)].
     Fun = fun() -> [Z||[Z]<-[ets:lookup(mqtt_client, Y)||Y<-FilterdClients]] end,
     emq_dashboard:lookup_table(Fun, PageNo, PageSize, fun row/1).
 
 findKeys(Table,Key,List) when Key=:='$end_of_table' -> List;
 findKeys(Table,Key,List) -> findKeys(Table,ets:next(Table,Key),[Key|List]).
 
-filterParameterSize(Parameter,Key) -> string:len(Parameter)=<string:len(string:to_lower(binary_to_list(Key))).
+filterParameterSize(Parameter,Key) -> string:len(string:to_lower(binary_to_list(Parameter))=<string:len(string:to_lower(binary_to_list(Key))).
 
-filterParameterLetters(Parameter,Key) -> string:to_lower(Parameter)=:=string:substr(string:to_lower(binary_to_list(Key)),1,string:len(Parameter)).
+filterParameterLetters(Parameter,Key) -> string:to_lower(string:to_lower(binary_to_list(Parameter))=:=string:substr(string:to_lower(binary_to_list(Key)),1,string:len(Parameter)).
 
 row(#mqtt_client{client_id    = ClientId,
                  peername     = {IpAddr, Port},
